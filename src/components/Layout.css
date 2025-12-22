@@ -1,0 +1,23 @@
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    background: var(--bg-dark);
+}
+
+.main-content {
+    flex: 1;
+    margin-left: calc(var(--sidebar-width) + 40px);
+    /* 20px gap + sidebar width */
+    padding: 20px 40px 20px 0;
+    /* Right padding */
+    transition: margin-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+}
+
+/* Optional: If we want the content to shift when sidebar expands (usually not for floating sidebar) */
+/* 
+.sidebar:hover ~ .main-content {
+  margin-left: calc(var(--sidebar-width-expanded) + 40px);
+} 
+*/

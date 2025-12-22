@@ -1,0 +1,128 @@
+.dsa-topic-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: background 0.2s;
+}
+
+.dsa-topic-card:hover {
+    background: var(--bg-card-hover);
+}
+
+.topic-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.topic-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.topic-stats {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.topic-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 150px;
+    justify-content: flex-end;
+}
+
+.progress-bar-sm {
+    width: 100px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: 3px;
+}
+
+.topic-content {
+    border-top: var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.problem-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+}
+
+.problem-row:last-child {
+    border-bottom: none;
+}
+
+.problem-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.problem-status {
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.status-icon.solved {
+    color: #10b981;
+    /* Emerald 500 */
+}
+
+.status-icon.pending {
+    color: var(--text-secondary);
+}
+
+.problem-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.problem-title {
+    font-size: 0.95rem;
+}
+
+.difficulty-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.difficulty-badge.easy {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.difficulty-badge.medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.difficulty-badge.hard {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.solve-link {
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.solve-link:hover {
+    color: var(--accent-primary);
+}
