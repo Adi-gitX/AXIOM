@@ -15,7 +15,10 @@ import {
     CheckCircle2,
     Sparkles,
     MousePointer2,
-    MessageCircle
+    MessageCircle,
+    Github,
+    Linkedin,
+    Twitter
 } from 'lucide-react';
 
 // Assets
@@ -163,8 +166,19 @@ const LandingPage = () => {
                                 transition={{ delay: 0.1 }}
                                 className="hidden md:flex gap-1 text-sm font-medium text-gray-600 bg-white/50 backdrop-blur-xl py-2 px-3 rounded-full border border-white/20 shadow-sm"
                             >
-                                {['Product', 'Solutions', 'Enterprise', 'Pricing'].map(item => (
-                                    <a key={item} href="#" className="px-5 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 font-display tracking-wide uppercase text-xs">{item}</a>
+                                {[
+                                    { label: 'Product', action: () => { } },
+                                    { label: 'Documentation', action: () => navigate('/docs') },
+                                    { label: 'Enterprise', action: () => { } },
+                                    { label: 'Pricing', action: () => navigate('/pricing') }
+                                ].map(item => (
+                                    <button
+                                        key={item.label}
+                                        onClick={item.action}
+                                        className="px-5 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 font-display tracking-wide uppercase text-xs focus:outline-none"
+                                    >
+                                        {item.label}
+                                    </button>
                                 ))}
                             </motion.nav>
                             <motion.button
@@ -469,48 +483,57 @@ const LandingPage = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
                     <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-12 h-full flex flex-col justify-between pt-32">
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-                            {/* Columns match reference: Product, Industries, Customers, Company, Resources */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                            {/* Platform */}
                             <div className="flex flex-col gap-6">
-                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Product</h4>
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Platform</h4>
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Policy engine</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Onboard</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Decide</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Lifecycle</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Data platform</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Education Hub</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">DSA Tracker</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Interview Prep</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Developer Connect</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Career Credentials</a></li>
                                 </ul>
                             </div>
-                            <div className="flex flex-col gap-6">
-                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Industries</h4>
-                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Financial technology</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Banking</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Platforms</a></li>
-                                </ul>
-                            </div>
-                            <div className="flex flex-col gap-6">
-                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Customers</h4>
-                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Compliance</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Revenue</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Technology</a></li>
-                                </ul>
-                            </div>
-                            <div className="flex flex-col gap-6">
-                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Company</h4>
-                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">About</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">News</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Careers</a></li>
-                                </ul>
-                            </div>
+
+                            {/* Resources */}
                             <div className="flex flex-col gap-6">
                                 <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Resources</h4>
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Trust</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Status</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">System Design Guide</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Engineering Blog</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Success Stories</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Community Guidelines</a></li>
                                 </ul>
+                            </div>
+
+                            {/* Community */}
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Community</h4>
+                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Discord Server</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Events & Hackathons</a></li>
+                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Mentorship Program</a></li>
+                                </ul>
+                            </div>
+
+                            {/* Connect (Socials) */}
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Connect</h4>
+                                <div className="flex gap-4">
+                                    <a href="https://github.com/Adi-gitX" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300">
+                                        <Github className="w-5 h-5" />
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/kammatiaditya/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#0077b5] hover:text-white transition-all duration-300">
+                                        <Linkedin className="w-5 h-5" />
+                                    </a>
+                                    <a href="https://x.com/AdiGitX" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">
+                                        <Twitter className="w-5 h-5" />
+                                    </a>
+                                </div>
+                                <p className="text-white/60 text-sm max-w-xs leading-relaxed">
+                                    Follow the journey as we redefine engineering education.
+                                </p>
                             </div>
                         </div>
 

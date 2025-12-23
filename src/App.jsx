@@ -9,6 +9,8 @@ import DSATracker from './pages/DSATracker';
 import InterviewPrep from './pages/InterviewPrep';
 import DeveloperConnect from './pages/DeveloperConnect';
 import Jobs from './pages/Jobs';
+import Docs from './pages/Docs';
+import Pricing from './pages/Pricing';
 
 function App() {
     return (
@@ -16,6 +18,8 @@ function App() {
             <Routes>
                 {/* Public Route */}
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/docs" element={<Docs />} />
+                <Route path="/pricing" element={<Pricing />} />
 
                 {/* App Routes (Protected-ish) */}
                 <Route path="/app" element={<Layout />}>
@@ -25,7 +29,7 @@ function App() {
                     <Route path="interview" element={<InterviewPrep />} />
                     <Route path="connect" element={<DeveloperConnect />} />
                     <Route path="jobs" element={<Jobs />} />
-                    
+
                     {/* Redirect unknown app routes to dashboard */}
                     <Route path="*" element={<Navigate to="/app" replace />} />
                 </Route>
