@@ -33,6 +33,7 @@ export default {
                 'fade-in': 'fadeIn 0.5s ease-out',
                 'slide-in': 'slideIn 0.5s ease-out',
                 'blob': 'blob 7s infinite',
+                'shimmer': 'shimmer 2s infinite',
             },
             keyframes: {
                 fadeIn: {
@@ -48,6 +49,10 @@ export default {
                     '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
                     '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                     '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                },
+                shimmer: {
+                    '0%': { transform: 'translateX(-100%)' },
+                    '100%': { transform: 'translateX(100%)' },
                 }
             },
         },
