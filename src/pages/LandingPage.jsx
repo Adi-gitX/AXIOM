@@ -153,7 +153,7 @@ const LandingPage = () => {
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="text-2xl font-bold tracking-tighter text-gray-900"
+                                className="text-3xl font-bold tracking-tight text-gray-900 font-display"
                             >
                                 AXIOM
                             </motion.div>
@@ -161,17 +161,17 @@ const LandingPage = () => {
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className="hidden md:flex gap-1 text-sm font-medium text-gray-600 bg-white/50 backdrop-blur-xl py-1.5 px-2 rounded-full border border-white/20 shadow-sm"
+                                className="hidden md:flex gap-1 text-sm font-medium text-gray-600 bg-white/50 backdrop-blur-xl py-2 px-3 rounded-full border border-white/20 shadow-sm"
                             >
                                 {['Product', 'Solutions', 'Enterprise', 'Pricing'].map(item => (
-                                    <a key={item} href="#" className="px-5 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300">{item}</a>
+                                    <a key={item} href="#" className="px-5 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 font-display tracking-wide uppercase text-xs">{item}</a>
                                 ))}
                             </motion.nav>
                             <motion.button
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 onClick={() => navigate('/app')}
-                                className="px-6 py-2.5 text-sm font-semibold bg-gray-900 text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-gray-900/20"
+                                className="px-6 py-2.5 text-sm font-semibold bg-gray-900 text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-gray-900/20 font-display tracking-wide"
                             >
                                 Log in
                             </motion.button>
@@ -179,18 +179,18 @@ const LandingPage = () => {
 
                         {/* Hero Text */}
                         <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4">
-                            <div className="text-center max-w-6xl mx-auto space-y-8">
+                            <div className="text-center max-w-7xl mx-auto space-y-10">
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.6 }}
-                                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-white/40 backdrop-blur-md shadow-sm text-xs font-bold uppercase tracking-widest text-gray-500 mb-6"
+                                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-white/40 backdrop-blur-md shadow-sm text-xs font-bold uppercase tracking-widest text-gray-500 mb-6 font-display"
                                 >
                                     <Sparkles className="w-3 h-3 text-amber-500" />
                                     <span>Public Beta 1.0</span>
                                 </motion.div>
 
-                                <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-[0.95] text-gray-900 mx-auto">
+                                <h1 className="text-6xl sm:text-8xl md:text-9xl font-bold tracking-tighter leading-[0.9] text-gray-900 mx-auto font-display">
                                     <motion.span
                                         initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
                                         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -213,7 +213,7 @@ const LandingPage = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8, delay: 0.4 }}
-                                    className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed text-balance tracking-wide"
+                                    className="text-lg md:text-2xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed text-balance tracking-wide"
                                 >
                                     Master DSA, System Design, and Engineering with a platform built for the perfectionist.
                                 </motion.p>
@@ -222,11 +222,11 @@ const LandingPage = () => {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.5, delay: 0.6 }}
-                                    className="pt-8"
+                                    className="pt-10"
                                 >
                                     <button
                                         onClick={() => navigate('/app')}
-                                        className="group relative px-8 py-4 bg-gray-900 text-white rounded-full font-bold text-base md:text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-gray-900/30"
+                                        className="group relative px-10 py-5 bg-gray-900 text-white rounded-full font-bold text-lg md:text-xl overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-gray-900/30 font-display tracking-tight"
                                     >
                                         <span className="relative z-10 flex items-center gap-3">
                                             Start your journey <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -241,13 +241,13 @@ const LandingPage = () => {
 
                     {/* LOGO MARQUEE (Seamless) */}
                     <div className="relative py-24 bg-stone-50 border-t border-transparent">
-                        <p className="text-center text-xs font-bold tracking-[0.2em] text-gray-400 uppercase mb-12">Trusted by engineering teams at</p>
+                        <p className="text-center text-xs font-bold tracking-[0.2em] text-gray-400 uppercase mb-12 font-display">Trusted by engineering teams at</p>
                         <div className="relative flex overflow-x-hidden group">
                             <div className="animate-marquee whitespace-nowrap flex gap-32">
                                 {[...Array(2)].map((_, i) => (
                                     <div key={i} className="flex gap-32 items-center opacity-30 grayscale transition-all duration-700 group-hover:opacity-100 group-hover:grayscale-0">
                                         {['Google', 'Meta', 'Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb'].map(brand => (
-                                            <span key={`${i}-${brand}`} className="text-4xl font-bold font-display text-gray-900 cursor-default">{brand}</span>
+                                            <span key={`${i}-${brand}`} className="text-5xl font-bold font-display text-gray-900 cursor-default tracking-tighter">{brand}</span>
                                         ))}
                                     </div>
                                 ))}
@@ -258,18 +258,18 @@ const LandingPage = () => {
                     </div>
 
                     {/* BENTO GRID (Active & Tilted) */}
-                    <div className="bg-white py-32 px-6 relative">
+                    <div className="bg-white py-40 px-6 relative">
                         <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-stone-50 to-transparent pointer-events-none" />
 
                         <div className="max-w-7xl mx-auto relative z-10">
                             <div className="mb-24 text-center md:text-left">
                                 <ScrollRevealText>
-                                    <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 text-gray-900 leading-[0.95]">
+                                    <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-8 text-gray-900 leading-[0.9] font-display">
                                         Designed for <br /> world-class engineers.
                                     </h2>
                                 </ScrollRevealText>
                                 <ScrollRevealText>
-                                    <p className="text-xl md:text-2xl text-gray-500 max-w-2xl font-light leading-relaxed">
+                                    <p className="text-xl md:text-3xl text-gray-500 max-w-3xl font-light leading-relaxed">
                                         Everything you need to go from junior developer to principal engineer, all in one seamless ecosystem.
                                     </p>
                                 </ScrollRevealText>
@@ -277,14 +277,14 @@ const LandingPage = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[350px] md:auto-rows-[450px]">
                                 {/* Card 1: Education Hub */}
-                                <TiltCard className="md:col-span-2 p-10 bg-stone-50">
+                                <TiltCard className="md:col-span-2 p-12 bg-stone-50">
                                     <div className="relative z-10 h-full flex flex-col justify-between">
-                                        <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6">
-                                            <Globe className="w-7 h-7 text-blue-600" />
+                                        <div className="w-16 h-16 rounded-3xl bg-white shadow-sm flex items-center justify-center mb-6">
+                                            <Globe className="w-8 h-8 text-blue-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-3xl font-bold mb-3 text-gray-900 tracking-tight">Education Hub</h3>
-                                            <p className="text-gray-500 text-lg max-w-sm">Comprehensive video courses and interactive system design modules.</p>
+                                            <h3 className="text-4xl font-bold mb-4 text-gray-900 tracking-tighter font-display">Education Hub</h3>
+                                            <p className="text-gray-500 text-xl max-w-md leading-relaxed">Comprehensive video courses and interactive system design modules.</p>
                                         </div>
                                     </div>
                                     <div className="absolute right-0 bottom-0 w-3/5 h-4/5 bg-white rounded-tl-[3rem] p-8 shadow-2xl translate-y-12 translate-x-12 group-hover:translate-y-6 group-hover:translate-x-6 transition-transform duration-700">
@@ -302,14 +302,14 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 2: DSA Tracker */}
-                                <TiltCard delay={0.1} className="p-10 bg-white">
+                                <TiltCard delay={0.1} className="p-12 bg-white">
                                     <div className="h-full flex flex-col justify-between relative z-10">
-                                        <div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center">
-                                            <Cpu className="w-7 h-7 text-purple-600" />
+                                        <div className="w-16 h-16 rounded-3xl bg-purple-50 flex items-center justify-center">
+                                            <Cpu className="w-8 h-8 text-purple-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-2xl font-bold mb-2 text-gray-900 tracking-tight">DSA Tracker</h3>
-                                            <p className="text-gray-500 text-base">Master 450+ patterns.</p>
+                                            <h3 className="text-3xl font-bold mb-2 text-gray-900 tracking-tighter font-display">DSA Tracker</h3>
+                                            <p className="text-gray-500 text-lg">Master 450+ patterns.</p>
                                         </div>
                                     </div>
                                     {/* Animated Graph Bars */}
@@ -327,27 +327,27 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 3: Interview Prep */}
-                                <TiltCard delay={0.2} className="p-10 bg-white">
+                                <TiltCard delay={0.2} className="p-12 bg-white">
                                     <div className="h-full flex flex-col justify-between relative z-10">
-                                        <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center">
-                                            <ShieldCheck className="w-7 h-7 text-green-600" />
+                                        <div className="w-16 h-16 rounded-3xl bg-green-50 flex items-center justify-center">
+                                            <ShieldCheck className="w-8 h-8 text-green-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-2xl font-bold mb-2 text-gray-900 tracking-tight">Interview Prep</h3>
-                                            <p className="text-gray-500 text-base">Mock interviews with AI.</p>
+                                            <h3 className="text-3xl font-bold mb-2 text-gray-900 tracking-tighter font-display">Interview Prep</h3>
+                                            <p className="text-gray-500 text-lg">Mock interviews with AI.</p>
                                         </div>
                                     </div>
                                 </TiltCard>
 
                                 {/* Card 4: Dev Connect */}
-                                <TiltCard delay={0.3} className="md:col-span-2 p-10 bg-stone-50">
+                                <TiltCard delay={0.3} className="md:col-span-2 p-12 bg-stone-50">
                                     <div className="flex flex-col md:flex-row h-full items-start md:items-center justify-between gap-12 relative z-10">
                                         <div className="max-w-md">
-                                            <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-8">
-                                                <Users className="w-7 h-7 text-orange-600" />
+                                            <div className="w-16 h-16 rounded-3xl bg-orange-50 flex items-center justify-center mb-8">
+                                                <Users className="w-8 h-8 text-orange-600" />
                                             </div>
-                                            <h3 className="text-3xl font-bold mb-3 text-gray-900 tracking-tight">Developer Connect</h3>
-                                            <p className="text-gray-500 text-lg text-balance">Join a private community of elite engineers. Share knowledge, find mentors.</p>
+                                            <h3 className="text-4xl font-bold mb-4 text-gray-900 tracking-tighter font-display">Developer Connect</h3>
+                                            <p className="text-gray-500 text-xl text-balance leading-relaxed">Join a private community of elite engineers. Share knowledge, find mentors.</p>
                                         </div>
 
                                         {/* Chat Animation */}
@@ -356,17 +356,17 @@ const LandingPage = () => {
                                                 initial={{ opacity: 0, x: 20 }}
                                                 whileInView={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: 0.2 }}
-                                                className="bg-white p-4 rounded-2xl rounded-tr-none shadow-md border border-gray-100 self-end max-w-[90%]"
+                                                className="bg-white p-5 rounded-2xl rounded-tr-none shadow-md border border-gray-100 self-end max-w-[90%]"
                                             >
-                                                <p className="text-xs text-gray-600">How do I optimize this graph query?</p>
+                                                <p className="text-sm text-gray-600">How do I optimize this graph query?</p>
                                             </motion.div>
                                             <motion.div
                                                 initial={{ opacity: 0, x: -20 }}
                                                 whileInView={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: 0.6 }}
-                                                className="bg-blue-600 p-4 rounded-2xl rounded-tl-none shadow-md shadow-blue-200 self-start max-w-[90%]"
+                                                className="bg-blue-600 p-5 rounded-2xl rounded-tl-none shadow-md shadow-blue-200 self-start max-w-[90%]"
                                             >
-                                                <p className="text-xs text-white">Use a bidirectional BFS.</p>
+                                                <p className="text-sm text-white">Use a bidirectional BFS.</p>
                                             </motion.div>
                                         </div>
                                     </div>
@@ -376,19 +376,19 @@ const LandingPage = () => {
                     </div>
 
                     {/* DEEP DIVE TERMINAL */}
-                    <div className="bg-white py-32 px-6">
+                    <div className="bg-white py-40 px-6">
                         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
                             <ScrollRevealText>
-                                <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 text-gray-900 leading-[0.95]">
+                                <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-10 text-gray-900 leading-[0.9] font-display">
                                     Build your future,<br /><span className="text-gray-300">line by line.</span>
                                 </h2>
-                                <p className="text-lg text-gray-500 mb-10 leading-relaxed font-light max-w-lg">
+                                <p className="text-xl text-gray-500 mb-12 leading-relaxed font-light max-w-lg">
                                     AXIOM provides the tools, runtime, and environment you need to prove your skills to the world's best companies.
                                 </p>
-                                <div className="space-y-4">
+                                <div className="space-y-5">
                                     {['Real-time Execution', 'Verified Credentials', 'Global Leaderboards'].map((item, i) => (
-                                        <div key={i} className="flex items-center gap-4 text-base font-medium text-gray-900">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                                        <div key={i} className="flex items-center gap-4 text-lg font-medium text-gray-900">
+                                            <div className="w-2 h-2 rounded-full bg-blue-600" />
                                             {item}
                                         </div>
                                     ))}
@@ -404,15 +404,15 @@ const LandingPage = () => {
                                             <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                                             <div className="w-3 h-3 rounded-full bg-green-500/50" />
                                         </div>
-                                        <div className="ml-auto text-xs text-white/20">axiom-cli — 120x80</div>
+                                        <div className="ml-auto text-xs text-white/20 font-display tracking-widest">axiom-cli — 120x80</div>
                                     </div>
-                                    <div className="p-8 text-blue-400 space-y-2">
+                                    <div className="p-8 text-blue-400 space-y-3 font-mono text-base">
                                         <div className="flex gap-2">
                                             <span className="text-pink-500">➜</span>
                                             <span className="text-cyan-400">~</span>
                                             <span className="text-white">axiom init career-v2</span>
                                         </div>
-                                        <div className="pt-4 text-white/50 space-y-1">
+                                        <div className="pt-4 text-white/50 space-y-2">
                                             <p>Initializing workspace...</p>
                                             <p>Loading dependencies:</p>
                                             <div className="pl-4 text-green-400">
@@ -439,19 +439,19 @@ const LandingPage = () => {
 
                     {/* PRE-FOOTER CTA */}
                     <div className="relative py-60 flex flex-col items-center justify-center text-center px-6 overflow-hidden bg-white">
-                        <div className="max-w-4xl z-10">
+                        <div className="max-w-5xl z-10">
                             <ScrollRevealText>
-                                <h2 className="text-7xl md:text-9xl font-bold tracking-tighter mb-12 text-gray-900">Ready to ascend?</h2>
+                                <h2 className="text-8xl md:text-[10rem] font-bold tracking-tighter mb-16 text-gray-900 leading-[0.8] font-display">Ready to ascend?</h2>
                             </ScrollRevealText>
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => navigate('/app')}
-                                className="px-16 py-8 bg-black text-white text-2xl font-bold rounded-full shadow-2xl hover:shadow-black/50 transition-all"
+                                className="px-16 py-8 bg-black text-white text-2xl font-bold rounded-full shadow-2xl hover:shadow-black/50 transition-all font-display tracking-wide"
                             >
                                 Start your journey
                             </motion.button>
-                            <p className="mt-8 text-gray-400 text-sm font-medium tracking-widest uppercase">No credit card required</p>
+                            <p className="mt-10 text-gray-400 text-sm font-bold tracking-[0.2em] uppercase font-display">No credit card required</p>
                         </div>
                     </div>
 
@@ -471,9 +471,9 @@ const LandingPage = () => {
                     <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-12 h-full flex flex-col justify-between pt-32">
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                             {/* Columns match reference: Product, Industries, Customers, Company, Resources */}
-                            <div className="flex flex-col gap-4">
-                                <h4 className="font-bold text-lg text-white mb-2">Product</h4>
-                                <ul className="space-y-3 text-white text-sm font-medium drop-shadow-md">
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Product</h4>
+                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Policy engine</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Onboard</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Decide</a></li>
@@ -481,41 +481,41 @@ const LandingPage = () => {
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Data platform</a></li>
                                 </ul>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <h4 className="font-bold text-lg text-white mb-2">Industries</h4>
-                                <ul className="space-y-3 text-white text-sm font-medium drop-shadow-md">
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Industries</h4>
+                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Financial technology</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Banking</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Platforms</a></li>
                                 </ul>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <h4 className="font-bold text-lg text-white mb-2">Customers</h4>
-                                <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Customers</h4>
+                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Compliance</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Revenue</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Technology</a></li>
                                 </ul>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <h4 className="font-bold text-lg text-white mb-2">Company</h4>
-                                <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Company</h4>
+                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">About</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">News</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Careers</a></li>
                                 </ul>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <h4 className="font-bold text-lg text-white mb-2">Resources</h4>
-                                <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                            <div className="flex flex-col gap-6">
+                                <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Resources</h4>
+                                <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Trust</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Status</a></li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-end text-white/80 text-xs font-medium tracking-wide drop-shadow-md pb-8">
-                            <div>&copy; AXIOM 2025</div>
+                        <div className="flex justify-between items-end text-white/60 text-xs font-medium tracking-wide drop-shadow-md pb-8">
+                            <div className="font-display tracking-widest">&copy; AXIOM 2025</div>
                             <div className="flex gap-6">
                                 <a href="#" className="hover:text-white hover:underline transition-all">Privacy Policy</a>
                                 <a href="#" className="hover:text-white hover:underline transition-all">Security</a>
