@@ -456,46 +456,69 @@ const LandingPage = () => {
             </div>
             {/* END MAIN CONTENT WRAPPER */}
 
+
+
             {/* FIXED FOOTER (Revealed by Parallax) */}
             <div className="fixed bottom-0 left-0 right-0 h-[80vh] z-0 flex flex-col justify-end bg-gray-900 text-white overflow-hidden">
                 <div
-                    className="absolute inset-0 bg-cover bg-top opacity-50 mix-blend-overlay"
+                    className="absolute inset-0 bg-cover bg-bottom opacity-100"
                     style={{ backgroundImage: `url(${footerBg})` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
 
-                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-20">
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-12 mb-32">
-                        <div className="flex flex-col gap-6">
-                            <h4 className="font-bold text-2xl font-display text-white">Product</h4>
-                            <ul className="space-y-4 text-gray-400">
-                                <li><a href="#" className="hover:text-white transition-colors">Curriculum</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Challenges</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
+                {/* No heavy gradient overlay to keep image vivid, just subtle text protection if needed */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+
+                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-12 h-full flex flex-col justify-between pt-32">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+                        {/* Columns match reference: Product, Industries, Customers, Company, Resources */}
+                        <div className="flex flex-col gap-4">
+                            <h4 className="font-bold text-lg text-white mb-2">Product</h4>
+                            <ul className="space-y-3 text-white/90 text-sm font-medium shadow-black/10 drop-shadow-md">
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Policy engine</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Onboard</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Decide</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Lifecycle</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Data platform</a></li>
                             </ul>
                         </div>
-                        <div className="flex flex-col gap-6">
-                            <h4 className="font-bold text-2xl font-display text-white">Company</h4>
-                            <ul className="space-y-4 text-gray-400">
-                                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                        <div className="flex flex-col gap-4">
+                            <h4 className="font-bold text-lg text-white mb-2">Industries</h4>
+                            <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Financial technology</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Banking</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Platforms</a></li>
                             </ul>
                         </div>
-                        <div className="md:col-span-3 flex flex-col items-start md:items-end">
-                            <h4 className="text-9xl font-bold tracking-tighter text-white/10 mb-8 pointer-events-none">AXIOM</h4>
-                            <div className="flex gap-4">
-                                <input type="email" placeholder="Enter your email" className="bg-white/10 border border-white/20 rounded-full px-6 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 w-64" />
-                                <button className="bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-gray-200 transition-colors">Subscribe</button>
-                            </div>
+                        <div className="flex flex-col gap-4">
+                            <h4 className="font-bold text-lg text-white mb-2">Customers</h4>
+                            <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Compliance</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Revenue</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Technology</a></li>
+                            </ul>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h4 className="font-bold text-lg text-white mb-2">Company</h4>
+                            <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">About</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">News</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Careers</a></li>
+                            </ul>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h4 className="font-bold text-lg text-white mb-2">Resources</h4>
+                            <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Trust</a></li>
+                                <li><a href="#" className="hover:text-white hover:underline transition-all">Status</a></li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-8 border-t border-white/10 text-gray-500 text-sm">
-                        <div>&copy; 2025 AXIOM Inc.</div>
-                        <div className="flex gap-8">
-                            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                            <a href="#" className="hover:text-white transition-colors">Terms</a>
+                    <div className="flex justify-between items-end text-white/80 text-xs font-medium tracking-wide drop-shadow-md pb-8">
+                        <div>&copy; AXIOM 2025</div>
+                        <div className="flex gap-6">
+                            <a href="#" className="hover:text-white hover:underline transition-all">Privacy Policy</a>
+                            <a href="#" className="hover:text-white hover:underline transition-all">Security</a>
                         </div>
                     </div>
                 </div>
