@@ -21,13 +21,13 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  /* display: flex; - Removed to fix page flow */
+  /* place-items: center; - Removed to fix page flow */
+  /* min-width: 320px; */
   min-height: 100vh;
   background-color: theme('colors.background');
   overflow-x: hidden;
-  background-image: 
+  background-image:
     radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
@@ -85,20 +85,16 @@ body {
 /* Premium Landing Page Enhancements */
 @layer utilities {
   .landing-gradient-overlay {
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.1) 0%,
-      transparent 30%,
-      transparent 70%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0.1) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(0, 0, 0, 0.2) 100%);
   }
 }
 
 /* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
+/* html { scroll-behavior: smooth; } - Removed to avoid conflict with Lenis */
 
 /* Font smoothing for better typography */
 body {
