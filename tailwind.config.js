@@ -34,6 +34,7 @@ export default {
                 'slide-in': 'slideIn 0.5s ease-out',
                 'blob': 'blob 7s infinite',
                 'shimmer': 'shimmer 2s infinite',
+                'marquee': 'marquee 25s linear infinite',
             },
             keyframes: {
                 fadeIn: {
@@ -53,6 +54,10 @@ export default {
                 shimmer: {
                     '0%': { transform: 'translateX(-100%)' },
                     '100%': { transform: 'translateX(100%)' },
+                },
+                marquee: {
+                    '0%': { transform: 'translateX(0%)' },
+                    '100%': { transform: 'translateX(-50%)' },
                 }
             },
         },
