@@ -43,7 +43,7 @@ const Sidebar = () => {
                 exit={{ opacity: 0, width: 0 }}
                 className="font-display text-xl font-bold tracking-wider"
               >
-                DEV UNIVERSE
+                AXIOM
               </motion.span>
             )}
           </AnimatePresence>

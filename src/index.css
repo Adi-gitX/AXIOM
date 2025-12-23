@@ -44,3 +44,31 @@ body {
   display: flex;
   /* Changed to flex for sidebar layout */
 }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.border');
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.textMuted');
+}
+
+/* Glow Effect Utility */
+.glow-on-hover {
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-on-hover:hover {
+  box-shadow: 0 0 25px -5px theme('colors.primary');
+  border-color: theme('colors.primary');
+}
