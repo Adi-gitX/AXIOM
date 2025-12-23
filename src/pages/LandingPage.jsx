@@ -145,7 +145,7 @@ const LandingPage = () => {
                                 className="absolute inset-0 bg-cover bg-center"
                                 style={{ backgroundImage: `url(${landscapeBg})` }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/40 to-stone-50" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-stone-50" />
                         </motion.div>
 
                         {/* Navigation */}
@@ -190,7 +190,7 @@ const LandingPage = () => {
                                     <span>Public Beta 1.0</span>
                                 </motion.div>
 
-                                <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold tracking-tighter leading-[0.95] text-gray-900 mx-auto">
+                                <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-[0.95] text-gray-900 mx-auto">
                                     <motion.span
                                         initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
                                         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -213,7 +213,7 @@ const LandingPage = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8, delay: 0.4 }}
-                                    className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed text-balance"
+                                    className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed text-balance tracking-wide"
                                 >
                                     Master DSA, System Design, and Engineering with a platform built for the perfectionist.
                                 </motion.p>
@@ -465,15 +465,15 @@ const LandingPage = () => {
                         style={{ backgroundImage: `url(${footerBg})` }}
                     />
 
-                    {/* No heavy gradient overlay to keep image vivid, just subtle text protection if needed */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                    {/* Darker gradient overlay at bottom for text visibility */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
                     <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-12 h-full flex flex-col justify-between pt-32">
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                             {/* Columns match reference: Product, Industries, Customers, Company, Resources */}
                             <div className="flex flex-col gap-4">
                                 <h4 className="font-bold text-lg text-white mb-2">Product</h4>
-                                <ul className="space-y-3 text-white/90 text-sm font-medium shadow-black/10 drop-shadow-md">
+                                <ul className="space-y-3 text-white text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Policy engine</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Onboard</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Decide</a></li>
@@ -483,7 +483,7 @@ const LandingPage = () => {
                             </div>
                             <div className="flex flex-col gap-4">
                                 <h4 className="font-bold text-lg text-white mb-2">Industries</h4>
-                                <ul className="space-y-3 text-white/90 text-sm font-medium drop-shadow-md">
+                                <ul className="space-y-3 text-white text-sm font-medium drop-shadow-md">
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Financial technology</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Banking</a></li>
                                     <li><a href="#" className="hover:text-white hover:underline transition-all">Platforms</a></li>
@@ -525,7 +525,7 @@ const LandingPage = () => {
                 </div>
 
             </div>
-        </ReactLenis>
+        </ReactLenis >
     );
 };
 
