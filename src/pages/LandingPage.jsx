@@ -20,6 +20,7 @@ import {
     Linkedin,
     Twitter
 } from 'lucide-react';
+import { ExpandableScreen, ExpandableScreenTrigger, ExpandableScreenContent } from '../components/ui/ExpandableScreen';
 
 // Assets
 import landscapeBg from '../assets/axiom-landscape.png';
@@ -452,19 +453,54 @@ const LandingPage = () => {
                     </div>
 
                     {/* PRE-FOOTER CTA */}
+                    {/* PRE-FOOTER CTA */}
                     <div className="relative py-60 flex flex-col items-center justify-center text-center px-6 overflow-hidden bg-white">
                         <div className="max-w-5xl z-10">
                             <ScrollRevealText>
                                 <h2 className="text-8xl md:text-[10rem] font-bold tracking-tighter mb-16 text-gray-900 leading-[0.8] font-display">Ready to ascend?</h2>
                             </ScrollRevealText>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => navigate('/app')}
-                                className="px-16 py-8 bg-black text-white text-2xl font-bold rounded-full shadow-2xl hover:shadow-black/50 transition-all font-display tracking-wide"
-                            >
-                                Start your journey
-                            </motion.button>
+
+                            <ExpandableScreen>
+                                <ExpandableScreenTrigger className="mx-auto rounded-full bg-black text-white shadow-2xl hover:shadow-black/50 transition-all">
+                                    <button className="px-16 py-8 text-2xl font-bold tracking-wide font-display flex items-center gap-3">
+                                        Join the waitlist <ArrowRight className="w-6 h-6" />
+                                    </button>
+                                </ExpandableScreenTrigger>
+
+                                <ExpandableScreenContent className="bg-black/95 backdrop-blur-2xl">
+                                    <div className="max-w-7xl mx-auto px-6 py-20 min-h-full flex flex-col justify-center items-center text-center">
+                                        <h3 className="text-6xl md:text-8xl font-bold text-white font-display mb-6 tracking-tighter">
+                                            Join the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">vanguard.</span>
+                                        </h3>
+                                        <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mb-12 font-light leading-relaxed">
+                                            AXIOM is currently in private beta. Secure your spot in the queue and get early access to the runtime.
+                                        </p>
+
+                                        <form className="w-full max-w-md space-y-4" onSubmit={(e) => e.preventDefault()}>
+                                            <div className="group relative">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Codename (Name)"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all font-display tracking-wide"
+                                                />
+                                            </div>
+                                            <div className="group relative">
+                                                <input
+                                                    type="email"
+                                                    placeholder="Signal (Email)"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all font-display tracking-wide"
+                                                />
+                                            </div>
+                                            <button className="w-full bg-white text-black font-bold text-xl py-4 rounded-2xl hover:bg-gray-200 transition-colors font-display tracking-wide mt-4">
+                                                Request Access
+                                            </button>
+                                            <p className="text-xs text-gray-600 mt-4">
+                                                No spam. Only critical updates.
+                                            </p>
+                                        </form>
+                                    </div>
+                                </ExpandableScreenContent>
+                            </ExpandableScreen>
                             <p className="mt-10 text-gray-400 text-sm font-bold tracking-[0.2em] uppercase font-display">No credit card required</p>
                         </div>
                     </div>
