@@ -4,10 +4,10 @@ import Sidebar from './Sidebar';
 
 const Layout = () => {
     return (
-        <div className="flex w-full min-h-screen bg-background text-text font-sans">
+        <div className="flex w-full min-h-screen font-sans">
             <Sidebar />
             <main className="flex-1 overflow-auto relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                {/* Subtle gradient overlay on content area if needed, but keeping it clean for the global mesh to show */}
                 <div className="relative z-10 p-8 h-full">
                     <Outlet />
                 </div>

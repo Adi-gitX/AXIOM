@@ -26,24 +26,29 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: theme('colors.background');
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
 @layer utilities {
   .glass-panel {
-    @apply bg-surface/80 backdrop-blur-md border border-border rounded-xl;
-  }
-
-  .glass-card {
-    @apply bg-surfaceHighlight/50 backdrop-blur-sm border border-border/50 rounded-lg hover:bg-surfaceHighlight/80 transition-all duration-300;
+    background-color: theme('colors.glass.100');
+    @apply backdrop-blur-xl border border-white/10 shadow-lg;
   }
 }
 
 #root {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
-  /* Changed to flex for sidebar layout */
+  flex-direction: column;
 }
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -55,20 +60,24 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: theme('colors.border');
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.textMuted');
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Glow Effect Utility */
 .glow-on-hover {
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .glow-on-hover:hover {
-  box-shadow: 0 0 25px -5px theme('colors.primary');
+  box-shadow: 0 0 20px -5px theme('colors.primary');
   border-color: theme('colors.primary');
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500;
 }

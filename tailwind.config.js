@@ -11,7 +11,7 @@ export default {
                 display: ['"Terminal Grotesque"', 'monospace'],
             },
             colors: {
-                background: '#0a0a0a',
+                background: '#000000', // Deep black for better contrast with glass
                 surface: '#121212',
                 surfaceHighlight: '#1e1e1e',
                 primary: '#3b82f6',
@@ -19,11 +19,20 @@ export default {
                 accent: '#8b5cf6',
                 text: '#e5e5e5',
                 textMuted: '#a3a3a3',
-                border: '#262626',
+                border: 'rgba(255, 255, 255, 0.1)', // Glass border
+                glass: {
+                    100: 'rgba(255, 255, 255, 0.1)',
+                    200: 'rgba(255, 255, 255, 0.2)',
+                    300: 'rgba(255, 255, 255, 0.3)',
+                }
+            },
+            backdropBlur: {
+                xs: '2px',
             },
             animation: {
-                'fade-in': 'fadeIn 0.3s ease-in-out',
-                'slide-in': 'slideIn 0.3s ease-out',
+                'fade-in': 'fadeIn 0.5s ease-out',
+                'slide-in': 'slideIn 0.5s ease-out',
+                'blob': 'blob 7s infinite',
             },
             keyframes: {
                 fadeIn: {
@@ -31,9 +40,15 @@ export default {
                     '100%': { opacity: '1' },
                 },
                 slideIn: {
-                    '0%': { transform: 'translateX(-20px)', opacity: '0' },
-                    '100%': { transform: 'translateX(0)', opacity: '1' },
+                    '0%': { transform: 'translateY(20px)', opacity: '0' },
+                    '100%': { transform: 'translateY(0)', opacity: '1' },
                 },
+                blob: {
+                    '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                    '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                    '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                    '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                }
             },
         },
     },
