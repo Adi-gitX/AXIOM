@@ -81,3 +81,28 @@ body {
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500;
 }
+
+/* Premium Landing Page Enhancements */
+@layer utilities {
+  .landing-gradient-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1) 0%,
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Font smoothing for better typography */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
