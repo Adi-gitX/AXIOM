@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import GlassCard from '../components/ui/GlassCard';
+import Button from '../components/ui/Button';
 
-// Posts data
+// Posts data (Keep existing data)
 const POSTS = [
     {
         id: 1,
@@ -180,37 +182,38 @@ const PostCard = ({ post, index, onClick }) => {
     };
 
     return (
-        <motion.article
+        <GlassCard
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
             onClick={onClick}
-            className="bg-white rounded-3xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 cursor-pointer"
+            hoverEffect={true}
+            className="p-0 border-transparent hover:border-white/10"
         >
-            <div className="p-5 pb-0">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg" style={{ backgroundColor: post.source.color }}>
+            <div className="p-6 pb-0">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg ring-1 ring-white/10" style={{ backgroundColor: post.source.color }}>
                     {post.source.icon}
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 leading-tight mb-3 hover:text-gray-600 transition-colors">{post.title}</h2>
+                <h2 className="text-xl font-bold text-white leading-tight mb-3 group-hover:text-glow transition-all">{post.title}</h2>
                 <div className="flex flex-wrap gap-2 mb-3">
                     {post.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1.5 bg-gray-100 text-sm text-gray-600 rounded-lg">#{tag}</span>
+                        <span key={tag} className="px-3 py-1.5 bg-white/5 border border-white/5 text-sm text-gray-400 rounded-lg">#{tag}</span>
                     ))}
                 </div>
                 <p className="text-gray-500 text-sm mb-4">{post.date} • {post.readTime}</p>
             </div>
 
-            <div className="mx-5 mb-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+            <div className="mx-6 mb-4 p-4 bg-black/40 rounded-2xl border border-white/5">
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            {post.preview.repo.split('/')[0]}/<span className="font-bold">{post.preview.repo.split('/')[1]}</span>
+                        <h3 className="text-lg font-semibold text-gray-200 mb-1">
+                            {post.preview.repo.split('/')[0]}/<span className="font-bold text-white">{post.preview.repo.split('/')[1]}</span>
                         </h3>
                         <p className="text-sm text-gray-500 truncate">{post.preview.description}</p>
                     </div>
-                    <img src={post.preview.icon} alt="" className="w-12 h-12 rounded-lg ml-3 bg-gray-200" onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${post.preview.repo.split('/')[1]}&background=random`} />
+                    <img src={post.preview.icon} alt="" className="w-12 h-12 rounded-lg ml-3 bg-white/5" onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${post.preview.repo.split('/')[1]}&background=random`} />
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500 pt-3 border-t border-gray-200">
+                <div className="flex items-center gap-4 text-sm text-gray-500 pt-3 border-t border-white/5">
                     <div className="flex items-center gap-1.5">
                         <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M2 5.5a3.5 3.5 0 115.898 2.549 5.507 5.507 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-7.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5zM11 4a.75.75 0 100 1.5 1.5 1.5 0 01.666 2.844.75.75 0 00-.416.672v.352a.75.75 0 00.574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 101.434-.44 5.01 5.01 0 00-2.56-3.012A3 3 0 0011 4z" /></svg>
                         <span className="font-medium">{post.preview.contributors}</span>
@@ -227,38 +230,35 @@ const PostCard = ({ post, index, onClick }) => {
                         <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013.5 6.25v-.878a2.25 2.25 0 111.5 0zM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0zm6.75.75a.75.75 0 100-1.5.75.75 0 000 1.5zm-3 8.75a.75.75 0 10-1.5 0 .75.75 0 001.5 0z" /></svg>
                         <span className="font-medium">{formatNumber(post.preview.forks)}</span>
                     </div>
-                    <div className="ml-auto">
-                        <svg className="w-5 h-5 text-gray-800" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>
-                    </div>
                 </div>
             </div>
 
-            <div className="mx-5 mb-4 h-1 bg-gray-200 rounded-full" />
+            <div className="mx-6 mb-4 h-px bg-white/5" />
 
-            <div className="px-5 pb-5 flex items-center justify-between">
+            <div className="px-6 pb-6 flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                    <button onClick={handleUpvote} className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${hasUpvoted ? 'text-white bg-gray-900' : 'text-gray-500 hover:bg-gray-100'}`}>
+                    <button onClick={handleUpvote} className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${hasUpvoted ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         <span className="font-semibold">{upvotes}</span>
                     </button>
-                    <button onClick={handleDownvote} className={`p-2 rounded-xl transition-all ${hasDownvoted ? 'text-white bg-gray-900' : 'text-gray-400 hover:bg-gray-100'}`}>
+                    <button onClick={handleDownvote} className={`p-2 rounded-xl transition-all ${hasDownvoted ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </button>
-                    <button onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-all">
+                    <button onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-500 hover:bg-white/10 hover:text-white transition-all">
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         <span className="font-medium">{post.comments}</span>
                     </button>
                 </div>
                 <div className="flex items-center gap-1">
-                    <button onClick={(e) => { e.stopPropagation(); setIsSaved(!isSaved); }} className={`p-2.5 rounded-xl transition-all ${isSaved ? 'text-white bg-gray-900' : 'text-gray-400 hover:bg-gray-100'}`}>
+                    <button onClick={(e) => { e.stopPropagation(); setIsSaved(!isSaved); }} className={`p-2.5 rounded-xl transition-all ${isSaved ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" /></svg>
                     </button>
-                    <button onClick={(e) => e.stopPropagation()} className="p-2.5 rounded-xl text-gray-400 hover:bg-gray-100 transition-all">
+                    <button onClick={(e) => e.stopPropagation()} className="p-2.5 rounded-xl text-gray-500 hover:bg-white/10 hover:text-white transition-all">
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" strokeLinecap="round" strokeLinejoin="round" /><path d="M16 6l-4-4-4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M12 2v13" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </button>
                 </div>
             </div>
-        </motion.article>
+        </GlassCard>
     );
 };
 
@@ -292,18 +292,18 @@ const PostModal = ({ post, onClose }) => {
     const handleCopyLink = () => { navigator.clipboard.writeText(window.location.href); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000); };
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 backdrop-blur-sm overflow-y-auto" onClick={onClose}>
-            <motion.div initial={{ opacity: 0, y: 40, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.95 }} className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden my-8 mx-4 flex" onClick={e => e.stopPropagation()}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+            <motion.div initial={{ opacity: 0, y: 40, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.95 }} className="w-full max-w-5xl glass-panel !bg-[#050505]/90 rounded-3xl shadow-2xl overflow-hidden my-8 mx-4 flex border border-white/10" onClick={e => e.stopPropagation()}>
 
                 {/* Main Content */}
-                <div className="flex-1 max-h-[90vh] overflow-y-auto">
+                <div className="flex-1 max-h-[90vh] overflow-y-auto custom-scrollbar">
                     {/* Banner */}
-                    <div className="px-5 py-3 flex items-center justify-between" style={{ backgroundColor: post.source.color }}>
+                    <div className="px-5 py-3 flex items-center justify-between shadow-lg" style={{ backgroundColor: post.source.color }}>
                         <div className="flex items-center gap-3 text-white">
                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" /></svg>
                             <span className="text-sm font-medium">Never miss posts from {post.source.name}</span>
                         </div>
-                        <button className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-xl">Subscribe</button>
+                        <button className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-xl backdrop-blur-sm">Subscribe</button>
                     </div>
 
                     {/* Header */}
@@ -311,76 +311,76 @@ const PostModal = ({ post, onClose }) => {
                         <div className="flex items-center justify-between mb-5">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg" style={{ backgroundColor: post.source.color }}>{post.source.icon}</div>
-                                <span className="font-medium text-gray-700">{post.source.name}</span>
+                                <span className="font-medium text-gray-300">{post.source.name}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <a href="#" className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800">
+                                <a href="#" className="flex items-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-gray-200">
                                     Read post <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
                                 </a>
-                                <button onClick={onClose} className="p-2.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl">
+                                <button onClick={onClose} className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
                                 </button>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3 mb-5">
-                            <img src={post.author.avatar} alt="" className="w-11 h-11 rounded-full ring-2 ring-gray-100" />
+                            <img src={post.author.avatar} alt="" className="w-11 h-11 rounded-full ring-2 ring-white/10" />
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-gray-900">{post.author.name}</span>
-                                    <span className="text-sm text-gray-400">{post.author.handle}</span>
+                                    <span className="font-semibold text-white">{post.author.name}</span>
+                                    <span className="text-sm text-gray-500">{post.author.handle}</span>
                                 </div>
-                                <span className="text-xs text-gray-500 font-medium">⚡ {post.author.reputation}</span>
+                                <span className="text-xs text-gray-400 font-medium">⚡ {post.author.reputation}</span>
                             </div>
                         </div>
 
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">{post.title}</h1>
-                        <p className="text-sm text-gray-400 mb-5">{post.readTime}</p>
+                        <h1 className="text-3xl font-bold text-white mb-2 leading-tight">{post.title}</h1>
+                        <p className="text-sm text-gray-500 mb-5">{post.readTime}</p>
                     </div>
 
                     {/* Quick Actions */}
                     <div className="px-6 pb-4 flex flex-wrap gap-2">
-                        <button className="px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-xl">✨ TLDR</button>
-                        <button className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl">Simplify it</button>
-                        <button className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl">Remove fluff</button>
-                        <button className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl">Challenge this</button>
+                        <button className="px-4 py-2 bg-white text-black text-sm font-bold rounded-xl shadow-glow">✨ TLDR</button>
+                        <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl hover:bg-white/10">Simplify it</button>
+                        <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl hover:bg-white/10">Remove fluff</button>
+                        <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl hover:bg-white/10">Challenge this</button>
                     </div>
 
                     {/* Content */}
                     <div className="px-6 pb-5">
-                        <p className="text-gray-600 leading-relaxed">{post.content}</p>
+                        <p className="text-gray-300 leading-relaxed text-lg">{post.content}</p>
                     </div>
 
                     {/* Tags */}
                     <div className="px-6 pb-5 flex flex-wrap gap-2">
                         {post.tags.map(tag => (
-                            <span key={tag} className="px-3.5 py-1.5 bg-gray-100 text-sm font-medium text-gray-600 rounded-xl">#{tag}</span>
+                            <span key={tag} className="px-3.5 py-1.5 bg-white/5 border border-white/5 text-sm font-medium text-gray-400 rounded-xl">#{tag}</span>
                         ))}
                     </div>
 
                     {/* Stats */}
-                    <div className="px-6 py-3 text-sm text-gray-500 border-t border-gray-100">
-                        <span className="font-bold text-gray-900">{upvotes}</span> Upvotes • <span className="font-bold text-gray-900">{comments.length}</span> Comments
+                    <div className="px-6 py-3 text-sm text-gray-500 border-t border-white/5">
+                        <span className="font-bold text-white">{upvotes}</span> Upvotes • <span className="font-bold text-white">{comments.length}</span> Comments
                     </div>
 
                     {/* Actions */}
-                    <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-1">
-                            <button onClick={handleUpvote} className={`p-3 rounded-xl ${hasUpvoted ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-500'}`}>
+                            <button onClick={handleUpvote} className={`p-3 rounded-xl transition-all ${hasUpvoted ? 'bg-white text-black shadow-glow' : 'hover:bg-white/5 text-gray-500 hover:text-white'}`}>
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             </button>
-                            <button onClick={handleDownvote} className={`p-3 rounded-xl ${hasDownvoted ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-500'}`}>
+                            <button onClick={handleDownvote} className={`p-3 rounded-xl transition-all ${hasDownvoted ? 'bg-white text-black shadow-glow' : 'hover:bg-white/5 text-gray-500 hover:text-white'}`}>
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             </button>
                         </div>
                         <div className="flex items-center gap-1">
-                            <button className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-100 rounded-xl text-sm text-gray-600">
+                            <button className="flex items-center gap-2 px-4 py-2.5 hover:bg-white/5 rounded-xl text-sm text-gray-400 hover:text-white transition-all">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg> Comment
                             </button>
-                            <button onClick={() => setIsSaved(!isSaved)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm ${isSaved ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-600'}`}>
+                            <button onClick={() => setIsSaved(!isSaved)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-all ${isSaved ? 'bg-white text-black shadow-glow' : 'hover:bg-white/5 text-gray-400 hover:text-white'}`}>
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" /></svg> {isSaved ? 'Saved' : 'Save'}
                             </button>
-                            <button onClick={handleCopyLink} className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-100 rounded-xl text-sm text-gray-600">
+                            <button onClick={handleCopyLink} className="flex items-center gap-2 px-4 py-2.5 hover:bg-white/5 rounded-xl text-sm text-gray-400 hover:text-white transition-all">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg>
                                 {copiedLink ? 'Copied!' : 'Copy'}
                             </button>
@@ -388,12 +388,12 @@ const PostModal = ({ post, onClose }) => {
                     </div>
 
                     {/* Comment Input */}
-                    <div className="px-6 py-5 border-t border-gray-100">
+                    <div className="px-6 py-5 border-t border-white/5">
                         <div className="flex items-center gap-4">
-                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=You" alt="" className="w-10 h-10 rounded-full" />
-                            <div className="flex-1 flex items-center gap-2 bg-gray-50 rounded-2xl p-2 border border-gray-200 focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-100">
-                                <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleComment()} placeholder="Share your thoughts..." className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 px-3 py-2 focus:outline-none" />
-                                <button onClick={handleComment} disabled={!newComment.trim()} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400">Post</button>
+                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=You" alt="" className="w-10 h-10 rounded-full ring-1 ring-white/10" />
+                            <div className="flex-1 flex items-center gap-2 bg-white/5 rounded-2xl p-2 border border-white/10 focus-within:border-white/20 focus-within:ring-1 focus-within:ring-white/20">
+                                <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleComment()} placeholder="Share your thoughts..." className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-500 px-3 py-2 focus:outline-none" />
+                                <button onClick={handleComment} disabled={!newComment.trim()} className="px-5 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-gray-200 disabled:bg-white/10 disabled:text-gray-500">Post</button>
                             </div>
                         </div>
                     </div>
@@ -402,17 +402,17 @@ const PostModal = ({ post, onClose }) => {
                     <div className="px-6 pb-8 space-y-5">
                         {comments.map(comment => (
                             <div key={comment.id} className="flex gap-4">
-                                <img src={comment.author.avatar} alt="" className="w-10 h-10 rounded-full" />
+                                <img src={comment.author.avatar} alt="" className="w-10 h-10 rounded-full ring-1 ring-white/10" />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="font-semibold text-gray-900">{comment.author.name}</span>
+                                        <span className="font-semibold text-white">{comment.author.name}</span>
                                         <span className="text-xs text-gray-500 font-medium">⚡ {comment.author.reputation}</span>
-                                        <span className="text-xs text-gray-400">• {comment.time}</span>
+                                        <span className="text-xs text-gray-500">• {comment.time}</span>
                                     </div>
-                                    <p className="text-sm text-gray-600 mb-2">{comment.content}</p>
-                                    <div className="flex items-center gap-4 text-xs text-gray-400">
-                                        <button className="hover:text-gray-600">{comment.upvotes} upvotes</button>
-                                        <button className="hover:text-gray-600">Reply</button>
+                                    <p className="text-sm text-gray-300 mb-2">{comment.content}</p>
+                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                        <button className="hover:text-white transition-colors">{comment.upvotes} upvotes</button>
+                                        <button className="hover:text-white transition-colors">Reply</button>
                                     </div>
                                 </div>
                             </div>
@@ -421,46 +421,46 @@ const PostModal = ({ post, onClose }) => {
                 </div>
 
                 {/* Sidebar */}
-                <div className="w-80 bg-gray-50 border-l border-gray-100 p-6 hidden lg:block max-h-[90vh] overflow-y-auto">
+                <div className="w-80 bg-black/40 border-l border-white/5 p-6 hidden lg:block max-h-[90vh] overflow-y-auto">
                     {/* Source */}
-                    <div className="bg-white rounded-2xl p-5 mb-5 border border-gray-100">
+                    <div className="bg-white/5 rounded-2xl p-5 mb-5 border border-white/5">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-lg" style={{ backgroundColor: post.source.color }}>{post.source.icon}</div>
-                            <span className="font-bold text-gray-900">{post.source.name}</span>
+                            <span className="font-bold text-white">{post.source.name}</span>
                         </div>
                         <button className="w-full py-2.5 text-white font-semibold rounded-xl" style={{ backgroundColor: post.source.color }}>Join Community</button>
-                        <p className="text-xs text-gray-400 mt-3 text-center">2.4K Members • 29.7K Upvotes</p>
+                        <p className="text-xs text-gray-500 mt-3 text-center">2.4K Members • 29.7K Upvotes</p>
                     </div>
 
                     {/* Author */}
-                    <div className="bg-white rounded-2xl p-5 mb-5 border border-gray-100">
+                    <div className="bg-white/5 rounded-2xl p-5 mb-5 border border-white/5">
                         <div className="flex items-center gap-3 mb-4">
-                            <img src={post.author.avatar} alt="" className="w-14 h-14 rounded-full" />
+                            <img src={post.author.avatar} alt="" className="w-14 h-14 rounded-full ring-2 ring-white/10" />
                             <div>
-                                <p className="font-bold text-gray-900">{post.author.name}</p>
+                                <p className="font-bold text-white">{post.author.name}</p>
                                 <p className="text-xs text-gray-400">{post.author.handle}</p>
                             </div>
                         </div>
-                        <button onClick={() => setIsFollowing(!isFollowing)} className={`w-full py-2.5 font-semibold rounded-xl ${isFollowing ? 'bg-gray-100 text-gray-700' : 'bg-gray-900 text-white'}`}>
+                        <button onClick={() => setIsFollowing(!isFollowing)} className={`w-full py-2.5 font-semibold rounded-xl transition-all ${isFollowing ? 'bg-white/10 text-white' : 'bg-white text-black shadow-glow'}`}>
                             {isFollowing ? '✓ Following' : 'Follow'}
                         </button>
                         <p className="text-xs text-gray-500 font-medium mt-4">⚡ {post.author.reputation}</p>
                     </div>
 
                     {/* Share */}
-                    <div className="bg-white rounded-2xl p-5 border border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900 mb-4">Share this post</p>
+                    <div className="bg-white/5 rounded-2xl p-5 border border-white/5">
+                        <p className="text-sm font-semibold text-white mb-4">Share this post</p>
                         <div className="grid grid-cols-4 gap-2">
-                            <button onClick={handleCopyLink} className={`flex items-center justify-center p-3 rounded-xl ${copiedLink ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                            <button onClick={handleCopyLink} className={`flex items-center justify-center p-3 rounded-xl transition-all ${copiedLink ? 'bg-white text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg>
                             </button>
-                            <button className="flex items-center justify-center p-3 bg-[#25D366] text-white rounded-xl">
+                            <button className="flex items-center justify-center p-3 bg-[#25D366] text-white rounded-xl hover:opacity-90">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /></svg>
                             </button>
-                            <button className="flex items-center justify-center p-3 bg-[#1877F2] text-white rounded-xl">
+                            <button className="flex items-center justify-center p-3 bg-[#1877F2] text-white rounded-xl hover:opacity-90">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                             </button>
-                            <button className="flex items-center justify-center p-3 bg-black text-white rounded-xl">
+                            <button className="flex items-center justify-center p-3 bg-black text-white rounded-xl border border-white/20 hover:bg-gray-900">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                             </button>
                         </div>
@@ -478,28 +478,28 @@ const Posts = () => {
     const filters = ['For You', 'Following', 'Popular', 'Recent'];
 
     return (
-        <div className="min-h-screen bg-white p-6 lg:p-8">
-            <div className="max-w-[1200px] mx-auto space-y-6">
+        <div className="min-h-screen p-6 lg:p-8">
+            <div className="max-w-[1200px] mx-auto space-y-8">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-display">Posts</h1>
-                        <p className="text-gray-500 mt-1">Discover developer articles and projects</p>
+                        <h1 className="text-4xl font-light text-white font-display tracking-tight mb-2">Posts</h1>
+                        <p className="text-gray-400 text-lg font-light">Discover developer articles and projects</p>
                     </div>
-                    <button className="px-5 py-2.5 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors flex items-center gap-2">
+                    <Button variant="primary">
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" strokeLinecap="round" /></svg>
                         New Post
-                    </button>
+                    </Button>
                 </header>
 
-                <div className="flex items-center gap-2 border-b border-gray-200 pb-4">
+                <div className="flex items-center gap-2 border-b border-white/10 pb-4">
                     {filters.map(filter => (
-                        <button key={filter} onClick={() => setActiveFilter(filter)} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeFilter === filter ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                        <button key={filter} onClick={() => setActiveFilter(filter)} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeFilter === filter ? 'bg-white text-black shadow-glow' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
                             {filter}
                         </button>
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {POSTS.map((post, index) => (
                         <PostCard key={post.id} post={post} index={index} onClick={() => setSelectedPost(post)} />
                     ))}

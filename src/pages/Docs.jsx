@@ -45,9 +45,9 @@ const Docs = () => {
     const NavLink = ({ id, label }) => (
         <button
             onClick={(e) => scrollToSection(e, id)}
-            className={`w-full text-left block py-1.5 px-3 rounded-lg text-sm transition-all duration-300 ${activeSection === id
-                ? 'bg-blue-50 text-blue-600 font-semibold translate-x-1'
-                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+            className={`w-full text-left block py-2 px-3 rounded-lg text-sm transition-all duration-300 ${activeSection === id
+                ? 'bg-white/10 text-white font-semibold translate-x-1 shadow-[0_0_15px_rgba(255,255,255,0.1)] border border-white/5'
+                : 'text-gray-500 hover:text-white hover:bg-white/5'
                 }`}
         >
             {label}
@@ -56,16 +56,16 @@ const Docs = () => {
 
     return (
         <ReactLenis root options={{ lerp: 0.05 }}>
-            <div className="bg-stone-50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-900">
+            <div className="min-h-screen font-sans">
                 <PublicNavbar />
 
                 <div className="max-w-7xl mx-auto pt-32 px-6 flex flex-col md:flex-row gap-12">
 
                     {/* SIDEBAR */}
-                    <aside className="hidden md:block w-64 fixed h-[calc(100vh-8rem)] overflow-y-auto pt-8 pb-20 pr-4 border-r border-gray-200/50">
+                    <aside className="hidden md:block w-64 fixed h-[calc(100vh-8rem)] overflow-y-auto pt-8 pb-20 pr-4 border-r border-white/5 custom-scrollbar">
                         <div className="space-y-8">
                             <div>
-                                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3 font-display">Start Here</h3>
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-display">Start Here</h3>
                                 <div className="space-y-1">
                                     <NavLink id="intro" label="Introduction" />
                                     <NavLink id="features" label="Core Features" />
@@ -74,7 +74,7 @@ const Docs = () => {
                             </div>
 
                             <div>
-                                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3 font-display">Modules</h3>
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-display">Modules</h3>
                                 <div className="space-y-1">
                                     <NavLink id="education" label="Education Hub" />
                                     <NavLink id="dsa" label="DSA Tracker" />
@@ -83,7 +83,7 @@ const Docs = () => {
                             </div>
 
                             <div>
-                                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3 font-display">Reference</h3>
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-display">Reference</h3>
                                 <div className="space-y-1">
                                     <NavLink id="cli" label="CLI Commands" />
                                     <NavLink id="api" label="API Access" />
@@ -97,22 +97,22 @@ const Docs = () => {
 
                         {/* Intro Section */}
                         <section id="intro" className="space-y-6">
-                            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 tracking-tighter font-display leading-[0.9]">
+                            <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tighter font-display leading-[0.9] text-glow">
                                 Introduction
                             </h1>
-                            <p className="text-xl text-gray-600 leading-relaxed font-light max-w-2xl">
+                            <p className="text-xl text-gray-400 leading-relaxed font-light max-w-2xl">
                                 AXIOM is the definitive ecosystem for software engineers. From mastering algorithms to system design, we provide the runtime environment for your career growth.
                             </p>
-                            <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                <p className="text-gray-600">
-                                    <span className="font-semibold text-gray-900">Note:</span> AXIOM is currently in Public Beta 1.0. Some features may evolve.
+                            <div className="p-6 bg-white/5 rounded-2xl border border-white/10 shadow-sm backdrop-blur-md">
+                                <p className="text-gray-300">
+                                    <span className="font-semibold text-white">Note:</span> AXIOM is currently in Public Beta 1.0. Some features may evolve.
                                 </p>
                             </div>
                         </section>
 
                         {/* Features Section */}
                         <section id="features" className="space-y-8">
-                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight font-display">Core Features</h2>
+                            <h2 className="text-3xl font-bold text-white tracking-tight font-display">Core Features</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {[
                                     { icon: Code2, title: 'Interactive Runtime', desc: 'Execute code directly in the browser with our custom runtime.' },
@@ -120,13 +120,13 @@ const Docs = () => {
                                     { icon: Globe, title: 'Global Sync', desc: 'Progress synchronized across all devices instantly.' },
                                     { icon: Terminal, title: 'CLI Integration', desc: 'Manage your learning path via axiom-cli.' }
                                 ].map((item, i) => (
-                                    <div key={i} className="flex gap-4 p-4 rounded-2xl bg-white border border-gray-100 hover:shadow-md transition-shadow">
-                                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
-                                            <item.icon className="w-5 h-5 text-gray-900" />
+                                    <div key={i} className="glass-card flex gap-4 p-5 rounded-2xl border border-white/10 hover:border-white/20 transition-all group hover:bg-white/5">
+                                        <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-white/20 transition-colors">
+                                            <item.icon className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
-                                            <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                                            <h3 className="font-bold text-white mb-1">{item.title}</h3>
+                                            <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -135,49 +135,49 @@ const Docs = () => {
 
                         {/* Quickstart Section */}
                         <section id="quickstart" className="space-y-8">
-                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight font-display">Quick Start</h2>
-                            <p className="text-lg text-gray-600 leading-relaxed max-w-3xl">
+                            <h2 className="text-3xl font-bold text-white tracking-tight font-display">Quick Start</h2>
+                            <p className="text-lg text-gray-400 leading-relaxed max-w-3xl">
                                 Get up and running with AXIOM in less than 5 minutes.
                             </p>
-                            <div className="bg-[#0D1117] rounded-2xl overflow-hidden font-mono text-sm text-white shadow-xl max-w-2xl">
-                                <div className="px-4 py-3 border-b border-gray-800 bg-white/5 flex gap-2">
+                            <div className="bg-[#0D1117] rounded-2xl overflow-hidden font-mono text-sm text-white shadow-xl max-w-2xl border border-white/10">
+                                <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex gap-2">
                                     <div className="w-3 h-3 rounded-full bg-red-500/50" />
                                     <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                                     <div className="w-3 h-3 rounded-full bg-green-500/50" />
                                 </div>
                                 <div className="p-6 space-y-4">
                                     <div className="flex gap-2">
-                                        <span className="text-pink-500">$</span>
+                                        <span className="text-pink-400">$</span>
                                         <span>npm install -g @axiom/cli</span>
                                     </div>
                                     <div className="flex gap-2">
-                                        <span className="text-pink-500">$</span>
+                                        <span className="text-pink-400">$</span>
                                         <span>axiom login</span>
                                     </div>
                                     <div className="flex gap-2">
-                                        <span className="text-pink-500">$</span>
+                                        <span className="text-pink-400">$</span>
                                         <span>axiom init my-workspace</span>
                                     </div>
                                 </div>
                             </div>
                         </section>
 
-                        <div className="w-full h-px bg-gray-200" />
+                        <div className="w-full h-px bg-white/10" />
 
                         {/* Modules Section */}
                         <section id="education" className="space-y-6">
-                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight font-display">Education Hub</h2>
-                            <p className="text-gray-600 leading-relaxed">
+                            <h2 className="text-3xl font-bold text-white tracking-tight font-display">Education Hub</h2>
+                            <p className="text-gray-400 leading-relaxed">
                                 Curated video courses covering System Design (LLD/HLD), Operating Systems, and DBMS.
                             </p>
                         </section>
 
                         <section id="dsa" className="space-y-6">
-                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight font-display">DSA Tracker</h2>
-                            <p className="text-gray-600 leading-relaxed">
+                            <h2 className="text-3xl font-bold text-white tracking-tight font-display">DSA Tracker</h2>
+                            <p className="text-gray-400 leading-relaxed">
                                 The heart of AXIOM. Track your progress through 450+ algorithmic problems.
                             </p>
-                            <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                            <ul className="list-disc pl-5 text-gray-400 space-y-2 marker:text-white/50">
                                 <li>Blind 75 & NeetCode 150 Integration</li>
                                 <li>Spaced Repetition tracking</li>
                                 <li>Companies tag filter (Google, Meta, Amazon)</li>
@@ -185,27 +185,27 @@ const Docs = () => {
                         </section>
 
                         <section id="cli" className="space-y-8 pt-12">
-                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight font-display">CLI Commands</h2>
+                            <h2 className="text-3xl font-bold text-white tracking-tight font-display">CLI Commands</h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">
-                                    <thead className="border-b border-gray-200">
+                                    <thead className="border-b border-white/10">
                                         <tr>
-                                            <th className="py-3 font-bold text-gray-900">Command</th>
-                                            <th className="py-3 font-bold text-gray-900">Description</th>
+                                            <th className="py-3 font-bold text-white">Command</th>
+                                            <th className="py-3 font-bold text-white">Description</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-white/5">
                                         <tr>
-                                            <td className="py-3 font-mono text-pink-600">axiom sync</td>
-                                            <td className="py-3 text-gray-600">Syncs local progress with the cloud.</td>
+                                            <td className="py-3 font-mono text-pink-400">axiom sync</td>
+                                            <td className="py-3 text-gray-400">Syncs local progress with the cloud.</td>
                                         </tr>
                                         <tr>
-                                            <td className="py-3 font-mono text-pink-600">axiom test</td>
-                                            <td className="py-3 text-gray-600">Runs test cases against the current solution.</td>
+                                            <td className="py-3 font-mono text-pink-400">axiom test</td>
+                                            <td className="py-3 text-gray-400">Runs test cases against the current solution.</td>
                                         </tr>
                                         <tr>
-                                            <td className="py-3 font-mono text-pink-600">axiom submit</td>
-                                            <td className="py-3 text-gray-600">Submits solution for verification.</td>
+                                            <td className="py-3 font-mono text-pink-400">axiom submit</td>
+                                            <td className="py-3 text-gray-400">Submits solution for verification.</td>
                                         </tr>
                                     </tbody>
                                 </table>

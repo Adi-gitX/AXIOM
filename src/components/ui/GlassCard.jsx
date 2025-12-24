@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 const GlassCard = ({ children, className, hoverEffect = true, ...props }) => {
@@ -10,15 +9,13 @@ const GlassCard = ({ children, className, hoverEffect = true, ...props }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className={twMerge(
-                clsx(
-                    'relative overflow-hidden rounded-2xl border border-white/10 bg-glass-100 backdrop-blur-xl shadow-lg p-6',
-                    hoverEffect && 'hover:bg-glass-200 hover:border-white/20 hover:shadow-xl transition-all duration-300 group',
-                    className
-                )
+                'glass-card relative overflow-hidden rounded-3xl p-6',
+                hoverEffect && 'glass-card-hover group cursor-pointer',
+                className
             )}
             {...props}
         >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.07] to-transparent pointer-events-none opacity-50" />
             <div className="relative z-10">{children}</div>
         </motion.div>
     );
