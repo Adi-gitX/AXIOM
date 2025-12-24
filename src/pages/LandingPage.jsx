@@ -18,7 +18,8 @@ import {
     MessageCircle,
     Github,
     Linkedin,
-    Twitter
+    Twitter,
+    Check
 } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { ExpandableScreen, ExpandableScreenTrigger, ExpandableScreenContent } from '../components/ui/ExpandableScreen';
@@ -392,20 +393,35 @@ const LandingPage = () => {
                     </div>
 
                     {/* LOGO MARQUEE (Seamless) */}
-                    <div className="relative py-24 bg-stone-50 border-t border-transparent">
-                        <p className="text-center text-xs font-bold tracking-[0.2em] text-gray-400 uppercase mb-12 font-display">Trusted by engineering teams at</p>
-                        <div className="relative flex overflow-x-hidden group">
-                            <div className="animate-marquee whitespace-nowrap flex gap-32">
-                                {[...Array(2)].map((_, i) => (
-                                    <div key={i} className="flex gap-32 items-center opacity-30 grayscale transition-all duration-700 group-hover:opacity-100 group-hover:grayscale-0">
-                                        {['Google', 'Meta', 'Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb'].map(brand => (
-                                            <span key={`${i}-${brand}`} className="text-5xl font-bold font-display text-gray-900 cursor-default tracking-tighter">{brand}</span>
-                                        ))}
-                                    </div>
+                    <div className="relative py-20 bg-stone-50">
+                        <p className="text-center text-xs font-bold tracking-[0.25em] text-gray-400 uppercase mb-10 font-display">Trusted by engineering teams at</p>
+                        <div className="relative overflow-hidden">
+                            {/* Left fade */}
+                            <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-stone-50 to-transparent z-10 pointer-events-none" />
+                            {/* Right fade */}
+                            <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-stone-50 to-transparent z-10 pointer-events-none" />
+
+                            {/* Marquee container */}
+                            <div className="animate-marquee flex whitespace-nowrap">
+                                {/* First set */}
+                                {['Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb', 'Google', 'Meta'].map((brand, i) => (
+                                    <span
+                                        key={`a-${brand}-${i}`}
+                                        className="mx-12 text-4xl md:text-5xl font-bold font-display text-gray-300 hover:text-gray-900 transition-colors duration-300 cursor-default tracking-tight"
+                                    >
+                                        {brand}
+                                    </span>
+                                ))}
+                                {/* Duplicate for seamless loop */}
+                                {['Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb', 'Google', 'Meta'].map((brand, i) => (
+                                    <span
+                                        key={`b-${brand}-${i}`}
+                                        className="mx-12 text-4xl md:text-5xl font-bold font-display text-gray-300 hover:text-gray-900 transition-colors duration-300 cursor-default tracking-tight"
+                                    >
+                                        {brand}
+                                    </span>
                                 ))}
                             </div>
-                            <div className="absolute inset-y-0 left-0 w-64 bg-gradient-to-r from-stone-50 to-transparent z-10" />
-                            <div className="absolute inset-y-0 right-0 w-64 bg-gradient-to-l from-stone-50 to-transparent z-10" />
                         </div>
                     </div>
 

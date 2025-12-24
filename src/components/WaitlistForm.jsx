@@ -2,6 +2,44 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Github, ArrowRight } from 'lucide-react';
 
+// Marquee styles for rotating company names
+const marqueeStyles = `
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+    animation: scroll 20s linear infinite;
+}
+
+.animate-marquee:hover {
+    animation-play-state: paused;
+}
+`;
+
+const companies = [
+    'Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb', 'Google', 'Meta',
+    'Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb', 'Google', 'Meta'
+];
+
+const CompanyMarquee = () => (
+    <div className="w-full overflow-hidden py-6 border-y border-white/5 bg-black/40 backdrop-blur-sm">
+        <style>{marqueeStyles}</style>
+        <div className="animate-marquee flex whitespace-nowrap">
+            {companies.map((company, i) => (
+                <span
+                    key={i}
+                    className="mx-8 text-xl md:text-2xl font-bold tracking-tight text-white/20 hover:text-white/40 transition-colors cursor-default select-none"
+                    style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                >
+                    {company}
+                </span>
+            ))}
+        </div>
+    </div>
+);
+
 export const WaitlistForm = () => {
     const [status, setStatus] = useState('idle'); // idle, loading, success
     const [role, setRole] = useState('architect');
@@ -84,6 +122,9 @@ export const WaitlistForm = () => {
                         </ul>
                     </div>
                 </div>
+
+                {/* Rotating Company Names */}
+                <CompanyMarquee />
 
                 <div className="relative z-10 flex gap-8 text-[10px] font-mono text-white/30 tracking-widest uppercase">
                     <div>Latency: 12ms</div>
@@ -168,7 +209,7 @@ export const WaitlistForm = () => {
                         >
                             <span className="relative z-10 flex items-center justify-center gap-3">
                                 {status === 'loading' ? 'Compiling...' : 'Execute Sequence'}
-                                {!status === 'loading' && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                                {status !== 'loading' && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                             </span>
                             {/* Hover effect */}
                             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
