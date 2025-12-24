@@ -21,7 +21,7 @@ const DSATracker = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-4xl font-light text-white text-glow">DSA Tracker</h1>
+                    <h1 className="text-4xl font-light text-white text-glow font-display">DSA Tracker</h1>
                     <p className="text-gray-400 mt-2">Striver's A2Z Sheet</p>
                 </motion.header>
 
@@ -114,8 +114,8 @@ const TopicItem = ({ topic, index, isOpen, onToggle }) => {
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className={`text-xs px-2 py-0.5 rounded border ${p.difficulty === 'Easy' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                                    p.difficulty === 'Medium' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                                        'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                                p.difficulty === 'Medium' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                                    'bg-rose-500/10 text-rose-400 border-rose-500/20'
                                                 }`}>{p.difficulty}</span>
                                             <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white transition-colors" onClick={(e) => e.stopPropagation()}>
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

@@ -31,7 +31,7 @@ const Jobs = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-4xl font-light text-white text-glow">Jobs</h1>
+                    <h1 className="text-4xl font-light text-white text-glow font-display">Jobs</h1>
                     <p className="text-gray-400 mt-2">Find your next opportunity</p>
                 </motion.header>
 

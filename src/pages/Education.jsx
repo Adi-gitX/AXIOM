@@ -21,13 +21,13 @@ const Education = () => {
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
                             </button>
                             <div>
-                                <h1 className="text-3xl font-light text-white text-glow">{getTopic(topic)?.name}</h1>
+                                <h1 className="text-3xl font-light text-white text-glow font-display">{getTopic(topic)?.name}</h1>
                                 <p className="text-gray-400 mt-1">{videos.length} videos</p>
                             </div>
                         </div>
                     ) : (
                         <>
-                            <h1 className="text-4xl font-light text-white text-glow">Education</h1>
+                            <h1 className="text-4xl font-light text-white text-glow font-display">Education</h1>
                             <p className="text-gray-400 mt-2">Choose what to learn</p>
                         </>
                     )}

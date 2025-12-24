@@ -50,7 +50,7 @@ const DeveloperConnect = () => {
                                 : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'
                                 }`}
                         >
-                            <span className="text-gray-500 opacity-50">#</span>
+                            <span className="text-gray-500 opacity-50 font-mono">#</span>
                             <span className="text-sm font-medium">{channel.name}</span>
                         </button>
                     ))}
@@ -62,7 +62,7 @@ const DeveloperConnect = () => {
 
                 {/* Header */}
                 <header className="px-8 py-6 border-b border-white/5 bg-black/10 backdrop-blur-md">
-                    <h1 className="text-2xl font-light text-white text-glow">
+                    <h1 className="text-2xl font-light text-white text-glow font-display">
                         #{CHANNELS.find(c => c.id === activeChannel)?.name}
                     </h1>
                     <p className="text-sm text-gray-400 mt-1">

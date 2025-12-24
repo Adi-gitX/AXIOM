@@ -35,7 +35,7 @@ const PublicNavbar = () => {
                         <button
                             key={item.label}
                             onClick={() => navigate(item.path)}
-                            className={`px-6 py-2 rounded-full transition-all duration-300 font-display tracking-wide uppercase text-xs ${isActive(item.path)
+                            className={`px-6 py-2 rounded-full transition-all duration-300 tracking-wide uppercase text-xs ${isActive(item.path)
                                 ? 'bg-white text-black shadow-glow font-bold'
                                 : 'hover:bg-white/10 hover:text-white text-gray-400'
                                 }`}
@@ -49,7 +49,7 @@ const PublicNavbar = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     onClick={() => navigate('/app')}
-                    className="px-6 py-2.5 text-sm font-bold bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-glow hover:bg-gray-200 font-display tracking-wide"
+                    className="px-6 py-2.5 text-sm font-bold bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-glow hover:bg-gray-200 tracking-wide"
                 >
                     Launch App
                 </motion.button>
