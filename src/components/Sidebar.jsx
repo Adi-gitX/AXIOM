@@ -8,7 +8,8 @@ import {
   Briefcase,
   Settings,
   LayoutDashboard,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -19,6 +20,7 @@ const Sidebar = () => {
     { path: '/app/interview', icon: BookOpen, label: 'Interview Prep' },
     { path: '/app/connect', icon: MessageSquare, label: 'Dev Connect' },
     { path: '/app/jobs', icon: Briefcase, label: 'Internships' },
+    { path: '/app/posts', icon: FileText, label: 'Posts' },
   ];
 
   return (

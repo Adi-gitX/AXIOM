@@ -9,6 +9,7 @@ import DSATracker from './pages/DSATracker';
 import InterviewPrep from './pages/InterviewPrep';
 import DeveloperConnect from './pages/DeveloperConnect';
 import Jobs from './pages/Jobs';
+import Posts from './pages/Posts';
 import Docs from './pages/Docs';
 import Pricing from './pages/Pricing';
 
@@ -29,6 +30,7 @@ function App() {
                     <Route path="interview" element={<InterviewPrep />} />
                     <Route path="connect" element={<DeveloperConnect />} />
                     <Route path="jobs" element={<Jobs />} />
+                    <Route path="posts" element={<Posts />} />
 
                     {/* Redirect unknown app routes to dashboard */}
                     <Route path="*" element={<Navigate to="/app" replace />} />
