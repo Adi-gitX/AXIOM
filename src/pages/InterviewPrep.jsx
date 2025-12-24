@@ -27,7 +27,7 @@ const InterviewPrep = () => {
 
     return (
         <div className="min-h-screen p-8 lg:p-12">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
 
                 {/* Header */}
                 <motion.header
@@ -35,7 +35,7 @@ const InterviewPrep = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-4xl font-light text-white text-glow font-display">Interview Prep</h1>
+                    <h1 className="text-5xl font-light text-white text-glow font-display">Interview Prep</h1>
                     <p className="text-gray-400 mt-2">Resources to ace your interviews</p>
                 </motion.header>
 
@@ -56,7 +56,7 @@ const InterviewPrep = () => {
                 </div>
 
                 {/* Resources */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-12">
                     {filtered.map((r, i) => (
                         <motion.div
                             key={r.id}

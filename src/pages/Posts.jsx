@@ -478,11 +478,11 @@ const Posts = () => {
     const filters = ['For You', 'Following', 'Popular', 'Recent'];
 
     return (
-        <div className="min-h-screen p-6 lg:p-8">
-            <div className="max-w-[1200px] mx-auto space-y-8">
+        <div className="min-h-screen p-8 lg:p-12">
+            <div className="max-w-5xl mx-auto space-y-12">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-4xl font-light text-white font-display tracking-tight mb-2">Posts</h1>
+                        <h1 className="text-5xl font-light text-white font-display tracking-tight mb-2">Posts</h1>
                         <p className="text-gray-400 text-lg font-light">Discover developer articles and projects</p>
                     </div>
                     <Button variant="primary">

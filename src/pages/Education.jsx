@@ -27,7 +27,7 @@ const Education = () => {
                         </div>
                     ) : (
                         <>
-                            <h1 className="text-4xl font-light text-white text-glow font-display">Education</h1>
+                            <h1 className="text-5xl font-light text-white text-glow font-display">Education</h1>
                             <p className="text-gray-400 mt-2">Choose what to learn</p>
                         </>
                     )}

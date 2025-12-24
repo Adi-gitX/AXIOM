@@ -23,7 +23,7 @@ const Jobs = () => {
 
     return (
         <div className="min-h-screen p-8 lg:p-12">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
 
                 {/* Header */}
                 <motion.header
@@ -31,7 +31,7 @@ const Jobs = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-4xl font-light text-white text-glow font-display">Jobs</h1>
+                    <h1 className="text-5xl font-light text-white text-glow font-display">Jobs</h1>
                     <p className="text-gray-400 mt-2">Find your next opportunity</p>
                 </motion.header>
 
