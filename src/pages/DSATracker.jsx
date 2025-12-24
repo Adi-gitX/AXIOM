@@ -1,60 +1,73 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, CheckCircle2, Circle, ExternalLink, Trophy } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, ExternalLink, Trophy, Target, Flame } from 'lucide-react';
 import { TOPICS } from '../data/dsaSheet';
 import useStore from '../store/useStore';
-import GlassCard from '../components/ui/GlassCard';
 
 const DSATracker = () => {
-    const { solvedProblems, toggleProblem } = useStore();
-    
+    const { solvedProblems } = useStore();
+
     // Calculate total progress
     const totalProblems = TOPICS.reduce((acc, topic) => acc + topic.total, 0);
     const solvedCount = solvedProblems.length;
     const progressPercentage = Math.round((solvedCount / totalProblems) * 100);
 
     return (
-        <div className="space-y-8 animate-fade-in max-w-6xl mx-auto pb-10">
-            {/* Header / Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <GlassCard className="md:col-span-2 flex flex-col justify-between relative overflow-hidden h-64 border-blue-500/20">
-                    <div className="relative z-10">
-                        <h1 className="text-4xl font-display font-bold text-white mb-2">Striver's A2Z DSA Sheet</h1>
-                        <p className="text-white/60 text-lg">Track your journey to mastery. Complete problems to level up.</p>
-                    </div>
-                    <div className="mt-6 flex items-end gap-3 font-display font-bold">
-                        <span className="text-6xl text-blue-500 text-shadow-glow">{solvedCount}</span>
-                        <span className="text-2xl text-white/40 mb-3">/ {totalProblems} Solved</span>
-                    </div>
-                    {/* Background decorations */}
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3" />
-                </GlassCard>
+        <div className="min-h-screen p-6 lg:p-8">
+            <div className="max-w-[1100px] mx-auto space-y-8">
 
-                <GlassCard className="flex items-center justify-center relative h-64 border-purple-500/20">
-                     <div className="text-center relative z-10">
-                        <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
-                            <Trophy size={32} className="text-yellow-500" />
+                {/* Header */}
+                <header>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display mb-2">
+                        DSA Tracker
+                    </h1>
+                    <p className="text-gray-500 text-lg">
+                        Master data structures and algorithms with Striver's A2Z Sheet
+                    </p>
+                </header>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Progress Card */}
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 md:col-span-2">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1">Total Progress</p>
+                                <p className="text-4xl font-bold text-gray-900">
+                                    {solvedCount} <span className="text-xl text-gray-400 font-normal">/ {totalProblems}</span>
+                                </p>
+                            </div>
+                            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                                <Target size={24} className="text-blue-600" />
+                            </div>
                         </div>
-                        <h3 className="text-3xl font-bold text-white mb-1">{progressPercentage}% </h3>
-                        <p className="text-sm text-white/50 uppercase tracking-widest font-semibold">Complete</p>
-                     </div>
-                     {/* Circular Progress Ring */}
-                     <svg className="absolute inset-0 w-full h-full -rotate-90 p-4 opacity-50" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-white/5" strokeWidth="6" />
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-blue-500 transition-all duration-1000 ease-out" strokeWidth="6"
-                            strokeDasharray="264"
-                            strokeDashoffset={264 - (264 * progressPercentage) / 100}
-                             strokeLinecap="round"
-                        />
-                     </svg>
-                </GlassCard>
-            </div>
+                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progressPercentage}%` }}
+                                transition={{ duration: 1 }}
+                                className="h-full bg-gray-900 rounded-full"
+                            />
+                        </div>
+                        <p className="text-sm text-gray-400 mt-2">{progressPercentage}% complete</p>
+                    </div>
 
-            {/* Accordion Topics */}
-            <div className="space-y-4">
-                {TOPICS.map((topic) => (
-                    <AccordionItem key={topic.id} topic={topic} />
-                ))}
+                    {/* Trophy Card */}
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col items-center justify-center text-center">
+                        <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-3">
+                            <Trophy size={28} className="text-amber-500" />
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900 mb-1">{progressPercentage}%</p>
+                        <p className="text-sm text-gray-500">Completion Rate</p>
+                    </div>
+                </div>
+
+                {/* Topics Accordion */}
+                <div className="space-y-3">
+                    {TOPICS.map((topic) => (
+                        <AccordionItem key={topic.id} topic={topic} />
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -63,46 +76,47 @@ const DSATracker = () => {
 const AccordionItem = ({ topic }) => {
     const [isOpen, setIsOpen] = useState(false);
     const { solvedProblems, toggleProblem } = useStore();
-    
-    // Calculate solved for this specific topic based on global state
+
+    // Calculate solved for this specific topic
     const topicProblemIds = topic.problems.map(p => p.id);
     const solvedInTopic = topicProblemIds.filter(id => solvedProblems.includes(id)).length;
     const isComplete = solvedInTopic === topic.total;
+    const progressPercent = (solvedInTopic / topic.total) * 100;
 
     return (
-        <motion.div 
-            className={`rounded-2xl border transition-all duration-500 overflow-hidden ${isOpen ? 'bg-white/5 border-white/10' : 'bg-transparent border-white/5 hover:bg-white/5'}`}
-            initial={false}
-        >
-            <button 
+        <div className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-gray-200 shadow-sm' : 'border-gray-100 hover:border-gray-200'
+            }`}>
+            <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between p-6 text-left group"
+                className="w-full flex items-center justify-between p-5 text-left group"
             >
-                <div className="flex items-center gap-5">
-                    <span className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl transition-colors
-                        ${isComplete ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-white/70 group-hover:bg-blue-500/20 group-hover:text-blue-400'}
-                    `}>
-                        {isComplete ? <CheckCircle2 size={24} /> : topic.id}
+                <div className="flex items-center gap-4">
+                    <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-colors ${isComplete
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : 'bg-gray-100 text-gray-600 group-hover:bg-gray-900 group-hover:text-white'
+                        }`}>
+                        {isComplete ? <CheckCircle2 size={20} /> : topic.id}
                     </span>
                     <div>
-                        <h3 className="font-bold text-white text-xl group-hover:text-blue-400 transition-colors">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
                             {topic.name}
                         </h3>
-                        <div className="flex items-center gap-2 mt-1">
-                             <div className="h-1.5 w-24 bg-white/10 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-blue-500 rounded-full transition-all duration-500" 
-                                    style={{ width: `${(solvedInTopic / topic.total) * 100}%` }}
+                        <div className="flex items-center gap-3 mt-1">
+                            <div className="h-1.5 w-20 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-emerald-500' : 'bg-gray-900'}`}
+                                    style={{ width: `${progressPercent}%` }}
                                 />
-                             </div>
-                             <p className="text-white/40 text-xs font-medium">
+                            </div>
+                            <p className="text-xs text-gray-400 font-medium">
                                 {solvedInTopic} / {topic.total}
-                             </p>
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div className={`p-2 rounded-full transition-all duration-300 ${isOpen ? 'bg-white/10 rotate-180' : 'text-white/30 group-hover:text-white'}`}>
-                     <ChevronDown size={20} />
+                <div className={`p-2 rounded-full transition-all duration-300 ${isOpen ? 'bg-gray-100 rotate-180' : 'text-gray-400 group-hover:text-gray-600'
+                    }`}>
+                    <ChevronDown size={18} />
                 </div>
             </button>
 
@@ -114,36 +128,47 @@ const AccordionItem = ({ topic }) => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <div className="px-6 pb-6 pt-0">
-                            <div className="pl-[4.25rem] grid gap-2">
+                        <div className="px-5 pb-5 pt-0">
+                            <div className="pl-14 space-y-1">
                                 {topic.problems.map((prob) => {
                                     const isSolved = solvedProblems.includes(prob.id);
                                     return (
-                                        <div key={prob.id} className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors group/item border border-transparent hover:border-white/5">
-                                            <div className="flex items-center gap-4">
-                                                <button 
+                                        <div
+                                            key={prob.id}
+                                            className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-gray-50 transition-colors group/item"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <button
                                                     onClick={() => toggleProblem(prob.id)}
-                                                    className={`transition-all duration-300 ${isSolved ? 'text-green-500 scale-110' : 'text-white/20 hover:text-white hover:scale-110'}`}
+                                                    className={`transition-all duration-200 ${isSolved
+                                                        ? 'text-emerald-500'
+                                                        : 'text-gray-300 hover:text-gray-500'
+                                                        }`}
                                                 >
-                                                    {isSolved 
-                                                        ? <CheckCircle2 size={22} className="fill-green-500/10" /> 
-                                                        : <Circle size={22} />
+                                                    {isSolved
+                                                        ? <CheckCircle2 size={20} className="fill-emerald-50" />
+                                                        : <Circle size={20} />
                                                     }
                                                 </button>
-                                                <span className={`font-medium text-lg transition-colors ${isSolved ? 'text-white/30 line-through' : 'text-white/90'}`}>
+                                                <span className={`font-medium transition-colors ${isSolved ? 'text-gray-400 line-through' : 'text-gray-700'
+                                                    }`}>
                                                     {prob.title}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-4">
-                                                <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider
-                                                    ${prob.difficulty === 'Easy' ? 'bg-green-500/10 text-green-400' : ''}
-                                                    ${prob.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' : ''}
-                                                    ${prob.difficulty === 'Hard' ? 'bg-red-500/10 text-red-400' : ''}
-                                                `}>
+                                            <div className="flex items-center gap-3">
+                                                <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${prob.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-600' :
+                                                    prob.difficulty === 'Medium' ? 'bg-amber-50 text-amber-600' :
+                                                        'bg-red-50 text-red-600'
+                                                    }`}>
                                                     {prob.difficulty}
                                                 </span>
-                                                <a href={prob.link} target="_blank" rel="noopener noreferrer" className="p-2 text-white/30 hover:text-blue-400 opacity-0 group-hover/item:opacity-100 transition-all hover:bg-blue-500/10 rounded-lg">
-                                                    <ExternalLink size={18} />
+                                                <a
+                                                    href={prob.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="p-2 text-gray-300 hover:text-blue-600 opacity-0 group-hover/item:opacity-100 transition-all hover:bg-blue-50 rounded-lg"
+                                                >
+                                                    <ExternalLink size={16} />
                                                 </a>
                                             </div>
                                         </div>
@@ -154,7 +179,7 @@ const AccordionItem = ({ topic }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 };
 

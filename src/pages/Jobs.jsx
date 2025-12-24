@@ -20,18 +20,18 @@ const Jobs = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-8 lg:p-12">
+        <div className="min-h-screen p-6 lg:p-8">
             <div className="max-w-[1100px] mx-auto space-y-8">
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <header>
-                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight font-display mb-2">Internships & Jobs</h1>
-                        <p className="text-gray-500 text-lg">Curated opportunities from top companies.</p>
+                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display mb-2">Internships & Jobs</h1>
+                        <p className="text-gray-500 text-lg">Curated opportunities from top companies</p>
                     </header>
                     <button
                         onClick={handleRefresh}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-gray-800 transition-colors"
                     >
                         <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
                         {isRefreshing ? 'Syncing...' : 'Sync Jobs'}
@@ -45,7 +45,7 @@ const Jobs = () => {
                         <input
                             type="text"
                             placeholder="Search by role, company, or stack..."
-                            className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300 transition-all text-sm"
+                            className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-100 focus:border-gray-300 transition-all text-sm"
                         />
                     </div>
                     <select className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-700 text-sm font-medium focus:outline-none cursor-pointer hover:border-gray-300 transition-colors">
@@ -75,7 +75,7 @@ const Jobs = () => {
                                 <div className="flex items-start gap-4 flex-1">
                                     <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-xl object-cover" />
                                     <div>
-                                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{job.role}</h3>
+                                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-gray-700 transition-colors">{job.role}</h3>
                                         <p className="text-gray-500 text-sm mb-3 flex items-center gap-1">
                                             <Building2 size={14} /> {job.company}
                                         </p>
@@ -91,20 +91,20 @@ const Jobs = () => {
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => saveJob(job.id)}
-                                            className={`p-2 rounded-lg transition-colors ${isSaved ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+                                            className={`p-2 rounded-lg transition-colors ${isSaved ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
                                         >
                                             <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
                                         </button>
                                         <span className="text-xs text-gray-400">{job.posted}</span>
                                     </div>
                                     {isApplied ? (
-                                        <button disabled className="px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-200 text-sm font-semibold rounded-lg flex items-center gap-2">
+                                        <button disabled className="px-4 py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-sm font-semibold rounded-xl flex items-center gap-2">
                                             <CheckCircle size={14} /> Applied
                                         </button>
                                     ) : (
                                         <button
                                             onClick={() => applyToJob(job.id)}
-                                            className="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                                            className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors flex items-center gap-2"
                                         >
                                             Apply <ArrowRight size={14} />
                                         </button>
@@ -120,7 +120,7 @@ const Jobs = () => {
 };
 
 const Badge = ({ children, className = "" }) => (
-    <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 border border-gray-200 ${className}`}>
+    <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-600 border border-gray-100 ${className}`}>
         {children}
     </span>
 );
