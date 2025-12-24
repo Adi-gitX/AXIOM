@@ -188,74 +188,81 @@ const PostCard = ({ post, index, onClick }) => {
             transition={{ delay: index * 0.05 }}
             onClick={onClick}
             hoverEffect={true}
-            className="p-0 border-transparent hover:border-white/10"
+            className="p-0 border-transparent hover:border-white/10 flex flex-col h-full"
         >
-            <div className="p-6 pb-0">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg ring-1 ring-white/10" style={{ backgroundColor: post.source.color }}>
-                    {post.source.icon}
-                </div>
-                <h2 className="text-xl font-bold text-white leading-tight mb-3 group-hover:text-glow transition-all">{post.title}</h2>
-                <div className="flex flex-wrap gap-2 mb-3">
-                    {post.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1.5 bg-white/5 border border-white/5 text-sm text-gray-400 rounded-lg">#{tag}</span>
-                    ))}
-                </div>
-                <p className="text-gray-500 text-sm mb-4">{post.date} • {post.readTime}</p>
-            </div>
+            <div className="flex flex-col h-full">
+                <div className="flex-1 flex flex-col">
+                    <div className="p-6 pb-0">
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg ring-1 ring-white/10" style={{ backgroundColor: post.source.color }}>
+                            {post.source.icon}
+                        </div>
+                        <h2 className="text-xl font-bold text-white leading-tight mb-3 group-hover:text-glow transition-all">{post.title}</h2>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {post.tags.map(tag => (
+                                <span key={tag} className="px-3 py-1.5 bg-white/5 border border-white/5 text-sm text-gray-400 rounded-lg">#{tag}</span>
+                            ))}
+                        </div>
+                        <p className="text-gray-500 text-sm mb-4">{post.date} • {post.readTime}</p>
+                    </div>
 
-            <div className="mx-6 mb-4 p-4 bg-black/40 rounded-2xl border border-white/5">
-                <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-200 mb-1">
-                            {post.preview.repo.split('/')[0]}/<span className="font-bold text-white">{post.preview.repo.split('/')[1]}</span>
-                        </h3>
-                        <p className="text-sm text-gray-500 truncate">{post.preview.description}</p>
+                    <div className="mx-6 mb-4 p-4 bg-black/40 rounded-2xl border border-white/5 mt-auto">
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-lg font-semibold text-gray-200 mb-1">
+                                    {post.preview.repo.split('/')[0]}/<span className="font-bold text-white">{post.preview.repo.split('/')[1]}</span>
+                                </h3>
+                                <p className="text-sm text-gray-500 truncate">{post.preview.description}</p>
+                            </div>
+                            <img src={post.preview.icon} alt="" className="w-12 h-12 rounded-lg ml-3 bg-white/5" onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${post.preview.repo.split('/')[1]}&background=random`} />
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-gray-500 pt-3 border-t border-white/5">
+                            <div className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M2 5.5a3.5 3.5 0 115.898 2.549 5.507 5.507 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-7.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5zM11 4a.75.75 0 100 1.5 1.5 1.5 0 01.666 2.844.75.75 0 00-.416.672v.352a.75.75 0 00.574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 101.434-.44 5.01 5.01 0 00-2.56-3.012A3 3 0 0011 4z" /></svg>
+                                <span className="font-medium">{post.preview.contributors}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /><path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z" /></svg>
+                                <span className="font-medium">{post.preview.issues}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" /></svg>
+                                <span className="font-medium">{formatNumber(post.preview.stars)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013.5 6.25v-.878a2.25 2.25 0 111.5 0zM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0zm6.75.75a.75.75 0 100-1.5.75.75 0 000 1.5zm-3 8.75a.75.75 0 10-1.5 0 .75.75 0 001.5 0z" /></svg>
+                                <span className="font-medium">{formatNumber(post.preview.forks)}</span>
+                            </div>
+                        </div>
                     </div>
-                    <img src={post.preview.icon} alt="" className="w-12 h-12 rounded-lg ml-3 bg-white/5" onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${post.preview.repo.split('/')[1]}&background=random`} />
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500 pt-3 border-t border-white/5">
-                    <div className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M2 5.5a3.5 3.5 0 115.898 2.549 5.507 5.507 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-7.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5zM11 4a.75.75 0 100 1.5 1.5 1.5 0 01.666 2.844.75.75 0 00-.416.672v.352a.75.75 0 00.574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 101.434-.44 5.01 5.01 0 00-2.56-3.012A3 3 0 0011 4z" /></svg>
-                        <span className="font-medium">{post.preview.contributors}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /><path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z" /></svg>
-                        <span className="font-medium">{post.preview.issues}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" /></svg>
-                        <span className="font-medium">{formatNumber(post.preview.stars)}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013.5 6.25v-.878a2.25 2.25 0 111.5 0zM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0zm6.75.75a.75.75 0 100-1.5.75.75 0 000 1.5zm-3 8.75a.75.75 0 10-1.5 0 .75.75 0 001.5 0z" /></svg>
-                        <span className="font-medium">{formatNumber(post.preview.forks)}</span>
-                    </div>
-                </div>
-            </div>
 
-            <div className="mx-6 mb-4 h-px bg-white/5" />
+                <div className="mx-6 mb-4 h-px bg-white/5 mt-auto" />
 
-            <div className="px-6 pb-6 flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                    <button onClick={handleUpvote} className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${hasUpvoted ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        <span className="font-semibold">{upvotes}</span>
-                    </button>
-                    <button onClick={handleDownvote} className={`p-2 rounded-xl transition-all ${hasDownvoted ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    </button>
-                    <button onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-500 hover:bg-white/10 hover:text-white transition-all">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        <span className="font-medium">{post.comments}</span>
-                    </button>
-                </div>
-                <div className="flex items-center gap-1">
-                    <button onClick={(e) => { e.stopPropagation(); setIsSaved(!isSaved); }} className={`p-2.5 rounded-xl transition-all ${isSaved ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" /></svg>
-                    </button>
-                    <button onClick={(e) => e.stopPropagation()} className="p-2.5 rounded-xl text-gray-500 hover:bg-white/10 hover:text-white transition-all">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" strokeLinecap="round" strokeLinejoin="round" /><path d="M16 6l-4-4-4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M12 2v13" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    </button>
+                <div className="px-6 pb-6 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center bg-white/5 rounded-xl border border-white/5 p-1">
+                            <button onClick={handleUpvote} className={`h-8 flex items-center gap-2 px-3 rounded-lg transition-all ${hasUpvoted ? 'bg-white text-black shadow-glow' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                <span className="text-sm font-semibold">{upvotes}</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10 mx-1" />
+                            <button onClick={handleDownvote} className={`h-8 w-8 flex items-center justify-center rounded-lg transition-all ${hasDownvoted ? 'text-red-400 bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            </button>
+                        </div>
+                        <button onClick={(e) => e.stopPropagation()} className="h-10 px-3 flex items-center gap-2 rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            <span className="font-medium text-sm">{post.comments}</span>
+                        </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={(e) => { e.stopPropagation(); setIsSaved(!isSaved); }} className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${isSaved ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" /></svg>
+                        </button>
+                        <button onClick={(e) => e.stopPropagation()} className="h-10 w-10 flex items-center justify-center rounded-xl text-gray-500 hover:bg-white/10 hover:text-white transition-all">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" strokeLinecap="round" strokeLinejoin="round" /><path d="M16 6l-4-4-4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M12 2v13" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </GlassCard>
