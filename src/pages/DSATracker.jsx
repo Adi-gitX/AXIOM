@@ -1,180 +1,130 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, CheckCircle2, Circle, ExternalLink, Trophy, Target, Flame } from 'lucide-react';
 import { TOPICS } from '../data/dsaSheet';
 import useStore from '../store/useStore';
 
 const DSATracker = () => {
     const { solvedProblems } = useStore();
+    const [expanded, setExpanded] = useState(null);
 
-    // Calculate total progress
-    const totalProblems = TOPICS.reduce((acc, topic) => acc + topic.total, 0);
-    const solvedCount = solvedProblems.length;
-    const progressPercentage = Math.round((solvedCount / totalProblems) * 100);
+    const total = TOPICS.reduce((acc, t) => acc + t.total, 0);
+    const solved = solvedProblems.length;
+    const progress = Math.round((solved / total) * 100);
 
     return (
-        <div className="min-h-screen p-6 lg:p-8">
-            <div className="max-w-[1100px] mx-auto space-y-8">
+        <div className="min-h-screen bg-white p-8 lg:p-12">
+            <div className="max-w-4xl mx-auto">
 
                 {/* Header */}
-                <header>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display mb-2">
-                        DSA Tracker
-                    </h1>
-                    <p className="text-gray-500 text-lg">
-                        Master data structures and algorithms with Striver's A2Z Sheet
-                    </p>
-                </header>
+                <motion.header
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mb-12"
+                >
+                    <h1 className="text-4xl font-light text-gray-900">DSA Tracker</h1>
+                    <p className="text-gray-400 mt-2">Striver's A2Z Sheet</p>
+                </motion.header>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Progress Card */}
-                    <div className="bg-white rounded-2xl border border-gray-100 p-6 md:col-span-2">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <p className="text-sm text-gray-500 mb-1">Total Progress</p>
-                                <p className="text-4xl font-bold text-gray-900">
-                                    {solvedCount} <span className="text-xl text-gray-400 font-normal">/ {totalProblems}</span>
-                                </p>
-                            </div>
-                            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                                <Target size={24} className="text-blue-600" />
-                            </div>
+                {/* Progress */}
+                <div className="mb-12">
+                    <div className="flex items-end justify-between mb-3">
+                        <div>
+                            <p className="text-5xl font-light text-gray-900">{solved}</p>
+                            <p className="text-gray-400 mt-1">of {total} problems</p>
                         </div>
-                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${progressPercentage}%` }}
-                                transition={{ duration: 1 }}
-                                className="h-full bg-gray-900 rounded-full"
-                            />
-                        </div>
-                        <p className="text-sm text-gray-400 mt-2">{progressPercentage}% complete</p>
+                        <p className="text-3xl font-light text-gray-300">{progress}%</p>
                     </div>
-
-                    {/* Trophy Card */}
-                    <div className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col items-center justify-center text-center">
-                        <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-3">
-                            <Trophy size={28} className="text-amber-500" />
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900 mb-1">{progressPercentage}%</p>
-                        <p className="text-sm text-gray-500">Completion Rate</p>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.6 }}
+                            className="h-full bg-gray-900 rounded-full"
+                        />
                     </div>
                 </div>
 
-                {/* Topics Accordion */}
-                <div className="space-y-3">
-                    {TOPICS.map((topic) => (
-                        <AccordionItem key={topic.id} topic={topic} />
+                {/* Topics */}
+                <div className="space-y-2">
+                    {TOPICS.map((topic, i) => (
+                        <TopicItem
+                            key={topic.id}
+                            topic={topic}
+                            index={i}
+                            isOpen={expanded === topic.id}
+                            onToggle={() => setExpanded(expanded === topic.id ? null : topic.id)}
+                        />
                     ))}
                 </div>
+
             </div>
         </div>
     );
 };
 
-const AccordionItem = ({ topic }) => {
-    const [isOpen, setIsOpen] = useState(false);
+const TopicItem = ({ topic, index, isOpen, onToggle }) => {
     const { solvedProblems, toggleProblem } = useStore();
-
-    // Calculate solved for this specific topic
-    const topicProblemIds = topic.problems.map(p => p.id);
-    const solvedInTopic = topicProblemIds.filter(id => solvedProblems.includes(id)).length;
-    const isComplete = solvedInTopic === topic.total;
-    const progressPercent = (solvedInTopic / topic.total) * 100;
+    const solvedHere = topic.problems.filter(p => solvedProblems.includes(p.id)).length;
 
     return (
-        <div className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-gray-200 shadow-sm' : 'border-gray-100 hover:border-gray-200'
-            }`}>
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between p-5 text-left group"
-            >
+        <div className="bg-gray-50 rounded-xl overflow-hidden">
+            <button onClick={onToggle} className="w-full flex items-center justify-between p-5 text-left group">
                 <div className="flex items-center gap-4">
-                    <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-colors ${isComplete
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'bg-gray-100 text-gray-600 group-hover:bg-gray-900 group-hover:text-white'
-                        }`}>
-                        {isComplete ? <CheckCircle2 size={20} /> : topic.id}
-                    </span>
+                    <span className="text-xs text-gray-400 font-mono w-5">{String(index + 1).padStart(2, '0')}</span>
                     <div>
-                        <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
-                            {topic.name}
-                        </h3>
-                        <div className="flex items-center gap-3 mt-1">
-                            <div className="h-1.5 w-20 bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-emerald-500' : 'bg-gray-900'}`}
-                                    style={{ width: `${progressPercent}%` }}
-                                />
-                            </div>
-                            <p className="text-xs text-gray-400 font-medium">
-                                {solvedInTopic} / {topic.total}
-                            </p>
-                        </div>
+                        <h3 className="font-medium text-gray-900">{topic.name}</h3>
+                        <p className="text-xs text-gray-400 mt-0.5">{solvedHere}/{topic.total}</p>
                     </div>
                 </div>
-                <div className={`p-2 rounded-full transition-all duration-300 ${isOpen ? 'bg-gray-100 rotate-180' : 'text-gray-400 group-hover:text-gray-600'
-                    }`}>
-                    <ChevronDown size={18} />
-                </div>
+                <motion.svg
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    className="w-4 h-4 text-gray-400"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                >
+                    <path d="M19 9l-7 7-7-7" />
+                </motion.svg>
             </button>
 
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        initial={{ height: 0 }}
+                        animate={{ height: 'auto' }}
+                        exit={{ height: 0 }}
+                        className="overflow-hidden"
                     >
-                        <div className="px-5 pb-5 pt-0">
-                            <div className="pl-14 space-y-1">
-                                {topic.problems.map((prob) => {
-                                    const isSolved = solvedProblems.includes(prob.id);
-                                    return (
-                                        <div
-                                            key={prob.id}
-                                            className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-gray-50 transition-colors group/item"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    onClick={() => toggleProblem(prob.id)}
-                                                    className={`transition-all duration-200 ${isSolved
-                                                        ? 'text-emerald-500'
-                                                        : 'text-gray-300 hover:text-gray-500'
-                                                        }`}
-                                                >
-                                                    {isSolved
-                                                        ? <CheckCircle2 size={20} className="fill-emerald-50" />
-                                                        : <Circle size={20} />
-                                                    }
-                                                </button>
-                                                <span className={`font-medium transition-colors ${isSolved ? 'text-gray-400 line-through' : 'text-gray-700'
-                                                    }`}>
-                                                    {prob.title}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${prob.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-600' :
-                                                    prob.difficulty === 'Medium' ? 'bg-amber-50 text-amber-600' :
-                                                        'bg-red-50 text-red-600'
-                                                    }`}>
-                                                    {prob.difficulty}
-                                                </span>
-                                                <a
-                                                    href={prob.link}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="p-2 text-gray-300 hover:text-blue-600 opacity-0 group-hover/item:opacity-100 transition-all hover:bg-blue-50 rounded-lg"
-                                                >
-                                                    <ExternalLink size={16} />
-                                                </a>
-                                            </div>
+                        <div className="px-5 pb-5 space-y-1">
+                            {topic.problems.map((p) => {
+                                const done = solvedProblems.includes(p.id);
+                                return (
+                                    <div key={p.id} className="flex items-center justify-between py-2">
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => toggleProblem(p.id)}
+                                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${done ? 'bg-gray-900 border-gray-900' : 'border-gray-300 hover:border-gray-500'
+                                                    }`}
+                                            >
+                                                {done && (
+                                                    <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                        <path d="M20 6L9 17l-5-5" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                            <span className={`text-sm ${done ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{p.name}</span>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`text-xs px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-gray-100 text-gray-500' :
+                                                    p.difficulty === 'Medium' ? 'bg-gray-200 text-gray-600' : 'bg-gray-300 text-gray-700'
+                                                }`}>{p.difficulty}</span>
+                                            <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-gray-600" onClick={(e) => e.stopPropagation()}>
+                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </motion.div>
                 )}

@@ -1,162 +1,138 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Hash, Search, Bell, Users, Briefcase, Send, Smile, Settings } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useStore from '../store/useStore';
 
 const CHANNELS = [
-    { id: 'general', name: 'general-chat', icon: Hash },
-    { id: 'react', name: 'react-devs', icon: Hash },
-    { id: 'jobs', name: 'job-postings', icon: Briefcase },
-    { id: 'help', name: 'coding-help', icon: Users },
+    { id: 'general', name: 'General', description: 'General discussion' },
+    { id: 'react', name: 'React', description: 'React, hooks, components' },
+    { id: 'jobs', name: 'Jobs', description: 'Opportunities & careers' },
+    { id: 'help', name: 'Help', description: 'Get help with code' },
 ];
 
 const DeveloperConnect = () => {
     const [activeChannel, setActiveChannel] = useState('general');
-    const [input, setInput] = useState('');
-    const { channels, addMessage, user } = useStore();
+    const [messageInput, setMessageInput] = useState('');
+    const { channels, addMessage } = useStore();
     const messagesEndRef = useRef(null);
 
-    const messages = channels[activeChannel] || [];
+    // Use channels from store, default to empty array
+    const channelMessages = channels?.[activeChannel] || [];
 
-    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    useEffect(() => { scrollToBottom(); }, [messages, activeChannel]);
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [channelMessages]);
 
-    const handleSend = (e) => {
-        e.preventDefault();
-        if (!input.trim()) return;
-        const newMessage = {
+    const handleSend = () => {
+        if (!messageInput.trim()) return;
+        addMessage(activeChannel, {
             id: Date.now(),
-            user: user.name.split(' ')[0],
-            avatar: user.avatar,
-            content: input,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        addMessage(activeChannel, newMessage);
-        setInput('');
+            user: 'You',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=You',
+            content: messageInput,
+            time: 'now',
+        });
+        setMessageInput('');
     };
 
     return (
-        <div className="h-[calc(100vh-2rem)] m-4 flex gap-4">
+        <div className="min-h-screen bg-white flex">
 
-            {/* Channels Sidebar */}
-            <div className="w-60 bg-white rounded-2xl border border-gray-100 flex-col hidden md:flex overflow-hidden">
-                <div className="p-4 border-b border-gray-100">
-                    <h2 className="font-semibold text-gray-900 text-sm">AXIOM Community</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">Connect with developers</p>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-                    {CHANNELS.map(channel => (
+            {/* Sidebar */}
+            <div className="w-60 border-r border-gray-100 p-6 shrink-0 hidden lg:block">
+                <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-5">Channels</h2>
+                <div className="space-y-1">
+                    {CHANNELS.map((channel) => (
                         <button
                             key={channel.id}
                             onClick={() => setActiveChannel(channel.id)}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all
-                                ${activeChannel === channel.id
-                                    ? 'bg-gray-900 text-white font-medium'
-                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                            className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-left transition-all ${activeChannel === channel.id
+                                    ? 'bg-gray-900 text-white'
+                                    : 'text-gray-600 hover:bg-gray-50'
+                                }`}
                         >
-                            <channel.icon size={16} />
-                            <span className="truncate">{channel.name}</span>
+                            <span className="text-gray-400">#</span>
+                            <span className="text-sm">{channel.name}</span>
                         </button>
                     ))}
-                </div>
-
-                <div className="p-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2.5 px-2 py-2">
-                        <div className="relative">
-                            <img src={user.avatar} className="w-9 h-9 rounded-full bg-gray-100" alt="" />
-                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                            <p className="text-[10px] text-gray-400">Online</p>
-                        </div>
-                        <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                            <Settings size={14} />
-                        </button>
-                    </div>
                 </div>
             </div>
 
-            {/* Chat Area */}
-            <div className="flex-1 flex flex-col bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            {/* Main */}
+            <div className="flex-1 flex flex-col min-h-screen">
+
                 {/* Header */}
-                <div className="h-14 border-b border-gray-100 flex items-center justify-between px-5 shrink-0">
-                    <div className="flex items-center gap-2">
-                        <Hash size={18} className="text-gray-400" />
-                        <span className="font-semibold text-gray-900">{CHANNELS.find(c => c.id === activeChannel)?.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                            <Search size={18} />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                            <Bell size={18} />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                            <Users size={18} />
-                        </button>
-                    </div>
-                </div>
+                <header className="px-8 py-6 border-b border-gray-100">
+                    <h1 className="text-2xl font-light text-gray-900">
+                        #{CHANNELS.find(c => c.id === activeChannel)?.name}
+                    </h1>
+                    <p className="text-sm text-gray-400 mt-1">
+                        {CHANNELS.find(c => c.id === activeChannel)?.description}
+                    </p>
+                </header>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-stone-50">
-                    {messages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-                                <Hash size={28} className="text-gray-300" />
+                <div className="flex-1 overflow-y-auto px-8 py-6">
+                    {channelMessages.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center">
+                            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
+                                <span className="text-2xl text-gray-300">#</span>
                             </div>
-                            <p className="text-sm font-medium">No messages yet</p>
-                            <p className="text-xs text-gray-400">Start the conversation!</p>
+                            <p className="text-gray-500 font-medium">Welcome to #{CHANNELS.find(c => c.id === activeChannel)?.name}</p>
+                            <p className="text-sm text-gray-400 mt-1">Start the conversation</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-6 max-w-3xl">
+                            {channelMessages.map((msg) => (
+                                <motion.div
+                                    key={msg.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex gap-4"
+                                >
+                                    <img
+                                        src={msg.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${msg.user}`}
+                                        alt=""
+                                        className="w-10 h-10 rounded-full bg-gray-100 shrink-0"
+                                    />
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-900">{msg.user}</span>
+                                            <span className="text-xs text-gray-400">{msg.time}</span>
+                                        </div>
+                                        <p className="text-gray-700 mt-1">{msg.content}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                            <div ref={messagesEndRef} />
                         </div>
                     )}
-                    {messages.map((msg) => (
-                        <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            key={msg.id}
-                            className={`flex gap-3 ${msg.user === user.name.split(' ')[0] ? 'flex-row-reverse' : ''}`}
-                        >
-                            <img src={msg.avatar} alt="" className="w-9 h-9 rounded-full bg-gray-100 object-cover shrink-0" />
-                            <div className={`flex flex-col max-w-[70%] ${msg.user === user.name.split(' ')[0] ? 'items-end' : 'items-start'}`}>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-xs text-gray-700">{msg.user}</span>
-                                    <span className="text-[10px] text-gray-400">{msg.time}</span>
-                                </div>
-                                <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.user === user.name.split(' ')[0]
-                                        ? 'bg-gray-900 text-white rounded-tr-md'
-                                        : 'bg-white text-gray-800 rounded-tl-md border border-gray-100'
-                                    }`}>
-                                    {msg.content}
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                    <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
-                <div className="p-4 border-t border-gray-100 shrink-0 bg-white">
-                    <form onSubmit={handleSend} className="flex items-center gap-2 bg-gray-50 rounded-xl p-1.5 border border-gray-200 focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-100 transition-all">
-                        <button type="button" className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                            <Smile size={18} />
-                        </button>
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder={`Message #${CHANNELS.find(c => c.id === activeChannel)?.name}`}
-                            className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 text-sm focus:outline-none py-1.5"
-                        />
-                        <button
-                            type="submit"
-                            disabled={!input.trim()}
-                            className="bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white p-2.5 rounded-lg transition-colors"
-                        >
-                            <Send size={16} />
-                        </button>
-                    </form>
+                <div className="px-8 py-5 border-t border-gray-100">
+                    <div className="max-w-3xl">
+                        <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
+                            <input
+                                type="text"
+                                value={messageInput}
+                                onChange={(e) => setMessageInput(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                                placeholder={`Message #${CHANNELS.find(c => c.id === activeChannel)?.name.toLowerCase()}`}
+                                className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none"
+                            />
+                            <button
+                                onClick={handleSend}
+                                disabled={!messageInput.trim()}
+                                className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-all"
+                            >
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     );

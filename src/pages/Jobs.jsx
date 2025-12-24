@@ -1,128 +1,100 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Clock, DollarSign, Filter, RefreshCw, Bookmark, CheckCircle, ArrowRight, Building2 } from 'lucide-react';
 import useStore from '../store/useStore';
 
 const JOBS = [
-    { id: 1, role: "Senior Frontend Engineer", company: "Vercel", location: "Remote", type: "Full-time", stack: ["React", "Next.js", "TypeScript"], salary: "$140k - $180k", posted: "2h ago", logo: "https://api.dicebear.com/7.x/initials/svg?seed=VE&backgroundColor=000000&textColor=ffffff" },
-    { id: 2, role: "Software Engineer II", company: "Google", location: "Bangalore", type: "Hybrid", stack: ["C++", "Python"], salary: "₹35L - ₹55L", posted: "5h ago", logo: "https://api.dicebear.com/7.x/initials/svg?seed=GO&backgroundColor=4285f4&textColor=ffffff" },
-    { id: 3, role: "Product Designer", company: "Airbnb", location: "San Francisco", type: "On-site", stack: ["Figma", "UI/UX"], salary: "$160k - $220k", posted: "1d ago", logo: "https://api.dicebear.com/7.x/initials/svg?seed=AB&backgroundColor=ff5a5f&textColor=ffffff" },
-    { id: 4, role: "Backend Developer", company: "Netflix", location: "Remote", type: "Contract", stack: ["Java", "Spring"], salary: "$120/hr", posted: "Just now", logo: "https://api.dicebear.com/7.x/initials/svg?seed=NF&backgroundColor=e50914&textColor=ffffff" },
+    { id: 1, title: 'Frontend Developer', company: 'Google', location: 'Remote', type: 'Full-time', salary: '$150K - $200K', posted: '2d ago' },
+    { id: 2, title: 'Backend Engineer', company: 'Meta', location: 'Menlo Park, CA', type: 'Full-time', salary: '$170K - $220K', posted: '3d ago' },
+    { id: 3, title: 'Full Stack Developer', company: 'Stripe', location: 'San Francisco', type: 'Full-time', salary: '$160K - $210K', posted: '1w ago' },
+    { id: 4, title: 'React Developer', company: 'Airbnb', location: 'Remote', type: 'Contract', salary: '$80/hr', posted: '1w ago' },
+    { id: 5, title: 'Software Engineer', company: 'Netflix', location: 'Los Gatos, CA', type: 'Full-time', salary: '$180K - $250K', posted: '2w ago' },
+    { id: 6, title: 'DevOps Engineer', company: 'Spotify', location: 'Remote', type: 'Full-time', salary: '$140K - $180K', posted: '2w ago' },
 ];
 
 const Jobs = () => {
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const { savedJobs, appliedJobs, saveJob, applyToJob } = useStore();
+    const [filter, setFilter] = useState('All');
+    const { savedJobs, saveJob } = useStore();
 
-    const handleRefresh = () => {
-        setIsRefreshing(true);
-        setTimeout(() => setIsRefreshing(false), 1500);
-    };
+    const filters = ['All', 'Remote', 'Full-time', 'Contract'];
+
+    const filteredJobs = filter === 'All'
+        ? JOBS
+        : JOBS.filter(j => j.location.includes('Remote') && filter === 'Remote' || j.type === filter);
 
     return (
-        <div className="min-h-screen p-6 lg:p-8">
-            <div className="max-w-[1100px] mx-auto space-y-8">
+        <div className="min-h-screen bg-white p-8 lg:p-12">
+            <div className="max-w-4xl mx-auto">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <header>
-                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display mb-2">Internships & Jobs</h1>
-                        <p className="text-gray-500 text-lg">Curated opportunities from top companies</p>
-                    </header>
-                    <button
-                        onClick={handleRefresh}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-gray-800 transition-colors"
-                    >
-                        <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-                        {isRefreshing ? 'Syncing...' : 'Sync Jobs'}
-                    </button>
+                <motion.header
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mb-12"
+                >
+                    <h1 className="text-4xl font-light text-gray-900">Jobs</h1>
+                    <p className="text-gray-400 mt-2">Find your next opportunity</p>
+                </motion.header>
+
+                {/* Filters */}
+                <div className="flex flex-wrap gap-2 mb-8">
+                    {filters.map((f) => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`px-4 py-2 text-sm rounded-full transition-all ${filter === f
+                                ? 'bg-gray-900 text-white'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                        >
+                            {f}
+                        </button>
+                    ))}
                 </div>
 
-                {/* Search */}
-                <div className="flex flex-col md:flex-row gap-3">
-                    <div className="flex-1 relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Search by role, company, or stack..."
-                            className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-100 focus:border-gray-300 transition-all text-sm"
-                        />
-                    </div>
-                    <select className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-700 text-sm font-medium focus:outline-none cursor-pointer hover:border-gray-300 transition-colors">
-                        <option>Any Location</option>
-                        <option>Remote</option>
-                        <option>On-site</option>
-                    </select>
-                    <button className="p-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors">
-                        <Filter size={18} />
-                    </button>
-                </div>
-
-                {/* Job List */}
+                {/* Jobs */}
                 <div className="space-y-3">
-                    {JOBS.map((job, idx) => {
-                        const isSaved = savedJobs.includes(job.id);
-                        const isApplied = appliedJobs.includes(job.id);
-
+                    {filteredJobs.map((job, i) => {
+                        const saved = savedJobs.includes(job.id);
                         return (
                             <motion.div
                                 key={job.id}
-                                className="p-5 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all flex flex-col md:flex-row gap-5 group"
-                                initial={{ opacity: 0, y: 12 }}
+                                initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05 }}
+                                transition={{ delay: i * 0.03 }}
+                                className="p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
                             >
-                                <div className="flex items-start gap-4 flex-1">
-                                    <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-xl object-cover" />
+                                <div className="flex items-start justify-between">
                                     <div>
-                                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-gray-700 transition-colors">{job.role}</h3>
-                                        <p className="text-gray-500 text-sm mb-3 flex items-center gap-1">
-                                            <Building2 size={14} /> {job.company}
-                                        </p>
-                                        <div className="flex flex-wrap gap-2">
-                                            <Badge><MapPin size={12} /> {job.location}</Badge>
-                                            <Badge><Clock size={12} /> {job.type}</Badge>
-                                            <Badge className="text-emerald-600 bg-emerald-50 border-emerald-100"><DollarSign size={12} /> {job.salary}</Badge>
+                                        <h3 className="font-medium text-gray-900">{job.title}</h3>
+                                        <p className="text-sm text-gray-500 mt-1">{job.company}</p>
+                                        <div className="flex items-center gap-3 mt-3 text-xs text-gray-400">
+                                            <span>{job.location}</span>
+                                            <span>·</span>
+                                            <span>{job.salary}</span>
+                                            <span>·</span>
+                                            <span>{job.posted}</span>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="flex flex-col items-end justify-between gap-3 shrink-0">
                                     <div className="flex items-center gap-2">
+                                        <span className="text-xs text-gray-400 bg-white px-2 py-1 rounded">{job.type}</span>
                                         <button
                                             onClick={() => saveJob(job.id)}
-                                            className={`p-2 rounded-lg transition-colors ${isSaved ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
+                                            className={`p-2 rounded-lg transition-colors ${saved ? 'text-gray-900' : 'text-gray-300 hover:text-gray-600'}`}
                                         >
-                                            <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
+                                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
+                                                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" />
+                                            </svg>
                                         </button>
-                                        <span className="text-xs text-gray-400">{job.posted}</span>
                                     </div>
-                                    {isApplied ? (
-                                        <button disabled className="px-4 py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-sm font-semibold rounded-xl flex items-center gap-2">
-                                            <CheckCircle size={14} /> Applied
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => applyToJob(job.id)}
-                                            className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors flex items-center gap-2"
-                                        >
-                                            Apply <ArrowRight size={14} />
-                                        </button>
-                                    )}
                                 </div>
                             </motion.div>
                         );
                     })}
                 </div>
+
             </div>
         </div>
     );
 };
-
-const Badge = ({ children, className = "" }) => (
-    <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-600 border border-gray-100 ${className}`}>
-        {children}
-    </span>
-);
 
 export default Jobs;
