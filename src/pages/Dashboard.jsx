@@ -43,8 +43,8 @@ const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-5xl font-light text-white font-display tracking-tight mb-2">Dashboard</h1>
-                    <p className="text-gray-400 text-lg font-light">Your command center</p>
+                    <h1 className="text-5xl font-light text-foreground font-display tracking-tight mb-2">Dashboard</h1>
+                    <p className="text-muted-foreground text-lg font-light">Your command center</p>
                 </motion.header>
 
                 {/* Stats */}
@@ -57,8 +57,8 @@ const Dashboard = () => {
                             transition={{ delay: i * 0.05 }}
                             className="p-6 flex flex-col items-start justify-center"
                         >
-                            <p className="text-4xl font-light text-white mb-2">{stat.value}</p>
-                            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">{stat.label}</p>
+                            <p className="text-4xl font-light text-foreground mb-2">{stat.value}</p>
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
                         </GlassCard>
                     ))}
                 </div>
@@ -77,10 +77,10 @@ const Dashboard = () => {
                                             initial={{ height: 0 }}
                                             animate={{ height: `${(activity[i] / max) * 100}%` }}
                                             transition={{ delay: i * 0.05, duration: 0.6, ease: "circOut" }}
-                                            className={`w-full rounded-full ${i === 3 ? 'bg-white shadow-[0_0_15px_rgba(255,255,255,0.4)]' : 'bg-white/10'}`}
+                                            className={`w-full rounded-full ${i === 3 ? 'bg-foreground shadow-[0_0_15px_rgba(var(--foreground),0.4)]' : 'bg-foreground/10'}`}
                                             style={{ minHeight: 8 }}
                                         />
-                                        <span className={`text-xs font-mono ${i === 3 ? 'text-white font-bold' : 'text-gray-500'}`}>{day}</span>
+                                        <span className={`text-xs font-mono ${i === 3 ? 'text-foreground font-bold' : 'text-muted-foreground'}`}>{day}</span>
                                     </div>
                                 ))}
                             </div>
@@ -99,11 +99,11 @@ const Dashboard = () => {
                                     className="p-4 flex items-center justify-between group cursor-pointer"
                                 >
                                     <div>
-                                        <span className="text-lg font-medium text-gray-200 group-hover:text-white transition-colors">{link.name}</span>
-                                        <p className="text-xs text-gray-500 group-hover:text-gray-400 mt-1">{link.desc}</p>
+                                        <span className="text-lg font-medium text-foreground/80 group-hover:text-foreground transition-colors">{link.name}</span>
+                                        <p className="text-xs text-muted-foreground group-hover:text-foreground/70 mt-1">{link.desc}</p>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1">
-                                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                    <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1">
+                                        <svg className="w-4 h-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                                     </div>
                                 </GlassCard>
                             ))}
@@ -113,9 +113,8 @@ const Dashboard = () => {
                                         key={link.name}
                                         hoverEffect={true}
                                         onClick={() => navigate(link.path)}
-                                        className="p-4 flex flex-col justify-center items-center text-center group cursor-pointer"
                                     >
-                                        <span className="font-medium text-gray-300 group-hover:text-white transition-colors">{link.name}</span>
+                                        <span className="font-medium text-muted-foreground group-hover:text-foreground transition-colors">{link.name}</span>
                                     </GlassCard>
                                 ))}
                             </div>

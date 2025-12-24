@@ -299,8 +299,8 @@ const PostModal = ({ post, onClose }) => {
     const handleCopyLink = () => { navigator.clipboard.writeText(window.location.href); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000); };
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-md overflow-y-auto" onClick={onClose}>
-            <motion.div initial={{ opacity: 0, y: 40, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.95 }} className="w-full max-w-5xl glass-panel !bg-[#050505]/90 rounded-3xl shadow-2xl overflow-hidden my-8 mx-4 flex border border-white/10" onClick={e => e.stopPropagation()}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+            <motion.div initial={{ opacity: 0, y: 40, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.95 }} className="w-full max-w-5xl glass-panel !bg-card/95 rounded-3xl shadow-2xl overflow-hidden my-8 mx-4 flex border border-border" onClick={e => e.stopPropagation()}>
 
                 {/* Main Content */}
                 <div className="flex-1 max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -318,56 +318,56 @@ const PostModal = ({ post, onClose }) => {
                         <div className="flex items-center justify-between mb-5">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg" style={{ backgroundColor: post.source.color }}>{post.source.icon}</div>
-                                <span className="font-medium text-gray-300">{post.source.name}</span>
+                                <span className="font-medium text-muted-foreground">{post.source.name}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <a href="#" className="flex items-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-gray-200">
+                                <a href="#" className="flex items-center gap-2 px-4 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 transition-colors">
                                     Read post <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
                                 </a>
-                                <button onClick={onClose} className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl">
+                                <button onClick={onClose} className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
                                 </button>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3 mb-5">
-                            <img src={post.author.avatar} alt="" className="w-11 h-11 rounded-full ring-2 ring-white/10" />
+                            <img src={post.author.avatar} alt="" className="w-11 h-11 rounded-full ring-2 ring-border/10" />
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-white">{post.author.name}</span>
-                                    <span className="text-sm text-gray-500">{post.author.handle}</span>
+                                    <span className="font-semibold text-foreground">{post.author.name}</span>
+                                    <span className="text-sm text-muted-foreground">{post.author.handle}</span>
                                 </div>
-                                <span className="text-xs text-gray-400 font-medium">⚡ {post.author.reputation}</span>
+                                <span className="text-xs text-muted-foreground font-medium">⚡ {post.author.reputation}</span>
                             </div>
                         </div>
 
-                        <h1 className="text-3xl font-bold text-white mb-2 leading-tight">{post.title}</h1>
-                        <p className="text-sm text-gray-500 mb-5">{post.readTime}</p>
+                        <h1 className="text-3xl font-bold text-foreground mb-2 leading-tight">{post.title}</h1>
+                        <p className="text-sm text-muted-foreground mb-5">{post.readTime}</p>
                     </div>
 
                     {/* Quick Actions */}
                     <div className="px-6 pb-4 flex flex-wrap gap-2">
-                        <button className="px-4 py-2 bg-white text-black text-sm font-bold rounded-xl shadow-glow">✨ TLDR</button>
-                        <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl hover:bg-white/10">Simplify it</button>
-                        <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl hover:bg-white/10">Remove fluff</button>
-                        <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl hover:bg-white/10">Challenge this</button>
+                        <button className="px-4 py-2 bg-foreground text-background text-sm font-bold rounded-xl shadow-glow transition-all">✨ TLDR</button>
+                        <button className="px-4 py-2 bg-muted border border-border text-muted-foreground text-sm font-medium rounded-xl hover:bg-accent hover:text-foreground transition-all">Simplify it</button>
+                        <button className="px-4 py-2 bg-muted border border-border text-muted-foreground text-sm font-medium rounded-xl hover:bg-accent hover:text-foreground transition-all">Remove fluff</button>
+                        <button className="px-4 py-2 bg-muted border border-border text-muted-foreground text-sm font-medium rounded-xl hover:bg-accent hover:text-foreground transition-all">Challenge this</button>
                     </div>
 
                     {/* Content */}
                     <div className="px-6 pb-5">
-                        <p className="text-gray-300 leading-relaxed text-lg">{post.content}</p>
+                        <p className="text-muted-foreground leading-relaxed text-lg">{post.content}</p>
                     </div>
 
                     {/* Tags */}
                     <div className="px-6 pb-5 flex flex-wrap gap-2">
                         {post.tags.map(tag => (
-                            <span key={tag} className="px-3.5 py-1.5 bg-white/5 border border-white/5 text-sm font-medium text-gray-400 rounded-xl">#{tag}</span>
+                            <span key={tag} className="px-3.5 py-1.5 bg-muted border border-border/50 text-sm font-medium text-muted-foreground rounded-xl">#{tag}</span>
                         ))}
                     </div>
 
                     {/* Stats */}
-                    <div className="px-6 py-3 text-sm text-gray-500 border-t border-white/5">
-                        <span className="font-bold text-white">{upvotes}</span> Upvotes • <span className="font-bold text-white">{comments.length}</span> Comments
+                    <div className="px-6 py-3 text-sm text-muted-foreground border-t border-border">
+                        <span className="font-bold text-foreground">{upvotes}</span> Upvotes • <span className="font-bold text-foreground">{comments.length}</span> Comments
                     </div>
 
                     {/* Actions */}
@@ -428,37 +428,37 @@ const PostModal = ({ post, onClose }) => {
                 </div>
 
                 {/* Sidebar */}
-                <div className="w-80 bg-black/40 border-l border-white/5 p-6 hidden lg:block max-h-[90vh] overflow-y-auto">
+                <div className="w-80 bg-background/40 border-l border-border p-6 hidden lg:block max-h-[90vh] overflow-y-auto">
                     {/* Source */}
-                    <div className="bg-white/5 rounded-2xl p-5 mb-5 border border-white/5">
+                    <div className="bg-card rounded-2xl p-5 mb-5 border border-border">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-lg" style={{ backgroundColor: post.source.color }}>{post.source.icon}</div>
-                            <span className="font-bold text-white">{post.source.name}</span>
+                            <span className="font-bold text-foreground">{post.source.name}</span>
                         </div>
                         <button className="w-full py-2.5 text-white font-semibold rounded-xl" style={{ backgroundColor: post.source.color }}>Join Community</button>
                         <p className="text-xs text-gray-500 mt-3 text-center">2.4K Members • 29.7K Upvotes</p>
                     </div>
 
                     {/* Author */}
-                    <div className="bg-white/5 rounded-2xl p-5 mb-5 border border-white/5">
+                    <div className="bg-card rounded-2xl p-5 mb-5 border border-border">
                         <div className="flex items-center gap-3 mb-4">
-                            <img src={post.author.avatar} alt="" className="w-14 h-14 rounded-full ring-2 ring-white/10" />
+                            <img src={post.author.avatar} alt="" className="w-14 h-14 rounded-full ring-2 ring-border/10" />
                             <div>
-                                <p className="font-bold text-white">{post.author.name}</p>
-                                <p className="text-xs text-gray-400">{post.author.handle}</p>
+                                <p className="font-bold text-foreground">{post.author.name}</p>
+                                <p className="text-xs text-muted-foreground">{post.author.handle}</p>
                             </div>
                         </div>
-                        <button onClick={() => setIsFollowing(!isFollowing)} className={`w-full py-2.5 font-semibold rounded-xl transition-all ${isFollowing ? 'bg-white/10 text-white' : 'bg-white text-black shadow-glow'}`}>
+                        <button onClick={() => setIsFollowing(!isFollowing)} className={`w-full py-2.5 font-semibold rounded-xl transition-all ${isFollowing ? 'bg-secondary text-secondary-foreground' : 'bg-primary text-primary-foreground shadow-glow'}`}>
                             {isFollowing ? '✓ Following' : 'Follow'}
                         </button>
-                        <p className="text-xs text-gray-500 font-medium mt-4">⚡ {post.author.reputation}</p>
+                        <p className="text-xs text-muted-foreground font-medium mt-4">⚡ {post.author.reputation}</p>
                     </div>
 
                     {/* Share */}
-                    <div className="bg-white/5 rounded-2xl p-5 border border-white/5">
-                        <p className="text-sm font-semibold text-white mb-4">Share this post</p>
+                    <div className="bg-card rounded-2xl p-5 border border-border">
+                        <p className="text-sm font-semibold text-foreground mb-4">Share this post</p>
                         <div className="grid grid-cols-4 gap-2">
-                            <button onClick={handleCopyLink} className={`flex items-center justify-center p-3 rounded-xl transition-all ${copiedLink ? 'bg-white text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
+                            <button onClick={handleCopyLink} className={`flex items-center justify-center p-3 rounded-xl transition-all ${copiedLink ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground'}`}>
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg>
                             </button>
                             <button className="flex items-center justify-center p-3 bg-[#25D366] text-white rounded-xl hover:opacity-90">
@@ -467,7 +467,7 @@ const PostModal = ({ post, onClose }) => {
                             <button className="flex items-center justify-center p-3 bg-[#1877F2] text-white rounded-xl hover:opacity-90">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                             </button>
-                            <button className="flex items-center justify-center p-3 bg-black text-white rounded-xl border border-white/20 hover:bg-gray-900">
+                            <button className="flex items-center justify-center p-3 bg-foreground text-background rounded-xl border border-border/20 hover:bg-foreground/90">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                             </button>
                         </div>

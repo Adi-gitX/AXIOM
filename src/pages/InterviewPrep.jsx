@@ -35,8 +35,8 @@ const InterviewPrep = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-5xl font-light text-white text-glow font-display">Interview Prep</h1>
-                    <p className="text-gray-400 mt-2">Resources to ace your interviews</p>
+                    <h1 className="text-5xl font-light text-foreground text-glow font-display">Interview Prep</h1>
+                    <p className="text-muted-foreground mt-2">Resources to ace your interviews</p>
                 </motion.header>
 
                 {/* Filters */}
@@ -46,8 +46,8 @@ const InterviewPrep = () => {
                             key={c}
                             onClick={() => setCat(c)}
                             className={`px-4 py-2 text-sm rounded-full transition-all border ${cat === c
-                                ? 'bg-white text-black border-white shadow-glow font-medium'
-                                : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10 hover:text-white'
+                                ? 'bg-foreground text-background border-foreground shadow-glow font-medium'
+                                : 'bg-muted text-muted-foreground border-border hover:bg-accent hover:text-foreground'
                                 }`}
                         >
                             {c}
@@ -63,18 +63,18 @@ const InterviewPrep = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.03 }}
-                            className="glass-card p-6 rounded-2xl hover:bg-white/5 transition-all cursor-pointer group border border-white/5 hover:border-white/20"
+                            className="glass-card p-6 rounded-2xl hover:bg-accent/50 transition-all cursor-pointer group border border-border hover:border-border/80"
                         >
-                            <span className="text-xs text-gray-500 font-mono group-hover:text-white transition-colors">{r.cat}</span>
-                            <h3 className="font-medium text-white mt-1 group-hover:text-glow transition-all">{r.title}</h3>
-                            <p className="text-sm text-gray-400 mt-2">{r.desc}</p>
+                            <span className="text-xs text-muted-foreground font-mono group-hover:text-foreground transition-colors">{r.cat}</span>
+                            <h3 className="font-medium text-foreground mt-1 group-hover:text-glow transition-all">{r.title}</h3>
+                            <p className="text-sm text-muted-foreground mt-2">{r.desc}</p>
                         </motion.div>
                     ))}
                 </div>
 
                 {/* Tips */}
-                <div className="glass-panel p-8 rounded-3xl border border-white/5">
-                    <h2 className="text-xs font-bold text-white uppercase tracking-widest mb-6 opacity-50">Quick Tips</h2>
+                <div className="glass-panel p-8 rounded-3xl border border-border">
+                    <h2 className="text-xs font-bold text-foreground uppercase tracking-widest mb-6 opacity-50">Quick Tips</h2>
                     <div className="space-y-4">
                         {TIPS.map((tip, i) => (
                             <motion.div
@@ -82,10 +82,10 @@ const InterviewPrep = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: i * 0.05 }}
-                                className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors"
+                                className="flex items-start gap-4 p-4 rounded-xl hover:bg-muted/50 transition-colors"
                             >
-                                <span className="text-xs text-gray-600 font-mono pt-1">{String(i + 1).padStart(2, '0')}</span>
-                                <p className="text-gray-300 text-sm leading-relaxed">{tip}</p>
+                                <span className="text-xs text-muted-foreground font-mono pt-1">{String(i + 1).padStart(2, '0')}</span>
+                                <p className="text-foreground/80 text-sm leading-relaxed">{tip}</p>
                             </motion.div>
                         ))}
                     </div>

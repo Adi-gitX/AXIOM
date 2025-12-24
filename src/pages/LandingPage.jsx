@@ -24,6 +24,7 @@ import {
 import { AnimatePresence } from 'framer-motion';
 import { ExpandableScreen, ExpandableScreenTrigger, ExpandableScreenContent } from '../components/ui/ExpandableScreen';
 import { WaitlistForm } from '../components/WaitlistForm';
+import { AnimatedThemeToggler } from '../components/AnimatedThemeToggler';
 
 // Assets
 import landscapeBg from '../assets/axiom-landscape.png';
@@ -268,10 +269,10 @@ const LandingPage = () => {
 
     return (
         <ReactLenis root options={{ lerp: 0.05, duration: 1.2, smoothTouch: true, wheelMultiplier: 0.8 }}>
-            <div className="bg-stone-50 text-gray-900 selection:bg-gray-900 selection:text-white font-sans overflow-x-hidden">
+            <div className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans overflow-x-hidden">
 
                 {/* MAIN CONTENT WRAPPER (Z-10 to cover footer) */}
-                <div className="relative z-10 bg-stone-50 shadow-2xl mb-[80vh]">
+                <div className="relative z-10 bg-background shadow-2xl mb-[80vh]">
                     {/* ... Existing Content ... */}
                     {/* HERO SECTION */}
                     <div className="relative h-screen w-full overflow-hidden flex flex-col justify-between">
@@ -287,7 +288,7 @@ const LandingPage = () => {
                                 className="absolute inset-0 bg-cover bg-center"
                                 style={{ backgroundImage: `url(${landscapeBg})` }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-stone-50" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                         </motion.div>
 
                         {/* Navigation */}
@@ -303,7 +304,7 @@ const LandingPage = () => {
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className="hidden md:flex gap-1 text-sm font-medium text-gray-600 bg-white/50 backdrop-blur-xl py-2 px-3 rounded-full border border-white/20 shadow-sm"
+                                className="hidden md:flex gap-1 text-sm font-medium text-muted-foreground bg-background/50 backdrop-blur-xl py-2 px-3 rounded-full border border-border/20 shadow-sm"
                             >
                                 {[
                                     { label: 'Product', action: () => { } },
@@ -314,20 +315,23 @@ const LandingPage = () => {
                                     <button
                                         key={item.label}
                                         onClick={item.action}
-                                        className="px-5 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 font-display tracking-wide uppercase text-xs focus:outline-none"
+                                        className="px-5 py-2 rounded-full hover:bg-background hover:text-foreground transition-all duration-300 font-display tracking-wide uppercase text-xs focus:outline-none"
                                     >
                                         {item.label}
                                     </button>
                                 ))}
                             </motion.nav>
-                            <motion.button
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                onClick={() => navigate('/app')}
-                                className="px-6 py-2.5 text-sm font-semibold bg-gray-900 text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-gray-900/20 font-display tracking-wide"
-                            >
-                                Log in
-                            </motion.button>
+                            <div className="flex items-center gap-4">
+                                <AnimatedThemeToggler />
+                                <motion.button
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    onClick={() => navigate('/app')}
+                                    className="px-6 py-2.5 text-sm font-semibold bg-primary text-primary-foreground rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-primary/20 font-display tracking-wide"
+                                >
+                                    Log in
+                                </motion.button>
+                            </div>
                         </header>
 
                         {/* Hero Text */}
@@ -337,7 +341,7 @@ const LandingPage = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.6 }}
-                                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-white/40 backdrop-blur-md shadow-sm text-xs font-bold uppercase tracking-widest text-gray-500 mb-6 font-display"
+                                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-background/80 border border-border/40 backdrop-blur-md shadow-sm text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6 font-display"
                                 >
                                     <Sparkles className="w-3 h-3 text-amber-500" />
                                     <span>Public Beta 1.0</span>
@@ -348,7 +352,7 @@ const LandingPage = () => {
                                         initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
                                         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                                         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                                        className="block"
+                                        className="block text-foreground"
                                     >
                                         The new standard
                                     </motion.span>
@@ -356,7 +360,7 @@ const LandingPage = () => {
                                         initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
                                         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                                         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                                        className="block text-transparent bg-clip-text bg-gradient-to-b from-gray-900 via-gray-700 to-gray-500"
+                                        className="block text-transparent bg-clip-text bg-gradient-to-b from-foreground via-foreground/80 to-muted-foreground"
                                     >
                                         in excellence.
                                     </motion.span>

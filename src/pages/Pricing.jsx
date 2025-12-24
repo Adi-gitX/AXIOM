@@ -57,14 +57,14 @@ const Pricing = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 shadow-sm text-xs font-bold uppercase tracking-widest text-gray-400 mb-8 font-display"
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border shadow-sm text-xs font-bold uppercase tracking-widest text-muted-foreground mb-8 font-display"
                     >
                         <span>Invest in yourself</span>
                     </motion.div>
-                    <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-white font-display mb-8 leading-[0.9] text-glow">
+                    <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-foreground font-display mb-8 leading-[0.9] text-glow">
                         Simple pricing for <br /> serious engineers.
                     </h1>
-                    <p className="text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
                         Start for free, upgrade when you're ready to master the entire stack.
                     </p>
                 </div>
@@ -76,12 +76,12 @@ const Pricing = () => {
                         <div className="flex flex-col h-full relative z-10 transform-style-3d">
                             <div className="mb-4">
                                 <Zap className="w-10 h-10 text-blue-400 mb-4" />
-                                <h3 className="text-2xl font-bold text-white font-display tracking-tight">Cadet</h3>
-                                <p className="text-sm text-gray-400 mt-2">Perfect for getting started.</p>
+                                <h3 className="text-2xl font-bold text-foreground font-display tracking-tight">Cadet</h3>
+                                <p className="text-sm text-muted-foreground mt-2">Perfect for getting started.</p>
                             </div>
                             <div className="mb-8">
-                                <span className="text-5xl font-bold text-white tracking-tighter">$0</span>
-                                <span className="text-gray-500 font-medium">/mo</span>
+                                <span className="text-5xl font-bold text-foreground tracking-tighter">$0</span>
+                                <span className="text-muted-foreground font-medium">/mo</span>
                             </div>
                             <ul className="space-y-4 mb-8 flex-1">
                                 {[
@@ -90,13 +90,13 @@ const Pricing = () => {
                                     'Community Support',
                                     'Public Profile'
                                 ].map(item => (
-                                    <li key={item} className="flex gap-3 text-sm text-gray-300 font-medium">
+                                    <li key={item} className="flex gap-3 text-sm text-muted-foreground font-medium">
                                         <Check className="w-5 h-5 text-green-400 shrink-0" />
                                         {item}
                                     </li>
                                 ))}
                             </ul>
-                            <button onClick={() => navigate('/app')} className="w-full py-4 rounded-xl border border-white/20 text-white font-bold hover:bg-white/10 transition-colors backdrop-blur-md">
+                            <button onClick={() => navigate('/app')} className="w-full py-4 rounded-xl border border-border text-foreground font-bold hover:bg-accent transition-colors backdrop-blur-md">
                                 Get Started
                             </button>
                         </div>

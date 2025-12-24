@@ -31,8 +31,8 @@ const Jobs = () => {
                     animate={{ opacity: 1 }}
                     className="mb-12"
                 >
-                    <h1 className="text-5xl font-light text-white text-glow font-display">Jobs</h1>
-                    <p className="text-gray-400 mt-2">Find your next opportunity</p>
+                    <h1 className="text-5xl font-light text-foreground text-glow font-display">Jobs</h1>
+                    <p className="text-muted-foreground mt-2">Find your next opportunity</p>
                 </motion.header>
 
                 {/* Filters */}
@@ -42,8 +42,8 @@ const Jobs = () => {
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`px-4 py-2 text-sm rounded-full transition-all border ${filter === f
-                                ? 'bg-white text-black border-white shadow-glow font-medium'
-                                : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10 hover:text-white'
+                                ? 'bg-foreground text-background border-foreground shadow-glow font-medium'
+                                : 'bg-muted text-muted-foreground border-border hover:bg-accent hover:text-foreground'
                                 }`}
                         >
                             {f}
@@ -61,23 +61,23 @@ const Jobs = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.03 }}
-                                className="glass-card p-6 rounded-2xl hover:bg-white/5 transition-all group border border-white/5 hover:border-white/20"
+                                className="glass-card p-6 rounded-2xl hover:bg-accent/50 transition-all group border border-border hover:border-border/80"
                             >
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <h3 className="text-lg font-medium text-white group-hover:text-glow transition-all">{job.title}</h3>
-                                        <p className="text-sm text-gray-400 mt-1">{job.company}</p>
-                                        <div className="flex items-center gap-3 mt-4 text-xs text-gray-500 font-mono">
-                                            <span className="bg-white/5 px-2 py-1 rounded border border-white/5">{job.location}</span>
+                                        <h3 className="text-lg font-medium text-foreground group-hover:text-glow transition-all">{job.title}</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">{job.company}</p>
+                                        <div className="flex items-center gap-3 mt-4 text-xs text-muted-foreground font-mono">
+                                            <span className="bg-muted px-2 py-1 rounded border border-border">{job.location}</span>
                                             <span>{job.salary}</span>
                                             <span>{job.posted}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs text-white/60 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">{job.type}</span>
+                                        <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">{job.type}</span>
                                         <button
                                             onClick={() => saveJob(job.id)}
-                                            className={`p-2 rounded-xl transition-all ${saved ? 'bg-white text-black hover:bg-gray-200' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                                            className={`p-2 rounded-xl transition-all ${saved ? 'bg-foreground text-background hover:opacity-90' : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-accent'}`}
                                         >
                                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
                                                 <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" />
