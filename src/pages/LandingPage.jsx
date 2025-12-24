@@ -20,7 +20,9 @@ import {
     Linkedin,
     Twitter
 } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { ExpandableScreen, ExpandableScreenTrigger, ExpandableScreenContent } from '../components/ui/ExpandableScreen';
+import { WaitlistForm } from '../components/WaitlistForm';
 
 // Assets
 import landscapeBg from '../assets/axiom-landscape.png';
@@ -117,6 +119,141 @@ const Typewriter = ({ text, delay = 0 }) => {
 
     return <span>{displayText}</span>;
 }
+
+// --- INTERNAL COMPONENTS ---
+const WaitlistContent = () => {
+    const [status, setStatus] = useState('idle'); // idle, loading, success
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setStatus('loading');
+        setTimeout(() => setStatus('success'), 1500);
+    };
+
+    if (status === 'success') {
+        return (
+            <div className="h-full w-full flex flex-col justify-center items-center text-center px-6">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(34,197,94,0.4)]"
+                >
+                    <Check className="w-12 h-12 text-white" />
+                </motion.div>
+                <motion.h3
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-5xl md:text-7xl font-bold text-white font-display mb-6 tracking-tighter"
+                >
+                    Access Requested.
+                </motion.h3>
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-xl text-gray-400 max-w-lg font-light"
+                >
+                    We've received your signal. Keep an eye on your inbox for your deployment keys.
+                </motion.p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-7xl mx-auto px-6 py-20 min-h-full flex flex-col lg:flex-row gap-16 justify-center items-center">
+
+            {/* Left Column: Context */}
+            <div className="flex-1 text-center lg:text-left max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8">
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    Spots filling fast
+                </div>
+                <h3 className="text-6xl md:text-8xl font-bold text-white font-display mb-6 tracking-tighter leading-[0.9]">
+                    Join the <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">vanguard.</span>
+                </h3>
+                <p className="text-xl text-gray-400 mb-12 font-light leading-relaxed">
+                    AXIOM is the new standard for engineering excellence. Secure your spot in the queue and get early access to:
+                </p>
+                <ul className="space-y-4 text-left hidden lg:block">
+                    {[
+                        'The Interactive Runtime Environment',
+                        'Advanced System Design Simulations',
+                        'Real-time Performance Metrics',
+                        'Exclusive "Founder Mode" Access'
+                    ].map((item, i) => (
+                        <motion.li
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 * i }}
+                            key={item}
+                            className="flex items-center gap-3 text-gray-300 font-medium"
+                        >
+                            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                            </div>
+                            {item}
+                        </motion.li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* Right Column: Form */}
+            <div className="flex-1 w-full max-w-md">
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Identity</label>
+                            <div className="group relative">
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="Jane Doe"
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-black/40 transition-all font-display tracking-wide focus:ring-1 focus:ring-blue-500/20"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Coordinates</label>
+                            <div className="group relative">
+                                <input
+                                    type="email"
+                                    required
+                                    placeholder="jane@example.com"
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-black/40 transition-all font-display tracking-wide focus:ring-1 focus:ring-blue-500/20"
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            disabled={status === 'loading'}
+                            className="w-full bg-white text-black font-bold text-lg py-4 rounded-xl hover:bg-gray-100 disabled:opacity-70 disabled:cursor-not-allowed transition-all font-display tracking-wide mt-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] relative overflow-hidden"
+                        >
+                            {status === 'loading' ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                    Processing...
+                                </span>
+                            ) : (
+                                <span className="flex items-center justify-center gap-2">
+                                    Request Access <ArrowRight className="w-4 h-4" />
+                                </span>
+                            )}
+                        </button>
+                    </form>
+                    <p className="text-center text-xs text-gray-500 mt-6 leading-relaxed">
+                        By requesting access, you agree to join our private research cohort. <br />
+                        <span className="text-gray-400 cursor-pointer hover:text-white underline decoration-gray-600">Privacy Protocol</span> applied.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -466,46 +603,15 @@ const LandingPage = () => {
                                         Join the waitlist <ArrowRight className="w-6 h-6" />
                                     </button>
                                 </ExpandableScreenTrigger>
-
-                                <ExpandableScreenContent className="bg-black/95 backdrop-blur-2xl">
-                                    <div className="max-w-7xl mx-auto px-6 py-20 min-h-full flex flex-col justify-center items-center text-center">
-                                        <h3 className="text-6xl md:text-8xl font-bold text-white font-display mb-6 tracking-tighter">
-                                            Join the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">vanguard.</span>
-                                        </h3>
-                                        <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mb-12 font-light leading-relaxed">
-                                            AXIOM is currently in private beta. Secure your spot in the queue and get early access to the runtime.
-                                        </p>
-
-                                        <form className="w-full max-w-md space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                            <div className="group relative">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Codename (Name)"
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all font-display tracking-wide"
-                                                />
-                                            </div>
-                                            <div className="group relative">
-                                                <input
-                                                    type="email"
-                                                    placeholder="Signal (Email)"
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all font-display tracking-wide"
-                                                />
-                                            </div>
-                                            <button className="w-full bg-white text-black font-bold text-xl py-4 rounded-2xl hover:bg-gray-200 transition-colors font-display tracking-wide mt-4">
-                                                Request Access
-                                            </button>
-                                            <p className="text-xs text-gray-600 mt-4">
-                                                No spam. Only critical updates.
-                                            </p>
-                                        </form>
-                                    </div>
+                                <ExpandableScreenContent className="p-0">
+                                    <WaitlistForm />
                                 </ExpandableScreenContent>
                             </ExpandableScreen>
                             <p className="mt-10 text-gray-400 text-sm font-bold tracking-[0.2em] uppercase font-display">No credit card required</p>
                         </div>
                     </div>
 
-                </div>
+                </div >
                 {/* END MAIN CONTENT WRAPPER */}
 
                 {/* FIXED FOOTER (Revealed by Parallax) */}
@@ -583,7 +689,7 @@ const LandingPage = () => {
                     </div>
                 </div>
 
-            </div>
+            </div >
         </ReactLenis >
     );
 };

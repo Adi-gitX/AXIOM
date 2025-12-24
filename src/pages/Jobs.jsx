@@ -1,54 +1,13 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Building2, Globe, Clock, DollarSign, Filter, RefreshCw, Bookmark, CheckCircle, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search, MapPin, Clock, DollarSign, Filter, RefreshCw, Bookmark, CheckCircle, ArrowRight, Building2 } from 'lucide-react';
 import useStore from '../store/useStore';
-import GlassCard from '../components/ui/GlassCard';
 
 const JOBS = [
-    {
-        id: 1,
-        role: "Senior Frontend Engineer",
-        company: "Vercel",
-        location: "Remote",
-        type: "Full-time",
-        stack: ["React", "Next.js", "TypeScript"],
-        salary: "$140k - $180k",
-        posted: "2 hours ago",
-        logo: "https://api.dicebear.com/7.x/initials/svg?seed=VE"
-    },
-    {
-        id: 2,
-        role: "Software Engineer II",
-        company: "Google",
-        location: "Bangalore, IN",
-        type: "Hybrid",
-        stack: ["C++", "Python", "System Design"],
-        salary: "₹35L - ₹55L",
-        posted: "5 hours ago",
-        logo: "https://api.dicebear.com/7.x/initials/svg?seed=GO"
-    },
-    {
-        id: 3,
-        role: "Product Designer",
-        company: "Airbnb",
-        location: "San Francisco, CA",
-        type: "On-site",
-        stack: ["Figma", "UI/UX", "Prototyping"],
-        salary: "$160k - $220k",
-        posted: "1 day ago",
-        logo: "https://api.dicebear.com/7.x/initials/svg?seed=AI"
-    },
-    {
-        id: 4,
-        role: "Backend Developer",
-        company: "Netflix",
-        location: "Remote",
-        type: "Contract",
-        stack: ["Java", "Spring Boot", "Kafka"],
-        salary: "$120/hr",
-        posted: "Just now",
-        logo: "https://api.dicebear.com/7.x/initials/svg?seed=NE"
-    },
+    { id: 1, role: "Senior Frontend Engineer", company: "Vercel", location: "Remote", type: "Full-time", stack: ["React", "Next.js", "TypeScript"], salary: "$140k - $180k", posted: "2h ago", logo: "https://api.dicebear.com/7.x/initials/svg?seed=VE&backgroundColor=000000&textColor=ffffff" },
+    { id: 2, role: "Software Engineer II", company: "Google", location: "Bangalore", type: "Hybrid", stack: ["C++", "Python"], salary: "₹35L - ₹55L", posted: "5h ago", logo: "https://api.dicebear.com/7.x/initials/svg?seed=GO&backgroundColor=4285f4&textColor=ffffff" },
+    { id: 3, role: "Product Designer", company: "Airbnb", location: "San Francisco", type: "On-site", stack: ["Figma", "UI/UX"], salary: "$160k - $220k", posted: "1d ago", logo: "https://api.dicebear.com/7.x/initials/svg?seed=AB&backgroundColor=ff5a5f&textColor=ffffff" },
+    { id: 4, role: "Backend Developer", company: "Netflix", location: "Remote", type: "Contract", stack: ["Java", "Spring"], salary: "$120/hr", posted: "Just now", logo: "https://api.dicebear.com/7.x/initials/svg?seed=NF&backgroundColor=e50914&textColor=ffffff" },
 ];
 
 const Jobs = () => {
@@ -57,118 +16,111 @@ const Jobs = () => {
 
     const handleRefresh = () => {
         setIsRefreshing(true);
-        setTimeout(() => setIsRefreshing(false), 2000);
+        setTimeout(() => setIsRefreshing(false), 1500);
     };
 
     return (
-        <div className="animate-fade-in space-y-6 max-w-6xl mx-auto pb-10">
-             {/* Header */}
-             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-4xl font-display font-bold text-white mb-2">Internships & Jobs</h1>
-                    <p className="text-white/60">Curated opportunities from top companies.</p>
-                </div>
-                <button 
-                    onClick={handleRefresh}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-medium transition-colors text-white"
-                >
-                    <RefreshCw size={18} className={`${isRefreshing ? 'animate-spin' : ''}`} />
-                    {isRefreshing ? 'Fetching...' : 'Sync Opportunities'}
-                </button>
-            </div>
+        <div className="min-h-screen bg-[#fafafa] p-8 lg:p-12">
+            <div className="max-w-[1100px] mx-auto space-y-8">
 
-            {/* Search & Filter */}
-            <GlassCard className="p-4 flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="Search by role, company, or stack..." 
-                        className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 transition-colors"
-                    />
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <header>
+                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight font-display mb-2">Internships & Jobs</h1>
+                        <p className="text-gray-500 text-lg">Curated opportunities from top companies.</p>
+                    </header>
+                    <button
+                        onClick={handleRefresh}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors"
+                    >
+                        <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+                        {isRefreshing ? 'Syncing...' : 'Sync Jobs'}
+                    </button>
                 </div>
-                <div className="flex gap-2">
-                    <select className="bg-black/20 border border-white/5 rounded-xl px-6 py-3 text-white focus:outline-none cursor-pointer appearance-none hover:bg-black/30 transition-colors">
+
+                {/* Search */}
+                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1 relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search by role, company, or stack..."
+                            className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300 transition-all text-sm"
+                        />
+                    </div>
+                    <select className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-700 text-sm font-medium focus:outline-none cursor-pointer hover:border-gray-300 transition-colors">
                         <option>Any Location</option>
                         <option>Remote</option>
                         <option>On-site</option>
                     </select>
-                    <button className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors shadow-lg shadow-blue-600/20">
-                        <Filter size={20} />
+                    <button className="p-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors">
+                        <Filter size={18} />
                     </button>
                 </div>
-            </GlassCard>
 
-            {/* Job List */}
-            <div className="space-y-4">
-                {JOBS.map((job) => {
-                    const isSaved = savedJobs.includes(job.id);
-                    const isApplied = appliedJobs.includes(job.id);
+                {/* Job List */}
+                <div className="space-y-3">
+                    {JOBS.map((job, idx) => {
+                        const isSaved = savedJobs.includes(job.id);
+                        const isApplied = appliedJobs.includes(job.id);
 
-                    return (
-                        <GlassCard 
-                            key={job.id}
-                            className="p-6 flex flex-col md:flex-row gap-6 group cursor-pointer border-white/5 hover:border-blue-500/30"
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            whileHover={{ scale: 1.01 }}
-                        >
-                            <div className="flex items-start gap-5 flex-1">
-                                <img src={job.logo} alt={job.company} className="w-16 h-16 rounded-2xl bg-white p-2 object-contain shadow-lg" />
-                                <div>
-                                    <h3 className="font-bold text-2xl text-white group-hover:text-blue-400 transition-colors">{job.role}</h3>
-                                    <p className="font-medium text-white/60 text-lg mb-4">{job.company}</p>
-                                    
-                                    <div className="flex flex-wrap gap-3">
-                                        <Badge icon={MapPin}>{job.location}</Badge>
-                                        <Badge icon={Clock}>{job.type}</Badge>
-                                        <Badge icon={DollarSign} className="text-green-400 border-green-500/20 bg-green-500/5">{job.salary}</Badge>
+                        return (
+                            <motion.div
+                                key={job.id}
+                                className="p-5 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all flex flex-col md:flex-row gap-5 group"
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                            >
+                                <div className="flex items-start gap-4 flex-1">
+                                    <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-xl object-cover" />
+                                    <div>
+                                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{job.role}</h3>
+                                        <p className="text-gray-500 text-sm mb-3 flex items-center gap-1">
+                                            <Building2 size={14} /> {job.company}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            <Badge><MapPin size={12} /> {job.location}</Badge>
+                                            <Badge><Clock size={12} /> {job.type}</Badge>
+                                            <Badge className="text-emerald-600 bg-emerald-50 border-emerald-100"><DollarSign size={12} /> {job.salary}</Badge>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="flex flex-col items-end justify-between gap-4">
-                                <div className="flex gap-2">
-                                    <button 
-                                        onClick={(e) => { e.stopPropagation(); saveJob(job.id); }}
-                                        className={`p-3 rounded-xl transition-colors ${isSaved ? 'text-blue-400 bg-blue-500/10' : 'text-white/40 hover:text-white hover:bg-white/10'}`}
-                                    >
-                                        <Bookmark size={22} fill={isSaved ? "currentColor" : "none"} />
-                                    </button>
-                                    {job.stack.map(tech => (
-                                        <span key={tech} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-white/50 hidden md:inline-block">
-                                            {tech}
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className="flex items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
-                                    <span className="text-sm text-white/30 hidden md:inline-block">{job.posted}</span>
+                                <div className="flex flex-col items-end justify-between gap-3 shrink-0">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => saveJob(job.id)}
+                                            className={`p-2 rounded-lg transition-colors ${isSaved ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+                                        >
+                                            <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
+                                        </button>
+                                        <span className="text-xs text-gray-400">{job.posted}</span>
+                                    </div>
                                     {isApplied ? (
-                                        <button disabled className="px-6 py-3 bg-green-500/20 text-green-400 border border-green-500/20 text-sm font-bold rounded-xl flex items-center justify-center gap-2 cursor-default w-full md:w-auto">
-                                            <CheckCircle size={18} />
-                                            Applied
+                                        <button disabled className="px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-200 text-sm font-semibold rounded-lg flex items-center gap-2">
+                                            <CheckCircle size={14} /> Applied
                                         </button>
                                     ) : (
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); applyToJob(job.id); }}
-                                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 w-full md:w-auto"
+                                        <button
+                                            onClick={() => applyToJob(job.id)}
+                                            className="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
                                         >
-                                            Apply Now <ArrowRight size={18} />
+                                            Apply <ArrowRight size={14} />
                                         </button>
                                     )}
                                 </div>
-                            </div>
-                        </GlassCard>
-                    );
-                })}
+                            </motion.div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
 };
 
-const Badge = ({ children, icon: Icon, className }) => (
-    <span className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70 ${className}`}>
-        {Icon && <Icon size={14} />}
+const Badge = ({ children, className = "" }) => (
+    <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 border border-gray-200 ${className}`}>
         {children}
     </span>
 );

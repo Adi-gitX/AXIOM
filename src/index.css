@@ -2,6 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Warm White Theme - Matches Landing Page & Docs */
+    --background: 30 6% 98%;
+    /* stone-50: #fafaf9 */
+    --foreground: 24 10% 10%;
+    /* stone-900: #1c1917 */
+
+    --card: 0 0% 100%;
+    /* Pure White */
+    --card-foreground: 24 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 10% 10%;
+
+    /* Blue Accent from Docs Style */
+    --primary: 217 91% 60%;
+    /* blue-500 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    /* gray-100 */
+    --secondary-foreground: 24 10% 10%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    /* gray-500 */
+
+    --accent: 30 6% 96%;
+    /* stone-100 */
+    --accent-foreground: 24 10% 10%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    /* gray-200 */
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+    /* blue-500 for focus rings */
+
+    --radius: 1rem;
+    /* 16px for rounder corners like Docs */
+  }
+
+  .dark {
+    --background: 24 10% 10%;
+    /* stone-900 */
+    --foreground: 30 6% 98%;
+    /* stone-50 */
+
+    --card: 20 14% 14%;
+    /* stone-800 */
+    --card-foreground: 30 6% 98%;
+
+    --popover: 24 10% 10%;
+    --popover-foreground: 30 6% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 20 14% 14%;
+    --secondary-foreground: 30 6% 98%;
+
+    --muted: 12 6% 15%;
+    --muted-foreground: 24 7% 60%;
+
+    --accent: 12 6% 15%;
+    --accent-foreground: 30 6% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 30 6% 98%;
+
+    --border: 12 6% 15%;
+    --input: 12 6% 15%;
+    --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
 @font-face {
   font-family: 'Terminal Grotesque';
   src: url('./assets/fonts/terminal-grotesque.ttf') format('truetype');
@@ -9,36 +99,17 @@
   font-style: normal;
 }
 
-:root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: dark;
-  color: theme('colors.text');
-  background-color: theme('colors.background');
-}
-
-body {
-  margin: 0;
-  /* display: flex; - Removed to fix page flow */
-  /* place-items: center; - Removed to fix page flow */
-  /* min-width: 320px; */
-  min-height: 100vh;
-  background-color: theme('colors.background');
-  overflow-x: hidden;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
-  background-attachment: fixed;
-}
-
 @layer utilities {
   .glass-panel {
-    background-color: theme('colors.glass.100');
-    @apply backdrop-blur-xl border border-white/10 shadow-lg;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .glass-card-hover {
+    @apply hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_30px_rgba(255, 255, 255, 0.05)] transition-all duration-500 ease-out;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
 }
 
@@ -66,31 +137,6 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
-}
-
-/* Glow Effect Utility */
-.glow-on-hover {
-  transition: all 0.3s ease;
-}
-
-.glow-on-hover:hover {
-  box-shadow: 0 0 20px -5px #3b82f6;
-  border-color: #3b82f6;
-}
-
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500;
-}
-
-/* Premium Landing Page Enhancements */
-@layer utilities {
-  .landing-gradient-overlay {
-    background: linear-gradient(to bottom,
-        rgba(0, 0, 0, 0.1) 0%,
-        transparent 30%,
-        transparent 70%,
-        rgba(0, 0, 0, 0.2) 100%);
-  }
 }
 
 /* Smooth scroll behavior */

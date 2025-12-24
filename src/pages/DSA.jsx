@@ -4,16 +4,22 @@ import DSATopic from '../components/DSATopic';
 
 const DSA = () => {
     return (
-        <div className="page-container animate-fade-in">
-            <header className="page-header" style={{ marginBottom: '30px' }}>
-                <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>DSA Tracker</h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Striver's SDE Sheet Problem List</p>
-            </header>
+        <div className="min-h-screen bg-[#fafafa] p-8 lg:p-12">
+            <div className="max-w-[1000px] mx-auto space-y-10">
+                <header>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight font-display mb-3">
+                        DSA Tracker
+                    </h1>
+                    <p className="text-gray-500 text-lg max-w-xl">
+                        Track your progress through Striver's SDE Sheet. 450+ problems, organized by topic.
+                    </p>
+                </header>
 
-            <div className="dsa-container">
-                {TOPICS.map(topic => (
-                    <DSATopic key={topic.id} topic={topic} />
-                ))}
+                <div className="space-y-3">
+                    {TOPICS.map(topic => (
+                        <DSATopic key={topic.id} topic={topic} />
+                    ))}
+                </div>
             </div>
         </div>
     );
