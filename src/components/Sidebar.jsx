@@ -59,7 +59,7 @@ const Sidebar = () => {
       {/* Footer */}
       <div className="p-4 border-t border-border flex items-center gap-2">
         <div className="flex-1 flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-muted/50 cursor-pointer transition-all duration-300 group border border-transparent hover:border-border/50">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-800 to-black border border-border/10 flex items-center justify-center text-gray-400 text-xs font-medium group-hover:text-foreground group-hover:border-border transition-all">
+          <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground text-xs font-medium group-hover:text-foreground group-hover:border-border transition-all">
             AD
           </div>
           <div className="flex-1 min-w-0">

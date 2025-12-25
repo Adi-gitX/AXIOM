@@ -188,34 +188,34 @@ const PostCard = ({ post, index, onClick }) => {
             transition={{ delay: index * 0.05 }}
             onClick={onClick}
             hoverEffect={true}
-            className="p-0 border-transparent hover:border-white/10 flex flex-col h-full"
+            className="p-0 border-transparent hover:border-border/50 flex flex-col h-full group"
         >
             <div className="flex flex-col h-full">
                 <div className="flex-1 flex flex-col">
                     <div className="p-6 pb-0">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg ring-1 ring-white/10" style={{ backgroundColor: post.source.color }}>
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg ring-1 ring-border/10" style={{ backgroundColor: post.source.color }}>
                             {post.source.icon}
                         </div>
-                        <h2 className="text-xl font-bold text-white leading-tight mb-3 group-hover:text-glow transition-all">{post.title}</h2>
+                        <h2 className="text-xl font-bold text-foreground leading-tight mb-3 group-hover:text-glow transition-all">{post.title}</h2>
                         <div className="flex flex-wrap gap-2 mb-3">
                             {post.tags.map(tag => (
-                                <span key={tag} className="px-3 py-1.5 bg-white/5 border border-white/5 text-sm text-gray-400 rounded-lg">#{tag}</span>
+                                <span key={tag} className="px-3 py-1.5 bg-muted/50 border border-border/50 text-sm text-muted-foreground rounded-lg">#{tag}</span>
                             ))}
                         </div>
-                        <p className="text-gray-500 text-sm mb-4">{post.date} • {post.readTime}</p>
+                        <p className="text-muted-foreground text-sm mb-4">{post.date} • {post.readTime}</p>
                     </div>
 
-                    <div className="mx-6 mb-4 p-4 bg-black/40 rounded-2xl border border-white/5 mt-auto">
+                    <div className="mx-6 mb-4 p-4 bg-muted/30 rounded-2xl border border-border/50 mt-auto">
                         <div className="flex items-start justify-between mb-3">
                             <div className="flex-1 min-w-0">
-                                <h3 className="text-lg font-semibold text-gray-200 mb-1">
-                                    {post.preview.repo.split('/')[0]}/<span className="font-bold text-white">{post.preview.repo.split('/')[1]}</span>
+                                <h3 className="text-lg font-semibold text-foreground/80 mb-1">
+                                    {post.preview.repo.split('/')[0]}/<span className="font-bold text-foreground">{post.preview.repo.split('/')[1]}</span>
                                 </h3>
-                                <p className="text-sm text-gray-500 truncate">{post.preview.description}</p>
+                                <p className="text-sm text-muted-foreground truncate">{post.preview.description}</p>
                             </div>
-                            <img src={post.preview.icon} alt="" className="w-12 h-12 rounded-lg ml-3 bg-white/5" onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${post.preview.repo.split('/')[1]}&background=random`} />
+                            <img src={post.preview.icon} alt="" className="w-12 h-12 rounded-lg ml-3 bg-muted" onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${post.preview.repo.split('/')[1]}&background=random`} />
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 pt-3 border-t border-white/5">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground pt-3 border-t border-border/50">
                             <div className="flex items-center gap-1.5">
                                 <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor"><path d="M2 5.5a3.5 3.5 0 115.898 2.549 5.507 5.507 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-7.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5zM11 4a.75.75 0 100 1.5 1.5 1.5 0 01.666 2.844.75.75 0 00-.416.672v.352a.75.75 0 00.574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 101.434-.44 5.01 5.01 0 00-2.56-3.012A3 3 0 0011 4z" /></svg>
                                 <span className="font-medium">{post.preview.contributors}</span>
@@ -236,30 +236,30 @@ const PostCard = ({ post, index, onClick }) => {
                     </div>
                 </div>
 
-                <div className="mx-6 mb-4 h-px bg-white/5 mt-auto" />
+                <div className="mx-6 mb-4 h-px bg-border/50 mt-auto" />
 
                 <div className="px-6 pb-6 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-white/5 rounded-xl border border-white/5 p-1">
-                            <button onClick={handleUpvote} className={`h-8 flex items-center gap-2 px-3 rounded-lg transition-all ${hasUpvoted ? 'bg-white text-black shadow-glow' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                        <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 p-1">
+                            <button onClick={handleUpvote} className={`h-8 flex items-center gap-2 px-3 rounded-lg transition-all ${hasUpvoted ? 'bg-foreground text-background shadow-lg' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}>
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                 <span className="text-sm font-semibold">{upvotes}</span>
                             </button>
-                            <div className="w-px h-4 bg-white/10 mx-1" />
-                            <button onClick={handleDownvote} className={`h-8 w-8 flex items-center justify-center rounded-lg transition-all ${hasDownvoted ? 'text-red-400 bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                            <div className="w-px h-4 bg-border mx-1" />
+                            <button onClick={handleDownvote} className={`h-8 w-8 flex items-center justify-center rounded-lg transition-all ${hasDownvoted ? 'text-red-400 bg-background/50' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}>
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             </button>
                         </div>
-                        <button onClick={(e) => e.stopPropagation()} className="h-10 px-3 flex items-center gap-2 rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all">
+                        <button onClick={(e) => e.stopPropagation()} className="h-10 px-3 flex items-center gap-2 rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all">
                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             <span className="font-medium text-sm">{post.comments}</span>
                         </button>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={(e) => { e.stopPropagation(); setIsSaved(!isSaved); }} className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${isSaved ? 'text-black bg-white shadow-glow' : 'text-gray-500 hover:bg-white/10 hover:text-white'}`}>
+                        <button onClick={(e) => { e.stopPropagation(); setIsSaved(!isSaved); }} className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${isSaved ? 'text-background bg-foreground shadow-lg' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}>
                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" /></svg>
                         </button>
-                        <button onClick={(e) => e.stopPropagation()} className="h-10 w-10 flex items-center justify-center rounded-xl text-gray-500 hover:bg-white/10 hover:text-white transition-all">
+                        <button onClick={(e) => e.stopPropagation()} className="h-10 w-10 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all">
                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" strokeLinecap="round" strokeLinejoin="round" /><path d="M16 6l-4-4-4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M12 2v13" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </button>
                     </div>
@@ -395,12 +395,12 @@ const PostModal = ({ post, onClose }) => {
                     </div>
 
                     {/* Comment Input */}
-                    <div className="px-6 py-5 border-t border-white/5">
+                    <div className="px-6 py-5 border-t border-border">
                         <div className="flex items-center gap-4">
-                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=You" alt="" className="w-10 h-10 rounded-full ring-1 ring-white/10" />
-                            <div className="flex-1 flex items-center gap-2 bg-white/5 rounded-2xl p-2 border border-white/10 focus-within:border-white/20 focus-within:ring-1 focus-within:ring-white/20">
-                                <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleComment()} placeholder="Share your thoughts..." className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-500 px-3 py-2 focus:outline-none" />
-                                <button onClick={handleComment} disabled={!newComment.trim()} className="px-5 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-gray-200 disabled:bg-white/10 disabled:text-gray-500">Post</button>
+                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=You" alt="" className="w-10 h-10 rounded-full ring-1 ring-border/10" />
+                            <div className="flex-1 flex items-center gap-2 bg-muted/30 rounded-2xl p-2 border border-border focus-within:border-foreground/30 focus-within:ring-1 focus-within:ring-foreground/30">
+                                <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleComment()} placeholder="Share your thoughts..." className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground px-3 py-2 focus:outline-none" />
+                                <button onClick={handleComment} disabled={!newComment.trim()} className="px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">Post</button>
                             </div>
                         </div>
                     </div>
@@ -409,17 +409,17 @@ const PostModal = ({ post, onClose }) => {
                     <div className="px-6 pb-8 space-y-5">
                         {comments.map(comment => (
                             <div key={comment.id} className="flex gap-4">
-                                <img src={comment.author.avatar} alt="" className="w-10 h-10 rounded-full ring-1 ring-white/10" />
+                                <img src={comment.author.avatar} alt="" className="w-10 h-10 rounded-full ring-1 ring-border/10" />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="font-semibold text-white">{comment.author.name}</span>
-                                        <span className="text-xs text-gray-500 font-medium">⚡ {comment.author.reputation}</span>
-                                        <span className="text-xs text-gray-500">• {comment.time}</span>
+                                        <span className="font-semibold text-foreground">{comment.author.name}</span>
+                                        <span className="text-xs text-muted-foreground font-medium">⚡ {comment.author.reputation}</span>
+                                        <span className="text-xs text-muted-foreground">• {comment.time}</span>
                                     </div>
-                                    <p className="text-sm text-gray-300 mb-2">{comment.content}</p>
-                                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                                        <button className="hover:text-white transition-colors">{comment.upvotes} upvotes</button>
-                                        <button className="hover:text-white transition-colors">Reply</button>
+                                    <p className="text-sm text-foreground/80 mb-2">{comment.content}</p>
+                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                        <button className="hover:text-foreground transition-colors">{comment.upvotes} upvotes</button>
+                                        <button className="hover:text-foreground transition-colors">Reply</button>
                                     </div>
                                 </div>
                             </div>
@@ -489,8 +489,8 @@ const Posts = () => {
             <div className="max-w-5xl mx-auto space-y-12">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-5xl font-light text-white font-display tracking-tight mb-2">Posts</h1>
-                        <p className="text-gray-400 text-lg font-light">Discover developer articles and projects</p>
+                        <h1 className="text-5xl font-light text-foreground text-glow font-display tracking-tight mb-2">Posts</h1>
+                        <p className="text-muted-foreground text-lg font-light">Discover developer articles and projects</p>
                     </div>
                     <Button variant="primary">
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" strokeLinecap="round" /></svg>
@@ -498,9 +498,9 @@ const Posts = () => {
                     </Button>
                 </header>
 
-                <div className="flex items-center gap-2 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2 border-b border-border pb-4">
                     {filters.map(filter => (
-                        <button key={filter} onClick={() => setActiveFilter(filter)} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeFilter === filter ? 'bg-white text-black shadow-glow' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+                        <button key={filter} onClick={() => setActiveFilter(filter)} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeFilter === filter ? 'bg-foreground text-background shadow-lg' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
                             {filter}
                         </button>
                     ))}

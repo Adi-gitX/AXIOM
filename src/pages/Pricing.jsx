@@ -72,7 +72,7 @@ const Pricing = () => {
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
                     {/* PLAN 1: CADET */}
-                    <TiltCard delay={0} className="glass-card p-8 border border-white/10 hover:border-white/20">
+                    <TiltCard delay={0} className="glass-card p-8 border border-border hover:border-border/80">
                         <div className="flex flex-col h-full relative z-10 transform-style-3d">
                             <div className="mb-4">
                                 <Zap className="w-10 h-10 text-blue-400 mb-4" />
@@ -103,24 +103,24 @@ const Pricing = () => {
                     </TiltCard>
 
                     {/* PLAN 2: ENGINEER (Featured) */}
-                    <TiltCard delay={0.1} className="bg-white/5 backdrop-blur-3xl text-white p-8 shadow-2xl relative overflow-hidden ring-1 ring-white/20">
+                    <TiltCard delay={0.1} className="bg-primary/95 text-primary-foreground p-8 shadow-2xl relative overflow-hidden ring-1 ring-border/20">
                         <div className="absolute top-0 right-0 p-4">
                             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-glow">
                                 Popular
                             </div>
                         </div>
                         {/* Grid Overlay */}
-                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none" />
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none" />
 
                         <div className="flex flex-col h-full relative z-10">
                             <div className="mb-4">
-                                <Shield className="w-10 h-10 text-white mb-4" />
-                                <h3 className="text-2xl font-bold text-white font-display tracking-tight">Engineer</h3>
-                                <p className="text-sm text-gray-400 mt-2">Everything you need to get hired.</p>
+                                <Shield className="w-10 h-10 text-primary-foreground mb-4" />
+                                <h3 className="text-2xl font-bold text-primary-foreground font-display tracking-tight">Engineer</h3>
+                                <p className="text-sm text-primary-foreground/60 mt-2">Everything you need to get hired.</p>
                             </div>
                             <div className="mb-8">
-                                <span className="text-5xl font-bold text-white tracking-tighter">$12</span>
-                                <span className="text-gray-500 font-medium">/mo</span>
+                                <span className="text-5xl font-bold text-primary-foreground tracking-tighter">$12</span>
+                                <span className="text-primary-foreground/60 font-medium">/mo</span>
                             </div>
                             <ul className="space-y-4 mb-8 flex-1">
                                 {[
@@ -130,7 +130,7 @@ const Pricing = () => {
                                     'System Design (LLD/HLD)',
                                     'Mock Interview AI Bot'
                                 ].map(item => (
-                                    <li key={item} className="flex gap-3 text-sm text-gray-300 font-medium">
+                                    <li key={item} className="flex gap-3 text-sm text-primary-foreground/80 font-medium">
                                         <div className="bg-blue-600 rounded-full p-0.5 shrink-0 shadow-lg">
                                             <Check className="w-3 h-3 text-white" />
                                         </div>
@@ -138,23 +138,23 @@ const Pricing = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <button className="w-full py-4 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                            <button className="w-full py-4 rounded-xl bg-background text-foreground font-bold hover:bg-muted transition-colors shadow-lg">
                                 Upgrade Now
                             </button>
                         </div>
                     </TiltCard>
 
                     {/* PLAN 3: STAFF */}
-                    <TiltCard delay={0.2} className="glass-card p-8 border border-white/10 hover:border-white/20">
+                    <TiltCard delay={0.2} className="glass-card p-8 border border-border hover:border-border/80">
                         <div className="flex flex-col h-full relative z-10">
                             <div className="mb-4">
                                 <Crown className="w-10 h-10 text-purple-400 mb-4" />
-                                <h3 className="text-2xl font-bold text-white font-display tracking-tight">Staff</h3>
-                                <p className="text-sm text-gray-400 mt-2">For teams and organizations.</p>
+                                <h3 className="text-2xl font-bold text-foreground font-display tracking-tight">Staff</h3>
+                                <p className="text-sm text-muted-foreground mt-2">For teams and organizations.</p>
                             </div>
                             <div className="mb-8">
-                                <span className="text-5xl font-bold text-white tracking-tighter">$49</span>
-                                <span className="text-gray-500 font-medium">/mo</span>
+                                <span className="text-5xl font-bold text-foreground tracking-tighter">$49</span>
+                                <span className="text-muted-foreground font-medium">/mo</span>
                             </div>
                             <ul className="space-y-4 mb-8 flex-1">
                                 {[
@@ -164,13 +164,13 @@ const Pricing = () => {
                                     'Mentor Connect Access',
                                     'Priority Support'
                                 ].map(item => (
-                                    <li key={item} className="flex gap-3 text-sm text-gray-300 font-medium">
+                                    <li key={item} className="flex gap-3 text-sm text-muted-foreground font-medium">
                                         <Check className="w-5 h-5 text-purple-400 shrink-0" />
                                         {item}
                                     </li>
                                 ))}
                             </ul>
-                            <button className="w-full py-4 rounded-xl border border-white/20 text-white font-bold hover:bg-white/10 transition-colors backdrop-blur-md">
+                            <button className="w-full py-4 rounded-xl border border-border text-foreground font-bold hover:bg-muted transition-colors backdrop-blur-md">
                                 Contact Sales
                             </button>
                         </div>

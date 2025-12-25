@@ -27,8 +27,11 @@ import { WaitlistForm } from '../components/WaitlistForm';
 import { AnimatedThemeToggler } from '../components/AnimatedThemeToggler';
 
 // Assets
+// Assets
 import landscapeBg from '../assets/axiom-landscape.png';
+import darkerLandscape from '../assets/darkerlandscape.png'; // Dark Theme Hero
 import footerBg from '../assets/footer.png';
+import nightFooter from '../assets/nightfooter.png'; // Dark Theme Footer
 
 // --- COMPONENTS ---
 
@@ -264,6 +267,16 @@ const LandingPage = () => {
     const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+    // Theme Detection for Image Switching
+    const [isDark, setIsDark] = useState(false);
+    useEffect(() => {
+        const checkTheme = () => setIsDark(document.documentElement.classList.contains('dark'));
+        checkTheme(); // Initial check
+        const observer = new MutationObserver(checkTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => observer.disconnect();
+    }, []);
+
     // Footer Parallax Logic: The content div needs to be z-10 and have a margin-bottom equal to footer height
     // We'll use a fixed footer and a main content that slides over it.
 
@@ -285,8 +298,9 @@ const LandingPage = () => {
                                 initial={{ scale: 1.15 }}
                                 animate={{ scale: 1 }}
                                 transition={{ duration: 10, ease: "easeOut" }}
-                                className="absolute inset-0 bg-cover bg-center"
-                                style={{ backgroundImage: `url(${landscapeBg})` }}
+                                transition={{ duration: 10, ease: "easeOut" }}
+                                className="absolute inset-0 bg-cover bg-center transition-all duration-700"
+                                style={{ backgroundImage: `url(${isDark ? darkerLandscape : landscapeBg})` }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                         </motion.div>
@@ -296,7 +310,7 @@ const LandingPage = () => {
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="text-3xl font-bold tracking-tight text-gray-900 font-display"
+                                className="text-3xl font-bold tracking-tight text-foreground font-display"
                             >
                                 AXIOM
                             </motion.div>
@@ -347,7 +361,7 @@ const LandingPage = () => {
                                     <span>Public Beta 1.0</span>
                                 </motion.div>
 
-                                <h1 className="text-6xl sm:text-8xl md:text-9xl font-bold tracking-tighter leading-[0.9] text-gray-900 mx-auto font-display">
+                                <h1 className="text-6xl sm:text-8xl md:text-9xl font-bold tracking-tighter leading-[0.9] text-foreground mx-auto font-display">
                                     <motion.span
                                         initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
                                         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -370,7 +384,7 @@ const LandingPage = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8, delay: 0.4 }}
-                                    className="text-lg md:text-2xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed text-balance tracking-wide"
+                                    className="text-lg md:text-2xl text-muted-foreground max-w-3xl mx-auto font-normal leading-relaxed text-balance tracking-wide"
                                 >
                                     Master DSA, System Design, and Engineering with a platform built for the perfectionist.
                                 </motion.p>
@@ -383,7 +397,7 @@ const LandingPage = () => {
                                 >
                                     <button
                                         onClick={() => navigate('/app')}
-                                        className="group relative px-10 py-5 bg-gray-900 text-white rounded-full font-bold text-lg md:text-xl overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-gray-900/30 font-display tracking-tight"
+                                        className="group relative px-10 py-5 bg-foreground text-background rounded-full font-bold text-lg md:text-xl overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 font-display tracking-tight"
                                     >
                                         <span className="relative z-10 flex items-center gap-3">
                                             Start your journey <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -397,13 +411,13 @@ const LandingPage = () => {
                     </div>
 
                     {/* LOGO MARQUEE (Seamless) */}
-                    <div className="relative py-20 bg-stone-50">
-                        <p className="text-center text-xs font-bold tracking-[0.25em] text-gray-400 uppercase mb-10 font-display">Trusted by engineering teams at</p>
+                    <div className="relative py-20 bg-background/50 backdrop-blur-sm">
+                        <p className="text-center text-xs font-bold tracking-[0.25em] text-muted-foreground uppercase mb-10 font-display">Trusted by engineering teams at</p>
                         <div className="relative overflow-hidden">
                             {/* Left fade */}
-                            <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-stone-50 to-transparent z-10 pointer-events-none" />
+                            <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
                             {/* Right fade */}
-                            <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-stone-50 to-transparent z-10 pointer-events-none" />
+                            <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
                             {/* Marquee container */}
                             <div className="animate-marquee flex whitespace-nowrap">
@@ -420,7 +434,7 @@ const LandingPage = () => {
                                 {['Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb', 'Google', 'Meta'].map((brand, i) => (
                                     <span
                                         key={`b-${brand}-${i}`}
-                                        className="mx-12 text-4xl md:text-5xl font-bold font-display text-gray-300 hover:text-gray-900 transition-colors duration-300 cursor-default tracking-tight"
+                                        className="mx-12 text-4xl md:text-5xl font-bold font-display text-muted-foreground/30 hover:text-foreground transition-colors duration-300 cursor-default tracking-tight"
                                     >
                                         {brand}
                                     </span>
@@ -430,18 +444,18 @@ const LandingPage = () => {
                     </div>
 
                     {/* BENTO GRID (Active & Tilted) */}
-                    <div className="bg-white py-40 px-6 relative">
-                        <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-stone-50 to-transparent pointer-events-none" />
+                    <div className="glass-panel py-40 px-6 relative border-y border-border">
+                        <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-background/50 to-transparent pointer-events-none" />
 
                         <div className="max-w-7xl mx-auto relative z-10">
                             <div className="mb-24 text-center md:text-left">
                                 <ScrollRevealText>
-                                    <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-8 text-gray-900 leading-[0.9] font-display">
+                                    <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-8 text-foreground leading-[0.9] font-display">
                                         Designed for <br /> world-class engineers.
                                     </h2>
                                 </ScrollRevealText>
                                 <ScrollRevealText>
-                                    <p className="text-xl md:text-3xl text-gray-500 max-w-3xl font-light leading-relaxed">
+                                    <p className="text-xl md:text-3xl text-muted-foreground max-w-3xl font-light leading-relaxed">
                                         Everything you need to go from junior developer to principal engineer, all in one seamless ecosystem.
                                     </p>
                                 </ScrollRevealText>
@@ -449,14 +463,14 @@ const LandingPage = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[350px] md:auto-rows-[450px]">
                                 {/* Card 1: Education Hub */}
-                                <TiltCard className="md:col-span-2 p-12 bg-stone-50">
+                                <TiltCard className="md:col-span-2 p-12 bg-card/50">
                                     <div className="relative z-10 h-full flex flex-col justify-between">
                                         <div className="w-16 h-16 rounded-3xl bg-white shadow-sm flex items-center justify-center mb-6">
                                             <Globe className="w-8 h-8 text-blue-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-4xl font-bold mb-4 text-gray-900 tracking-tighter font-display">Education Hub</h3>
-                                            <p className="text-gray-500 text-xl max-w-md leading-relaxed">Comprehensive video courses and interactive system design modules.</p>
+                                            <h3 className="text-4xl font-bold mb-4 text-foreground tracking-tighter font-display">Education Hub</h3>
+                                            <p className="text-muted-foreground text-xl max-w-md leading-relaxed">Comprehensive video courses and interactive system design modules.</p>
                                         </div>
                                     </div>
                                     <div className="absolute right-0 bottom-0 w-3/5 h-4/5 bg-white rounded-tl-[3rem] p-8 shadow-2xl translate-y-12 translate-x-12 group-hover:translate-y-6 group-hover:translate-x-6 transition-transform duration-700">
@@ -474,14 +488,14 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 2: DSA Tracker */}
-                                <TiltCard delay={0.1} className="p-12 bg-white">
+                                <TiltCard delay={0.1} className="p-12 glass-card">
                                     <div className="h-full flex flex-col justify-between relative z-10">
                                         <div className="w-16 h-16 rounded-3xl bg-purple-50 flex items-center justify-center">
                                             <Cpu className="w-8 h-8 text-purple-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-3xl font-bold mb-2 text-gray-900 tracking-tighter font-display">DSA Tracker</h3>
-                                            <p className="text-gray-500 text-lg">Master 450+ patterns.</p>
+                                            <h3 className="text-3xl font-bold mb-2 text-foreground tracking-tighter font-display">DSA Tracker</h3>
+                                            <p className="text-muted-foreground text-lg">Master 450+ patterns.</p>
                                         </div>
                                     </div>
                                     {/* Animated Graph Bars */}
@@ -499,27 +513,27 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 3: Interview Prep */}
-                                <TiltCard delay={0.2} className="p-12 bg-white">
+                                <TiltCard delay={0.2} className="p-12 glass-card">
                                     <div className="h-full flex flex-col justify-between relative z-10">
                                         <div className="w-16 h-16 rounded-3xl bg-green-50 flex items-center justify-center">
                                             <ShieldCheck className="w-8 h-8 text-green-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-3xl font-bold mb-2 text-gray-900 tracking-tighter font-display">Interview Prep</h3>
-                                            <p className="text-gray-500 text-lg">Mock interviews with AI.</p>
+                                            <h3 className="text-3xl font-bold mb-2 text-foreground tracking-tighter font-display">Interview Prep</h3>
+                                            <p className="text-muted-foreground text-lg">Mock interviews with AI.</p>
                                         </div>
                                     </div>
                                 </TiltCard>
 
                                 {/* Card 4: Dev Connect */}
-                                <TiltCard delay={0.3} className="md:col-span-2 p-12 bg-stone-50">
+                                <TiltCard delay={0.3} className="md:col-span-2 p-12 bg-card/50">
                                     <div className="flex flex-col md:flex-row h-full items-start md:items-center justify-between gap-12 relative z-10">
                                         <div className="max-w-md">
                                             <div className="w-16 h-16 rounded-3xl bg-orange-50 flex items-center justify-center mb-8">
                                                 <Users className="w-8 h-8 text-orange-600" />
                                             </div>
-                                            <h3 className="text-4xl font-bold mb-4 text-gray-900 tracking-tighter font-display">Developer Connect</h3>
-                                            <p className="text-gray-500 text-xl text-balance leading-relaxed">Join a private community of elite engineers. Share knowledge, find mentors.</p>
+                                            <h3 className="text-4xl font-bold mb-4 text-foreground tracking-tighter font-display">Developer Connect</h3>
+                                            <p className="text-muted-foreground text-xl text-balance leading-relaxed">Join a private community of elite engineers. Share knowledge, find mentors.</p>
                                         </div>
 
                                         {/* Chat Animation */}
@@ -548,18 +562,18 @@ const LandingPage = () => {
                     </div>
 
                     {/* DEEP DIVE TERMINAL */}
-                    <div className="bg-white py-40 px-6">
+                    <div className="py-40 px-6">
                         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
                             <ScrollRevealText>
-                                <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-10 text-gray-900 leading-[0.9] font-display">
+                                <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-10 text-foreground leading-[0.9] font-display">
                                     Build your future,<br /><span className="text-gray-300">line by line.</span>
                                 </h2>
-                                <p className="text-xl text-gray-500 mb-12 leading-relaxed font-light max-w-lg">
+                                <p className="text-xl text-muted-foreground mb-12 leading-relaxed font-light max-w-lg">
                                     AXIOM provides the tools, runtime, and environment you need to prove your skills to the world's best companies.
                                 </p>
                                 <div className="space-y-5">
                                     {['Real-time Execution', 'Verified Credentials', 'Global Leaderboards'].map((item, i) => (
-                                        <div key={i} className="flex items-center gap-4 text-lg font-medium text-gray-900">
+                                        <div key={i} className="flex items-center gap-4 text-lg font-medium text-foreground">
                                             <div className="w-2 h-2 rounded-full bg-blue-600" />
                                             {item}
                                         </div>
@@ -611,14 +625,14 @@ const LandingPage = () => {
 
                     {/* PRE-FOOTER CTA */}
                     {/* PRE-FOOTER CTA */}
-                    <div className="relative py-60 flex flex-col items-center justify-center text-center px-6 overflow-hidden bg-white">
+                    <div className="relative py-60 flex flex-col items-center justify-center text-center px-6 overflow-hidden">
                         <div className="max-w-5xl z-10">
                             <ScrollRevealText>
-                                <h2 className="text-8xl md:text-[10rem] font-bold tracking-tighter mb-16 text-gray-900 leading-[0.8] font-display">Ready to ascend?</h2>
+                                <h2 className="text-8xl md:text-[10rem] font-bold tracking-tighter mb-16 text-foreground leading-[0.8] font-display">Ready to ascend?</h2>
                             </ScrollRevealText>
 
                             <ExpandableScreen>
-                                <ExpandableScreenTrigger className="mx-auto rounded-full bg-black text-white shadow-2xl hover:shadow-black/50 transition-all">
+                                <ExpandableScreenTrigger className="mx-auto rounded-full bg-foreground text-background shadow-2xl hover:shadow-primary/50 transition-all">
                                     <button className="px-16 py-8 text-2xl font-bold tracking-wide font-display flex items-center gap-3">
                                         Join the waitlist <ArrowRight className="w-6 h-6" />
                                     </button>
@@ -637,8 +651,8 @@ const LandingPage = () => {
                 {/* FIXED FOOTER (Revealed by Parallax) */}
                 <div className="fixed bottom-0 left-0 right-0 h-[80vh] z-0 flex flex-col justify-end bg-gray-900 text-white overflow-hidden">
                     <div
-                        className="absolute inset-0 bg-cover bg-bottom opacity-100"
-                        style={{ backgroundImage: `url(${footerBg})` }}
+                        className="absolute inset-0 bg-cover bg-bottom opacity-100 transition-all duration-700"
+                        style={{ backgroundImage: `url(${isDark ? nightFooter : footerBg})` }}
                     />
 
                     {/* Darker gradient overlay at bottom for text visibility */}

@@ -15,7 +15,7 @@ const GlassCard = ({ children, className, hoverEffect = true, ...props }) => {
             )}
             {...props}
         >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.07] to-transparent pointer-events-none opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-foreground/[0.03] to-transparent pointer-events-none opacity-50" />
             <div className="relative z-10">{children}</div>
         </motion.div>
     );

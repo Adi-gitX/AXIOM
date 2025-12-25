@@ -68,7 +68,7 @@ const Dashboard = () => {
 
                     {/* Activity Chart */}
                     <div className="lg:col-span-2 space-y-4">
-                        <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-1">Weekly Activity</h2>
+                        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">Weekly Activity</h2>
                         <GlassCard className="p-8">
                             <div className="flex items-end justify-between gap-4 h-40">
                                 {days.map((day, i) => (
@@ -89,7 +89,7 @@ const Dashboard = () => {
 
                     {/* Quick Access Links */}
                     <div className="space-y-4">
-                        <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-1">Quick Access</h2>
+                        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">Quick Access</h2>
                         <div className="grid grid-cols-1 gap-3">
                             {links.slice(0, 3).map((link, i) => (
                                 <GlassCard
