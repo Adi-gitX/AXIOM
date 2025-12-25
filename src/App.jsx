@@ -15,35 +15,50 @@ import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 
+import { AuthProvider } from './contexts/AuthContext';
+import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                {/* Public Route */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/docs" element={<Docs />} />
-                <Route path="/pricing" element={<Pricing />} />
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    {/* Public Route */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/docs" element={<Docs />} />
+                    <Route path="/pricing" element={<Pricing />} />
 
-                {/* App Routes (Protected-ish) */}
-                <Route path="/app" element={<Layout />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="education" element={<Education />} />
-                    <Route path="dsa" element={<DSATracker />} />
-                    <Route path="interview" element={<InterviewPrep />} />
-                    <Route path="connect" element={<DeveloperConnect />} />
-                    <Route path="jobs" element={<Jobs />} />
-                    <Route path="posts" element={<Posts />} />
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="settings" element={<Settings />} />
+                    {/* Auth Routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
 
-                    {/* Redirect unknown app routes to dashboard */}
-                    <Route path="*" element={<Navigate to="/app" replace />} />
-                </Route>
+                    {/* App Routes (Protected) */}
+                    <Route path="/app" element={
+                        <ProtectedRoute>
+                            <Layout />
+                        </ProtectedRoute>
+                    }>
+                        <Route index element={<Dashboard />} />
+                        <Route path="education" element={<Education />} />
+                        <Route path="dsa" element={<DSATracker />} />
+                        <Route path="interview" element={<InterviewPrep />} />
+                        <Route path="connect" element={<DeveloperConnect />} />
+                        <Route path="jobs" element={<Jobs />} />
+                        <Route path="posts" element={<Posts />} />
+                        <Route path="profile" element={<Profile />} />
+                        <Route path="settings" element={<Settings />} />
 
-                {/* Fallback for root 404s */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        </BrowserRouter>
+                        {/* Redirect unknown app routes to dashboard */}
+                        <Route path="*" element={<Navigate to="/app" replace />} />
+                    </Route>
+
+                    {/* Fallback for root 404s */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
     );
 }
 

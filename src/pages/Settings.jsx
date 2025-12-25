@@ -14,8 +14,22 @@ import {
 } from 'lucide-react';
 import { AnimatedThemeToggler } from '../components/AnimatedThemeToggler';
 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
 const Settings = () => {
     const [activeTab, setActiveTab] = useState('account');
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/login');
+        } catch (error) {
+            console.error('Failed to log out', error);
+        }
+    };
 
     const tabs = [
         { id: 'account', label: 'Account', icon: User },
@@ -38,8 +52,8 @@ const Settings = () => {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-medium text-sm border ${activeTab === tab.id
-                                        ? 'bg-foreground text-background border-foreground shadow-lg'
-                                        : 'bg-transparent text-muted-foreground border-transparent hover:bg-muted/50 hover:text-foreground'
+                                    ? 'bg-foreground text-background border-foreground shadow-lg'
+                                    : 'bg-transparent text-muted-foreground border-transparent hover:bg-muted/50 hover:text-foreground'
                                     }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -48,7 +62,10 @@ const Settings = () => {
                         ))}
 
                         <div className="pt-4 mt-4 border-t border-border">
-                            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-500/10 transition-all font-medium text-sm">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-500/10 transition-all font-medium text-sm"
+                            >
                                 <LogOut className="w-4 h-4" />
                                 Log Out
                             </button>

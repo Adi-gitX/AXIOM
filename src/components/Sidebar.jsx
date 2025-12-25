@@ -1,8 +1,35 @@
+
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { AnimatedThemeToggler } from './AnimatedThemeToggler';
 
+import { useAuth } from '../contexts/AuthContext';
+import { useState, useEffect } from 'react';
+
 const Sidebar = () => {
+  const { currentUser } = useAuth();
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (currentUser?.email) {
+        try {
+          const res = await fetch(`http://localhost:3000/api/users/${currentUser.email}`);
+          if (res.ok) {
+            const data = await res.json();
+            setProfileData(data);
+          }
+        } catch (err) {
+          console.error("Failed to fetch sidebar profile", err);
+        }
+      }
+    };
+    fetchProfile();
+  }, [currentUser]);
+
+  const displayName = profileData?.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
+  const displayAvatar = profileData?.avatar || currentUser?.photoURL || "https://github.com/shadcn.png";
+
   const navItems = [
     { path: '/app', label: 'Dashboard', end: true },
     { path: '/app/education', label: 'Education' },
@@ -64,10 +91,12 @@ const Sidebar = () => {
           <div className="flex items-center gap-3">
             <NavLink to="/app/profile" className="flex-1 flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 transition-all duration-300 cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center text-foreground text-xs font-bold relative overflow-hidden">
-                <img src="https://github.com/shadcn.png" alt="User" className="w-full h-full object-cover" />
+                <img src={displayAvatar} alt="User" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-foreground group-hover:text-glow transition-colors">Aditya K.</p>
+                <p className="text-sm font-bold text-foreground group-hover:text-glow transition-colors truncate">
+                  {displayName}
+                </p>
                 <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Pro Plan</p>
               </div>
             </NavLink>
