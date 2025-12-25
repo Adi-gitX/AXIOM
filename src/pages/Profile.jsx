@@ -301,7 +301,7 @@ const Profile = () => {
     }
 
     return (
-        <div className="flex-1 min-h-screen bg-background text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar pb-32">
+        <div className="flex-1 min-h-screen bg-transparent text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar pb-32">
             <div className="max-w-5xl mx-auto space-y-8">
 
                 {/* --- HEADER --- */}
