@@ -298,7 +298,6 @@ const LandingPage = () => {
                                 initial={{ scale: 1.15 }}
                                 animate={{ scale: 1 }}
                                 transition={{ duration: 10, ease: "easeOut" }}
-                                transition={{ duration: 10, ease: "easeOut" }}
                                 className="absolute inset-0 bg-cover bg-center transition-all duration-700"
                                 style={{ backgroundImage: `url(${isDark ? darkerLandscape : landscapeBg})` }}
                             />

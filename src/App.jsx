@@ -12,6 +12,8 @@ import Jobs from './pages/Jobs';
 import Posts from './pages/Posts';
 import Docs from './pages/Docs';
 import Pricing from './pages/Pricing';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 function App() {
     return (
@@ -31,6 +33,8 @@ function App() {
                     <Route path="connect" element={<DeveloperConnect />} />
                     <Route path="jobs" element={<Jobs />} />
                     <Route path="posts" element={<Posts />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="settings" element={<Settings />} />
 
                     {/* Redirect unknown app routes to dashboard */}
                     <Route path="*" element={<Navigate to="/app" replace />} />
