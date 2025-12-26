@@ -48,7 +48,7 @@ const Dashboard = () => {
                 </motion.header>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     {stats.map((stat, i) => (
                         <GlassCard
                             key={stat.label}
