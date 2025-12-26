@@ -6,7 +6,7 @@ export const uploadToCloudinary = async (file) => {
 
     try {
         // 1. Get Signature from Backend
-        const sigResponse = await fetch('http://localhost:3000/api/sign-cloudinary');
+        const sigResponse = await fetch('/api/sign-cloudinary');
         if (!sigResponse.ok) throw new Error('Failed to get upload signature');
         const { signature, timestamp } = await sigResponse.json();
 
@@ -20,7 +20,7 @@ export const uploadToCloudinary = async (file) => {
         // Remove upload_preset, we are using signed upload now
 
         const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
             {
                 method: 'POST',
                 body: formData,

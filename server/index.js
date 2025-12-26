@@ -12,16 +12,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Cloudinary Config
 cloudinary.config({
     cloud_name: process.env.VITE_CLOUDINARY_CLOUD_NAME,
     api_key: process.env.VITE_CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// --- Routes ---
-
-// Get Cloudinary Signature
 app.get('/api/sign-cloudinary', (req, res) => {
     const timestamp = Math.round((new Date).getTime() / 1000);
     const signature = cloudinary.utils.api_sign_request({
@@ -32,7 +28,6 @@ app.get('/api/sign-cloudinary', (req, res) => {
     res.json({ signature, timestamp });
 });
 
-// Get User Profile
 app.get('/api/users/:email', async (req, res) => {
     try {
         const { email } = req.params;
@@ -49,34 +44,41 @@ app.get('/api/users/:email', async (req, res) => {
     }
 });
 
-// Create/Update User Profile
 app.post('/api/users/profile', async (req, res) => {
     try {
         const { email, name, role, location, bio, avatar, banner, experience, skills, socials } = req.body;
 
-        // Check if user exists
-        const checkUser = await query('SELECT * FROM users WHERE email = $1', [email]);
+        const queryText = `
+            INSERT INTO users (
+                email, name, role, location, bio, avatar, banner, 
+                experience, skills, socials, resume_url, resume_name, updated_at
+            ) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
+            ON CONFLICT (email) 
+            DO UPDATE SET 
+                name = EXCLUDED.name,
+                role = EXCLUDED.role,
+                location = EXCLUDED.location,
+                bio = EXCLUDED.bio,
+                avatar = EXCLUDED.avatar,
+                banner = EXCLUDED.banner,
+                experience = EXCLUDED.experience,
+                skills = EXCLUDED.skills,
+                socials = EXCLUDED.socials,
+                resume_url = EXCLUDED.resume_url,
+                resume_name = EXCLUDED.resume_name,
+                updated_at = NOW()
+            RETURNING *;
+        `;
 
-        if (checkUser.rows.length > 0) {
-            // Update
-            const updateQuery = `
-        UPDATE users 
-        SET name = $2, role = $3, location = $4, bio = $5, avatar = $6, banner = $7, experience = $8, skills = $9, socials = $10 
-        WHERE email = $1 
-        RETURNING *
-      `;
-            const updatedUser = await query(updateQuery, [email, name, role, location, bio, avatar, banner, JSON.stringify(experience), JSON.stringify(skills), JSON.stringify(socials)]);
-            return res.json(updatedUser.rows[0]);
-        } else {
-            // Insert
-            const insertQuery = `
-        INSERT INTO users (email, name, role, location, bio, avatar, banner, experience, skills, socials) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
-        RETURNING *
-      `;
-            const newUser = await query(insertQuery, [email, name, role, location, bio, avatar, banner, JSON.stringify(experience), JSON.stringify(skills), JSON.stringify(socials)]);
-            return res.json(newUser.rows[0]);
-        }
+        const values = [
+            email, name, role, location, bio, avatar, banner,
+            JSON.stringify(experience), JSON.stringify(skills), JSON.stringify(socials),
+            req.body.resume_url, req.body.resume_name
+        ];
+
+        const { rows } = await query(queryText, values);
+        return res.json(rows[0]);
 
     } catch (err) {
         console.error(err.message);
@@ -84,12 +86,9 @@ app.post('/api/users/profile', async (req, res) => {
     }
 });
 
-// Initialize DB Table
 app.get('/init-db', async (req, res) => {
     try {
-        console.log('Initializing DB...');
         await query(`DROP TABLE IF EXISTS users CASCADE;`);
-        console.log('Table dropped.');
         await query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -102,7 +101,11 @@ app.get('/init-db', async (req, res) => {
                 banner TEXT,
                 experience JSONB,
                 skills JSONB,
-                socials JSONB
+                socials JSONB,
+                resume_url TEXT,
+                resume_name TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
         res.send('Database initialized successfully');
@@ -111,7 +114,6 @@ app.get('/init-db', async (req, res) => {
         res.status(500).json({ error: err.message, stack: err.stack });
     }
 });
-
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

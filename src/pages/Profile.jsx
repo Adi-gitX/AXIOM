@@ -12,7 +12,6 @@ import {
     Youtube,
     Globe,
     ExternalLink,
-
     Image as ImageIcon,
     Loader2,
     Settings,
@@ -28,8 +27,8 @@ import { updateProfile } from 'firebase/auth';
 import { cn } from '../lib/utils';
 import { uploadToCloudinary } from '../lib/cloudinary';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserStore } from '../stores/useUserStore';
 
-// --- Internal Toast Component ---
 const Toast = ({ message, type = 'success', onClose }) => {
     useEffect(() => {
         const timer = setTimeout(onClose, 3000);
@@ -53,13 +52,11 @@ const Toast = ({ message, type = 'success', onClose }) => {
 };
 
 const Profile = () => {
-    // --- State Management ---
     const { currentUser } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
-    const [toast, setToast] = useState(null); // { message, type }
+    const [toast, setToast] = useState(null);
     const fileInputRef = useRef(null);
 
-    // Initial Data
     const defaultUser = {
         name: 'Aditya Kammati',
         role: 'Senior Full Stack Engineer',
@@ -67,8 +64,8 @@ const Profile = () => {
         bio: 'Building the future of developer tools. Passionate about distributed systems, UI/UX, and AI agents.',
         avatar: 'https://github.com/shadcn.png',
         banner: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop',
-        resumeName: 'resume.pdf',
-        resumeUrl: '#'
+        resumeName: '',
+        resumeUrl: ''
     };
 
     const defaultSocials = [
@@ -95,56 +92,59 @@ const Profile = () => {
         }
     ];
 
-    // Load State
+    const { user: storeUser, setUser: setStoreUser } = useUserStore();
     const [user, setUser] = useState(defaultUser);
     const [socials, setSocials] = useState(defaultSocials);
     const [skills, setSkills] = useState(defaultSkills);
     const [experience, setExperience] = useState(defaultExperience);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch Data from Backend
     useEffect(() => {
         if (!currentUser?.email) {
             setIsLoading(false);
             return;
         }
 
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`http://localhost:3000/api/users/${currentUser.email}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setUser({
-                        name: data.name || defaultUser.name,
-                        role: data.role || defaultUser.role,
-                        location: data.location || defaultUser.location,
-                        bio: data.bio || defaultUser.bio,
-                        avatar: data.avatar || defaultUser.avatar,
-                        banner: data.banner || defaultUser.banner,
-                        resumeName: defaultUser.resumeName, // Resume logic placeholder
-                        resumeUrl: defaultUser.resumeUrl
-                    });
-                    setExperience(data.experience || defaultExperience);
-                    setSkills(data.skills || defaultSkills);
-                    setSocials(data.socials || defaultSocials);
+        const loadData = async () => {
+            let data = storeUser;
+
+            if (!data) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/users/${currentUser.email}`);
+                    if (response.ok) {
+                        data = await response.json();
+                        setStoreUser(data);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch profile:', error);
                 }
-            } catch (error) {
-                console.error('Failed to fetch profile:', error);
-            } finally {
-                setIsLoading(false);
             }
+
+            if (data) {
+                setUser({
+                    name: data.name || defaultUser.name,
+                    role: data.role || defaultUser.role,
+                    location: data.location || defaultUser.location,
+                    bio: data.bio || defaultUser.bio,
+                    avatar: data.avatar || defaultUser.avatar,
+                    banner: data.banner || defaultUser.banner,
+                    resumeName: data.resume_name || defaultUser.resumeName,
+                    resumeUrl: data.resume_url || defaultUser.resumeUrl
+                });
+                setExperience(data.experience || defaultExperience);
+                setSkills(data.skills || defaultSkills);
+                setSocials(data.socials || defaultSocials);
+            }
+            setIsLoading(false);
         };
 
-        fetchData();
-    }, [currentUser]);
+        loadData();
+    }, [currentUser, storeUser, setStoreUser]);
 
-
-    // Modal States
     const [showSocialModal, setShowSocialModal] = useState(false);
     const [newSocial, setNewSocial] = useState({ platform: 'GitHub', url: '' });
     const [newSkill, setNewSkill] = useState('');
 
-    // Icon Map
     const iconMap = {
         Github: Github,
         Linkedin: Linkedin,
@@ -160,8 +160,6 @@ const Profile = () => {
         { name: 'YouTube', icon: Youtube },
         { name: 'Website', icon: Globe },
     ];
-
-    // --- Actions ---
 
     const showNotification = (message, type = 'success') => {
         setToast({ message, type });
@@ -184,7 +182,9 @@ const Profile = () => {
                 banner: user.banner,
                 experience,
                 skills,
-                socials
+                socials,
+                resume_url: user.resumeUrl,
+                resume_name: user.resumeName
             };
 
             const response = await fetch('http://localhost:3000/api/users/profile', {
@@ -195,7 +195,9 @@ const Profile = () => {
 
             if (!response.ok) throw new Error('Failed to save');
 
-            // Sync with Firebase Auth Profile for Sidebar updates
+            const savedUser = await response.json();
+            setStoreUser(savedUser);
+
             await updateProfile(currentUser, {
                 displayName: user.name,
                 photoURL: user.avatar
@@ -268,15 +270,23 @@ const Profile = () => {
         setExperience(experience.filter(e => e.id !== id));
     };
 
-    const handleResumeUpload = (e) => {
+    const handleResumeUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            setUser({ ...user, resumeName: file.name });
-            showNotification(`Resume updated: ${file.name}`);
+            try {
+                showNotification('Uploading Resume...', 'success');
+                const url = await uploadToCloudinary(file);
+                if (url) {
+                    setUser(prev => ({ ...prev, resumeName: file.name, resumeUrl: url }));
+                    showNotification('Resume uploaded successfully!');
+                }
+            } catch (error) {
+                console.error(error);
+                showNotification('Failed to upload resume', 'error');
+            }
         }
     };
 
-    // --- Image Upload Handlers ---
     const bannerInputRef = useRef(null);
     const avatarInputRef = useRef(null);
 
@@ -284,7 +294,7 @@ const Profile = () => {
         const file = e.target.files[0];
         if (file) {
             try {
-                showNotification(`Uploading ${field}...`, 'success'); // Indicate upload start
+                showNotification(`Uploading ${field}...`, 'success');
                 const url = await uploadToCloudinary(file);
                 if (url) {
                     setUser(prev => ({ ...prev, [field]: url }));
@@ -303,15 +313,10 @@ const Profile = () => {
     return (
         <div className="flex-1 min-h-screen bg-transparent text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar pb-32">
             <div className="max-w-5xl mx-auto space-y-8">
-
-                {/* --- HEADER --- */}
                 <div className="relative group rounded-[2.5rem] overflow-hidden bg-background/50 backdrop-blur-3xl border border-white/20 dark:border-white/5 shadow-2xl transition-all duration-500 hover:shadow-primary/5">
-                    {/* Banner */}
                     <div className="h-64 md:h-80 w-full overflow-hidden relative">
                         <img src={user.banner} alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
-
-                        {/* Hidden Upload Input */}
                         <input
                             type="file"
                             ref={bannerInputRef}
@@ -319,7 +324,6 @@ const Profile = () => {
                             className="hidden"
                             accept="image/*"
                         />
-
                         {isEditing && (
                             <button
                                 onClick={() => bannerInputRef.current?.click()}
@@ -329,14 +333,10 @@ const Profile = () => {
                             </button>
                         )}
                     </div>
-
-                    {/* Profile Info */}
                     <div className="px-8 pb-8 -mt-20 relative flex flex-col md:flex-row items-end md:items-start gap-6">
                         <div className="relative">
                             <div className="w-40 h-40 rounded-[2rem] border-4 border-background overflow-hidden relative group/avatar shadow-2xl bg-muted">
                                 <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
-
-                                {/* Hidden Upload Input */}
                                 <input
                                     type="file"
                                     ref={avatarInputRef}
@@ -344,7 +344,6 @@ const Profile = () => {
                                     className="hidden"
                                     accept="image/*"
                                 />
-
                                 {isEditing && (
                                     <div
                                         onClick={() => avatarInputRef.current?.click()}
@@ -356,7 +355,6 @@ const Profile = () => {
                             </div>
                             <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-background shadow-lg" />
                         </div>
-
                         <div className="flex-1 pt-20 md:pt-24 min-w-0 text-center md:text-left w-full">
                             <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
                                 <div className="space-y-2 w-full md:w-auto">
@@ -389,7 +387,6 @@ const Profile = () => {
                                         </>
                                     )}
                                 </div>
-
                                 <div className="flex gap-3">
                                     {isEditing ? (
                                         <button onClick={handleSave} className="px-6 py-2.5 rounded-full bg-green-500 text-white font-bold text-sm hover:bg-green-600 transition-all shadow-lg active:scale-95 flex items-center gap-2">
@@ -410,10 +407,7 @@ const Profile = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* --- LEFT COLUMN (Bio, Experience, Tech) --- */}
                     <div className="md:col-span-2 space-y-8">
-
-                        {/* Bio */}
                         <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
                             <h2 className="text-xl font-bold font-display mb-4 flex items-center gap-2">
                                 About
@@ -430,7 +424,6 @@ const Profile = () => {
                             )}
                         </section>
 
-                        {/* Experience */}
                         <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-bold font-display">Experience</h2>
@@ -503,11 +496,8 @@ const Profile = () => {
                             </div>
                         </section>
 
-
-                        {/* Tech Stack */}
                         <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
                             <h2 className="text-xl font-bold font-display mb-6">Tech Stack</h2>
-
                             <div className="flex flex-wrap gap-3">
                                 <AnimatePresence>
                                     {skills.map((tech) => (
@@ -549,13 +539,9 @@ const Profile = () => {
                                 )}
                             </div>
                         </section>
-
                     </div>
 
-                    {/* --- RIGHT COLUMN (Socials, Resume) --- */}
                     <div className="space-y-6">
-
-                        {/* Socials */}
                         <div className="p-6 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold font-display">Connect</h3>
@@ -612,41 +598,64 @@ const Profile = () => {
                             </div>
                         </div>
 
-                        {/* Resume */}
-                        <div className="p-6 rounded-[2rem] bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 transition-all hover:border-primary/20 hover:shadow-[0_0_30px_rgba(0,0,0,0.05)]">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                                    <FileText className="w-6 h-6" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-foreground">Resume</h3>
-                                    <p className="text-xs text-muted-foreground truncate">{user.resumeName}</p>
-                                </div>
-                                {isEditing && (
-                                    <div className="relative">
-                                        <input
-                                            type="file"
-                                            ref={fileInputRef}
-                                            onChange={handleResumeUpload}
-                                            className="hidden"
-                                            accept=".pdf,.doc,.docx"
-                                        />
-                                        <button
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="p-2 hover:bg-background rounded-full transition-colors text-primary"
+                        {(user.resumeUrl || isEditing) && (
+                            <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
+                                <h2 className="text-xl font-bold font-display mb-6">Resume</h2>
+
+                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-muted/30 border border-white/10">
+                                    <FileText className="w-10 h-10 text-primary" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold truncate">{user.resumeName || 'No resume uploaded'}</p>
+                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold">PDF Format</p>
+                                    </div>
+
+                                    {user.resumeUrl && (
+                                        <a
+                                            href={user.resumeUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="p-2 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+                                            title="Download"
                                         >
-                                            <Upload className="w-4 h-4" />
-                                        </button>
+                                            <Share2 className="w-5 h-5" />
+                                        </a>
+                                    )}
+
+                                    {isEditing && (
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                onChange={handleResumeUpload}
+                                                className="hidden"
+                                                id="resume-upload"
+                                                accept=".pdf"
+                                            />
+                                            <label
+                                                htmlFor="resume-upload"
+                                                className="flex items-center gap-2 cursor-pointer bg-foreground text-background px-4 py-2 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
+                                            >
+                                                <Upload className="w-4 h-4" />
+                                                {user.resumeUrl ? 'Replace Resume' : 'Upload Resume'}
+                                            </label>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {user.resumeUrl && (
+                                    <div className="mt-6 w-full h-[500px] rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+                                        <iframe
+                                            src={user.resumeUrl.replace('http://', 'https://')}
+                                            className="w-full h-full"
+                                            title="Resume Preview"
+                                        />
+                                        <div className="p-2 text-center text-xs text-muted-foreground">
+                                            Powered by Cloudinary PDF Preview
+                                        </div>
                                     </div>
                                 )}
-                            </div>
-                            <button className="w-full py-3 rounded-xl border border-primary/20 text-primary font-bold text-sm hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group">
-                                Download Resume
-                                <Check className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity -ml-6 group-hover:ml-0" />
-                            </button>
-                        </div>
+                            </section>
+                        )}
 
-                        {/* Location / Availability Card */}
                         <div className="p-6 rounded-[2rem] bg-background/30 backdrop-blur-md border border-white/10 shadow-sm space-y-4">
                             <div className="flex items-center gap-3 text-sm">
                                 <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
@@ -668,12 +677,10 @@ const Profile = () => {
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            {/* Add Social Modal */}
             <AnimatePresence>
                 {showSocialModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -728,7 +735,6 @@ const Profile = () => {
                 )}
             </AnimatePresence>
 
-            {/* Notification Toast */}
             <AnimatePresence>
                 {toast && (
                     <Toast

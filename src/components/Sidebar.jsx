@@ -1,31 +1,18 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AnimatedThemeToggler } from './AnimatedThemeToggler';
-
 import { useAuth } from '../contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useUserStore } from '../stores/useUserStore';
 
 const Sidebar = () => {
   const { currentUser } = useAuth();
-  const [profileData, setProfileData] = useState(null);
+  const { user: profileData, fetchProfile } = useUserStore();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (currentUser?.email) {
-        try {
-          const res = await fetch(`http://localhost:3000/api/users/${currentUser.email}`);
-          if (res.ok) {
-            const data = await res.json();
-            setProfileData(data);
-          }
-        } catch (err) {
-          console.error("Failed to fetch sidebar profile", err);
-        }
-      }
-    };
-    fetchProfile();
-  }, [currentUser]);
+    if (currentUser?.email) {
+      fetchProfile(currentUser.email);
+    }
+  }, [currentUser, fetchProfile]);
 
   const displayName = profileData?.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
   const displayAvatar = profileData?.avatar || currentUser?.photoURL || "https://github.com/shadcn.png";
@@ -42,11 +29,7 @@ const Sidebar = () => {
 
   return (
     <div className="h-screen sticky top-0 flex flex-col w-72 shrink-0 z-40 p-4 transition-all duration-300">
-
-      {/* Sidebar Container - Landing Page Glass Aesthetic */}
       <div className="h-full flex flex-col rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-2xl overflow-hidden transition-all duration-500">
-
-        {/* Brand */}
         <div className="h-24 flex items-center px-6">
           <NavLink to="/" className="flex items-center gap-4 group w-full py-2">
             <div className="w-10 h-10 rounded-2xl bg-foreground/5 border border-foreground/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -56,7 +39,6 @@ const Sidebar = () => {
           </NavLink>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar px-4 pb-4">
           {navItems.map((item, i) => (
             <NavLink
@@ -64,12 +46,12 @@ const Sidebar = () => {
               to={item.path}
               end={item.end}
               className={({ isActive }) => `
-                relative flex items-center gap-4 px-5 py-3.5 rounded-full text-sm font-medium transition-all duration-300 group
-                ${isActive
+                                relative flex items-center gap-4 px-5 py-3.5 rounded-full text-sm font-medium transition-all duration-300 group
+                                ${isActive
                   ? 'bg-foreground text-background shadow-lg shadow-foreground/20'
                   : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
                 }
-              `}
+                            `}
             >
               {({ isActive }) => (
                 <>
@@ -77,8 +59,6 @@ const Sidebar = () => {
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="font-sans tracking-wide font-semibold">{item.label}</span>
-
-                  {/* Subtle active indicator dot */}
                   {isActive && <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-background animate-pulse" />}
                 </>
               )}
@@ -86,7 +66,6 @@ const Sidebar = () => {
           ))}
         </nav>
 
-        {/* Footer */}
         <div className="mt-auto p-4 border-t border-white/10 dark:border-white/5 bg-background/20 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <NavLink to="/app/profile" className="flex-1 flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 transition-all duration-300 cursor-pointer group">
