@@ -17,7 +17,7 @@ export const uploadToCloudinary = async (file) => {
         formData.append('timestamp', timestamp);
         formData.append('signature', signature);
         formData.append('upload_preset', 'profile');
-        // Remove upload_preset, we are using signed upload now
+        // We are using signed upload, but preset might still be configured for transformations
 
         const response = await fetch(
             `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,

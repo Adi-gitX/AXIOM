@@ -11,7 +11,7 @@ export const useUserStore = create((set) => ({
         if (!email) return;
         set({ loading: true, error: null });
         try {
-            const response = await fetch(`http://localhost:3000/api/users/${email}`);
+            const response = await fetch(`/api/users/${email}`);
             if (response.ok) {
                 const data = await response.json();
                 set({ user: data, loading: false });

@@ -58,11 +58,11 @@ const Profile = () => {
     const fileInputRef = useRef(null);
 
     const defaultUser = {
-        name: 'Aditya Kammati',
+        name: currentUser?.displayName || 'Aditya Kammati',
         role: 'Senior Full Stack Engineer',
         location: 'San Francisco, CA',
         bio: 'Building the future of developer tools. Passionate about distributed systems, UI/UX, and AI agents.',
-        avatar: 'https://github.com/shadcn.png',
+        avatar: currentUser?.photoURL || 'https://github.com/shadcn.png',
         banner: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop',
         resumeName: '',
         resumeUrl: ''
@@ -110,7 +110,7 @@ const Profile = () => {
 
             if (!data) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/users/${currentUser.email}`);
+                    const response = await fetch(`/api/users/${currentUser.email}`);
                     if (response.ok) {
                         data = await response.json();
                         setStoreUser(data);
@@ -120,17 +120,19 @@ const Profile = () => {
                 }
             }
 
+            // Always merge with defaultUser to ensure Auth fallback
+            setUser({
+                name: data?.name || defaultUser.name,
+                role: data?.role || defaultUser.role,
+                location: data?.location || defaultUser.location,
+                bio: data?.bio || defaultUser.bio,
+                avatar: data?.avatar || defaultUser.avatar,
+                banner: data?.banner || defaultUser.banner,
+                resumeName: data?.resume_name || defaultUser.resumeName,
+                resumeUrl: data?.resume_url || defaultUser.resumeUrl
+            });
+
             if (data) {
-                setUser({
-                    name: data.name || defaultUser.name,
-                    role: data.role || defaultUser.role,
-                    location: data.location || defaultUser.location,
-                    bio: data.bio || defaultUser.bio,
-                    avatar: data.avatar || defaultUser.avatar,
-                    banner: data.banner || defaultUser.banner,
-                    resumeName: data.resume_name || defaultUser.resumeName,
-                    resumeUrl: data.resume_url || defaultUser.resumeUrl
-                });
                 setExperience(data.experience || defaultExperience);
                 setSkills(data.skills || defaultSkills);
                 setSocials(data.socials || defaultSocials);
@@ -187,7 +189,7 @@ const Profile = () => {
                 resume_name: user.resumeName
             };
 
-            const response = await fetch('http://localhost:3000/api/users/profile', {
+            const response = await fetch('/api/users/profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

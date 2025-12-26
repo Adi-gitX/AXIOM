@@ -1,7 +1,7 @@
 import pg from 'pg';
-import dotenv from 'dotenv';
+import dotenvx from '@dotenvx/dotenvx';
 
-dotenv.config();
+dotenvx.config();
 
 // Force SSL rejection off globally for this process to handle self-signed certs
 // This is a common workaround for Aiven/Heroku dev databases

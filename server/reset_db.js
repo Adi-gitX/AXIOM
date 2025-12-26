@@ -1,6 +1,6 @@
-import { query } from './db.js';
-import dotenv from 'dotenv';
-dotenv.config();
+import { query } from './config/db.js';
+import dotenvx from '@dotenvx/dotenvx';
+dotenvx.config();
 
 // Force SSL bypass
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
