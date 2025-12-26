@@ -20,7 +20,7 @@ pool.on('error', (err) => {
 });
 
 pool.on('connect', () => {
-    console.log('Connected to Database successfully');
+    console.log('Database connected');
 });
 
 export const query = (text, params) => pool.query(text, params);

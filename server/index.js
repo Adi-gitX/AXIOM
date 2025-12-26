@@ -42,6 +42,15 @@ app.get('/', (req, res) => {
     res.send('AXIOM API is running');
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        status: 'error',
+        message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message
+    });
+});
+
 // Conditional Listen for Local Dev vs Vercel Export
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
