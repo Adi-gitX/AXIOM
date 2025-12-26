@@ -28,7 +28,10 @@ app.use(limiter);
 app.use(compression());
 app.use(morgan('combined'));
 
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:5173', 'https://axiomdev.vercel.app', 'https://axiom-client.vercel.app'],
+    credentials: true
+}));
 app.use(express.json());
 
 // Main API Routes
