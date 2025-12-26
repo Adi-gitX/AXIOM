@@ -56,6 +56,7 @@ const Dashboard = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05 }}
                             className="p-6 flex flex-col items-start justify-center"
+                            hoverEffect={false}
                         >
                             <p className="text-4xl font-light text-foreground mb-2">{stat.value}</p>
                             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
@@ -69,7 +70,7 @@ const Dashboard = () => {
                     {/* Activity Chart */}
                     <div className="lg:col-span-2 space-y-4">
                         <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">Weekly Activity</h2>
-                        <GlassCard className="p-8">
+                        <GlassCard className="p-8" hoverEffect={false}>
                             <div className="flex items-end justify-between gap-4 h-40">
                                 {days.map((day, i) => (
                                     <div key={i} className="flex-1 flex flex-col items-center gap-3">
