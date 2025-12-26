@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getApiUrl } from '../lib/api';
 
 export const useUserStore = create((set) => ({
     user: null,
@@ -11,7 +12,7 @@ export const useUserStore = create((set) => ({
         if (!email) return;
         set({ loading: true, error: null });
         try {
-            const API_URL = import.meta.env.VITE_API_URL || '';
+            const API_URL = getApiUrl();
             const response = await fetch(`${API_URL}/api/users/${email}`);
             if (response.ok) {
                 const data = await response.json();

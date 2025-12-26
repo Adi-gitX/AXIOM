@@ -26,6 +26,7 @@ import {
 import { updateProfile } from 'firebase/auth';
 import { cn } from '../lib/utils';
 import { uploadToCloudinary } from '../lib/cloudinary';
+import { getApiUrl } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserStore } from '../stores/useUserStore';
 
@@ -110,7 +111,7 @@ const Profile = () => {
 
             if (!data) {
                 try {
-                    const API_URL = import.meta.env.VITE_API_URL || '';
+                    const API_URL = getApiUrl();
                     const response = await fetch(`${API_URL}/api/users/${currentUser.email}`);
                     if (response.ok) {
                         data = await response.json();
@@ -190,7 +191,7 @@ const Profile = () => {
                 resume_name: user.resumeName
             };
 
-            const API_URL = import.meta.env.VITE_API_URL || '';
+            const API_URL = getApiUrl();
             const response = await fetch(`${API_URL}/api/users/profile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
