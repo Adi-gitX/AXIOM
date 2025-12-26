@@ -11,7 +11,8 @@ export const useUserStore = create((set) => ({
         if (!email) return;
         set({ loading: true, error: null });
         try {
-            const response = await fetch(`/api/users/${email}`);
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const response = await fetch(`${API_URL}/api/users/${email}`);
             if (response.ok) {
                 const data = await response.json();
                 set({ user: data, loading: false });

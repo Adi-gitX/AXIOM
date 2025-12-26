@@ -110,7 +110,8 @@ const Profile = () => {
 
             if (!data) {
                 try {
-                    const response = await fetch(`/api/users/${currentUser.email}`);
+                    const API_URL = import.meta.env.VITE_API_URL || '';
+                    const response = await fetch(`${API_URL}/api/users/${currentUser.email}`);
                     if (response.ok) {
                         data = await response.json();
                         setStoreUser(data);
@@ -189,7 +190,8 @@ const Profile = () => {
                 resume_name: user.resumeName
             };
 
-            const response = await fetch('/api/users/profile', {
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const response = await fetch(`${API_URL}/api/users/profile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
