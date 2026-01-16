@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # ⚡ AXIOM
 
@@ -8,6 +8,7 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-axiomdev.vercel.app-black?style=for-the-badge)](https://axiomdev.vercel.app)
 [![Backend](https://img.shields.io/badge/🔧_API-axiom--server--three.vercel.app-gray?style=for-the-badge)](https://axiom-server-three.vercel.app)
+[![CI](https://github.com/Adi-gitX/AXIOM/actions/workflows/ci.yml/badge.svg)](https://github.com/Adi-gitX/AXIOM/actions/workflows/ci.yml)
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)
@@ -32,7 +33,7 @@ As a self-taught developer, I experienced firsthand how fragmented the learning 
 
 ---
 
-## ✨ Features at a Glance
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
@@ -81,8 +82,6 @@ AXIOM/
 | **Framer Motion** | Fluid animations & transitions |
 | **Zustand** | Lightweight state management |
 | **Firebase Auth** | Secure authentication |
-| **React Lenis** | Smooth scroll experience |
-| **Lucide React** | Beautiful icons |
 
 ### Backend
 | Technology | Purpose |
@@ -90,7 +89,6 @@ AXIOM/
 | **Express 5** | Modern Node.js web framework |
 | **PostgreSQL** | Robust relational database |
 | **Cloudinary** | Cloud-based image management |
-| **@dotenvx/dotenvx** | Encrypted environment variables |
 
 ### Security & Performance
 | Technology | Purpose |
@@ -98,7 +96,6 @@ AXIOM/
 | **Helmet** | XSS & security headers protection |
 | **express-rate-limit** | DDoS prevention (100 req/15min) |
 | **compression** | Gzip response compression |
-| **morgan** | HTTP request logging |
 
 ---
 
@@ -124,21 +121,16 @@ cd server
 npm install
 ```
 
-Create `.env` with:
+Create `.env`:
 ```env
-# Database
 DATABASE_URL=your_postgres_connection_string
-
-# Cloudinary
 VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
 VITE_CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-
-# Environment
 NODE_ENV=development
 ```
 
-Initialize database and start:
+Start server:
 ```bash
 npm run init-db
 npm run dev
@@ -151,25 +143,16 @@ cd ../client
 npm install
 ```
 
-Create `.env` with:
+Create `.env`:
 ```env
-# API
 VITE_API_URL=http://localhost:3000
-
-# Firebase
 VITE_FIREBASE_API_KEY=your_firebase_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-
-# Cloudinary
 VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
-VITE_CLOUDINARY_API_KEY=your_api_key
 ```
 
-Start the dev server:
+Start dev server:
 ```bash
 npm run dev
 ```
@@ -178,55 +161,16 @@ Visit `http://localhost:5173` 🎉
 
 ---
 
-## 🔐 Security Features
+## 🔐 Security
 
-- **Environment Encryption**: Sensitive keys encrypted with `@dotenvx/dotenvx`
-- **Rate Limiting**: Protects against brute-force and DDoS attacks
-- **Secure Headers**: Helmet guards against XSS, clickjacking, and MIME sniffing
-- **CORS Configuration**: Whitelisted origins only
-- **Firebase Auth**: Industry-standard authentication with email/password
-
----
-
-## 📱 App Screenshots
-
-### Landing Page
-A stunning, modern landing page with smooth scroll animations, 3D tilt cards, and a bento-grid layout showcasing key features.
-
-### Dashboard
-Your personal command center displaying:
-- Problems solved counter
-- Day streak tracker
-- Hours studied
-- Completion percentage
-- Weekly activity chart
-- Quick access to all modules
-
-### Education Hub
-Browse 18+ curated technology topics with embedded YouTube video playback featuring content from top creators like freeCodeCamp, Programming with Mosh, and Traversy Media.
-
-### DSA Tracker
-Track your progress through Striver's A2Z DSA sheet with:
-- Topic-wise organization (Arrays, Linked Lists, Greedy, Recursion)
-- Difficulty indicators (Easy/Medium/Hard)
-- Progress visualization
-- Direct problem links
+- **Rate Limiting** — Protects against brute-force and DDoS attacks
+- **Secure Headers** — Helmet guards against XSS, clickjacking, MIME sniffing
+- **CORS Configuration** — Whitelisted origins only
+- **Firebase Auth** — Industry-standard authentication
 
 ---
 
-## 🎨 Design Philosophy
-
-AXIOM follows a **hyper-modern, glassmorphic design language**:
-
-- **Dark/Light Mode**: Seamless theme switching
-- **Glass Panels**: Backdrop blur effects for depth
-- **Micro-animations**: Hover effects, transitions, and scroll reveals
-- **Typography**: Clean, modern font hierarchy
-- **Color System**: Consistent semantic color tokens
-
----
-
-## 🗺️ Roadmap
+## ️ Roadmap
 
 - [ ] Real-time notifications
 - [ ] AI-powered code review integration
@@ -239,8 +183,6 @@ AXIOM follows a **hyper-modern, glassmorphic design language**:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
@@ -251,15 +193,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+MIT License
 
 ---
 
 <div align="center">
 
-### Built with ❤️ by [Aditya Kammati](https://github.com/Adi-gitX)
+**Built with ❤️ by [Aditya Kammati](https://github.com/Adi-gitX)**
 
 *Empowering developers, one feature at a time.*
 
 </div>
-]]>
