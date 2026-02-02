@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useStore from '../store/useStore';
+import { chatApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
+import GlassCard from '../components/ui/GlassCard';
 
 const CHANNELS = [
     { id: 'general', name: 'General', description: 'General discussion' },
@@ -10,28 +13,91 @@ const CHANNELS = [
 ];
 
 const DeveloperConnect = () => {
+    const { currentUser } = useAuth();
     const [activeChannel, setActiveChannel] = useState('general');
     const [messageInput, setMessageInput] = useState('');
-    const { channels, addMessage } = useStore();
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { channels: localChannels, addMessage: addLocalMessage } = useStore();
     const messagesEndRef = useRef(null);
+    const pollIntervalRef = useRef(null);
 
-    // Use channels from store, default to empty array
-    const channelMessages = channels?.[activeChannel] || [];
+    // Fetch messages from API
+    const fetchMessages = async () => {
+        try {
+            const data = await chatApi.getMessages(activeChannel);
+            if (data.messages && data.messages.length > 0) {
+                setMessages(data.messages);
+            } else {
+                // Fall back to local messages if API returns empty
+                setMessages(localChannels?.[activeChannel] || []);
+            }
+        } catch (err) {
+            console.error('Failed to fetch messages:', err);
+            // Fall back to local messages on error
+            setMessages(localChannels?.[activeChannel] || []);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    // Load messages when channel changes
+    useEffect(() => {
+        setLoading(true);
+        fetchMessages();
+
+        // Set up polling for new messages (every 5 seconds)
+        pollIntervalRef.current = setInterval(fetchMessages, 5000);
+
+        return () => {
+            if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+            }
+        };
+    }, [activeChannel]);
+
+    // Scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [channelMessages]);
+    }, [messages]);
 
-    const handleSend = () => {
+    // Send message
+    const handleSend = async () => {
         if (!messageInput.trim()) return;
-        addMessage(activeChannel, {
+
+        const newMessage = {
             id: Date.now(),
-            user: 'You',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=You',
+            user: currentUser?.displayName || currentUser?.email?.split('@')[0] || 'You',
+            avatar: currentUser?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.email || 'You'}`,
             content: messageInput,
-            time: 'now',
-        });
+            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+            email: currentUser?.email
+        };
+
+        // Optimistic update
+        setMessages(prev => [...prev, newMessage]);
         setMessageInput('');
+
+        // Send to API
+        try {
+            await chatApi.sendMessage(
+                currentUser?.email,
+                activeChannel,
+                messageInput,
+                newMessage.user,
+                newMessage.avatar
+            );
+        } catch (err) {
+            console.error('Failed to send message:', err);
+            // Keep the optimistic update, add to local store as backup
+            addLocalMessage(activeChannel, newMessage);
+        }
+    };
+
+    const getUserName = () => {
+        if (currentUser?.displayName) return currentUser.displayName;
+        if (currentUser?.email) return currentUser.email.split('@')[0];
+        return 'You';
     };
 
     return (
@@ -55,6 +121,24 @@ const DeveloperConnect = () => {
                         </button>
                     ))}
                 </div>
+
+                {/* Online Users */}
+                <div className="mt-8">
+                    <h3 className="text-xs font-bold text-foreground uppercase tracking-widest mb-4 opacity-50">Online</h3>
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 px-2">
+                            <div className="relative">
+                                <img
+                                    src={currentUser?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.email}`}
+                                    alt=""
+                                    className="w-8 h-8 rounded-full bg-muted"
+                                />
+                                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-card" />
+                            </div>
+                            <span className="text-sm text-foreground">{getUserName()}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Main */}
@@ -62,7 +146,7 @@ const DeveloperConnect = () => {
 
                 {/* Header */}
                 <header className="px-8 py-6 border-b border-border bg-card/30 backdrop-blur-md">
-                    <h1 className="text-2xl font-light text-foreground text-glow font-display">
+                    <h1 className="text-2xl font-light text-foreground font-display tracking-tight">
                         #{CHANNELS.find(c => c.id === activeChannel)?.name}
                     </h1>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -72,7 +156,11 @@ const DeveloperConnect = () => {
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
-                    {channelMessages.length === 0 ? (
+                    {loading ? (
+                        <div className="h-full flex items-center justify-center">
+                            <p className="text-muted-foreground">Loading messages...</p>
+                        </div>
+                    ) : messages.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-center">
                             <div className="w-16 h-16 rounded-full bg-muted border border-border flex items-center justify-center mb-6">
                                 <span className="text-3xl text-muted-foreground font-light">#</span>
@@ -82,7 +170,7 @@ const DeveloperConnect = () => {
                         </div>
                     ) : (
                         <div className="space-y-6 max-w-4xl mx-auto">
-                            {channelMessages.map((msg) => (
+                            {messages.map((msg) => (
                                 <motion.div
                                     key={msg.id}
                                     initial={{ opacity: 0, y: 10 }}
@@ -96,8 +184,10 @@ const DeveloperConnect = () => {
                                     />
                                     <div>
                                         <div className="flex items-center gap-3">
-                                            <span className="font-bold text-foreground text-sm">{msg.user}</span>
-                                            <span className="text-xs text-muted-foreground">{msg.time}</span>
+                                            <span className="font-bold text-foreground text-sm">{msg.user || msg.username}</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {msg.time || new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                                            </span>
                                         </div>
                                         <p className="text-foreground/90 mt-1 leading-relaxed">{msg.content}</p>
                                     </div>
