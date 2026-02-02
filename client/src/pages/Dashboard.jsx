@@ -1,37 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore';
 import { TOPICS } from '../data/dsaSheet';
 import GlassCard from '../components/ui/GlassCard';
+import { progressApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
     const { solvedProblems } = useStore();
 
-    const totalProblems = TOPICS.reduce((acc, topic) => acc + topic.total, 0);
-    const solvedCount = solvedProblems.length;
-    const progress = Math.round((solvedCount / totalProblems) * 100);
+    // State for API data
+    const [stats, setStats] = useState(null);
+    const [weeklyActivity, setWeeklyActivity] = useState([4, 7, 3, 9, 5, 8, 6]);
+    const [loading, setLoading] = useState(true);
 
-    const stats = [
-        { label: 'Problems Solved', value: solvedCount },
-        { label: 'Day Streak', value: 7 },
-        { label: 'Hours Studied', value: 24 },
-        { label: 'Completion', value: `${progress}%` },
+    // Calculate local fallback
+    const totalProblems = TOPICS.reduce((acc, topic) => acc + topic.total, 0);
+    const localSolvedCount = solvedProblems.length;
+    const localProgress = Math.round((localSolvedCount / totalProblems) * 100);
+
+    // Fetch real stats from API
+    useEffect(() => {
+        const fetchStats = async () => {
+            if (!currentUser?.email) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const data = await progressApi.getDashboardStats(currentUser.email);
+                setStats(data);
+                if (data.weeklyActivity) {
+                    setWeeklyActivity(data.weeklyActivity);
+                }
+            } catch (err) {
+                console.error('Failed to fetch dashboard stats:', err);
+                // Fall back to local data
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [currentUser?.email]);
+
+    // Use API stats or fallback to local
+    const displayStats = [
+        { label: 'Problems Solved', value: stats?.problemsSolved ?? localSolvedCount },
+        { label: 'Day Streak', value: stats?.dayStreak ?? 0 },
+        { label: 'Hours Studied', value: stats?.hoursStudied ?? 0 },
+        { label: 'Completion', value: `${stats ? Math.round((stats.problemsSolved / totalProblems) * 100) : localProgress}%` },
     ];
 
     const links = [
         { name: 'Education', path: '/app/education', desc: '18 topics' },
-        { name: 'DSA Tracker', path: '/app/dsa', desc: `${solvedCount}/${totalProblems}` },
+        { name: 'DSA Tracker', path: '/app/dsa', desc: `${stats?.problemsSolved ?? localSolvedCount}/${totalProblems}` },
         { name: 'Interview Prep', path: '/app/interview', desc: '5 areas' },
-        { name: 'Jobs', path: '/app/jobs', desc: '12 new' },
-        { name: 'Posts', path: '/app/posts', desc: '6 articles' },
+        { name: 'Jobs', path: '/app/jobs', desc: 'Find jobs' },
+        { name: 'Posts', path: '/app/posts', desc: 'Dev feed' },
         { name: 'Dev Connect', path: '/app/connect', desc: 'Chat' },
     ];
 
     const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    const activity = [4, 7, 3, 9, 5, 8, 6];
-    const max = Math.max(...activity);
+    const max = Math.max(...weeklyActivity, 1);
 
     return (
         <div className="min-h-screen p-8 lg:p-12">
@@ -49,7 +83,7 @@ const Dashboard = () => {
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                    {stats.map((stat, i) => (
+                    {displayStats.map((stat, i) => (
                         <GlassCard
                             key={stat.label}
                             initial={{ opacity: 0, y: 10 }}
@@ -57,7 +91,9 @@ const Dashboard = () => {
                             transition={{ delay: i * 0.05 }}
                             className="p-6 flex flex-col items-start justify-center"
                         >
-                            <p className="text-4xl font-light text-foreground mb-2">{stat.value}</p>
+                            <p className="text-4xl font-light text-foreground mb-2">
+                                {loading ? '...' : stat.value}
+                            </p>
                             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
                         </GlassCard>
                     ))}
@@ -75,12 +111,12 @@ const Dashboard = () => {
                                     <div key={i} className="flex-1 flex flex-col items-center gap-3">
                                         <motion.div
                                             initial={{ height: 0 }}
-                                            animate={{ height: `${(activity[i] / max) * 100}%` }}
+                                            animate={{ height: `${(weeklyActivity[i] / max) * 100}%` }}
                                             transition={{ delay: i * 0.05, duration: 0.6, ease: "circOut" }}
-                                            className={`w-full rounded-full ${i === 3 ? 'bg-foreground shadow-[0_0_15px_rgba(var(--foreground),0.4)]' : 'bg-foreground/10'}`}
+                                            className={`w-full rounded-full ${i === new Date().getDay() - 1 || (new Date().getDay() === 0 && i === 6) ? 'bg-foreground shadow-[0_0_15px_rgba(var(--foreground),0.4)]' : 'bg-foreground/10'}`}
                                             style={{ minHeight: 8 }}
                                         />
-                                        <span className={`text-xs font-mono ${i === 3 ? 'text-foreground font-bold' : 'text-muted-foreground'}`}>{day}</span>
+                                        <span className={`text-xs font-mono ${i === new Date().getDay() - 1 || (new Date().getDay() === 0 && i === 6) ? 'text-foreground font-bold' : 'text-muted-foreground'}`}>{day}</span>
                                     </div>
                                 ))}
                             </div>
