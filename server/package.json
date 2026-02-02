@@ -5,7 +5,12 @@
     "scripts": {
         "start": "node index.js",
         "dev": "node --watch index.js",
-        "init-db": "node reset_db.js"
+        "init-db": "node reset_db.js",
+        "migrate": "node scripts/migrate.js",
+        "seed:jobs": "node scripts/seedJobs.js",
+        "seed:posts": "node scripts/seedPosts.js",
+        "seed:all": "npm run seed:jobs && npm run seed:posts",
+        "setup": "npm run migrate && npm run seed:all"
     },
     "dependencies": {
         "@dotenvx/dotenvx": "^1.51.2",
