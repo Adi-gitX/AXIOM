@@ -175,12 +175,13 @@ const Docs = () => {
                         <section id="dsa" className="space-y-6">
                             <h2 className="text-3xl font-bold text-foreground tracking-tight font-display">DSA Tracker</h2>
                             <p className="text-muted-foreground leading-relaxed">
-                                The heart of AXIOM. Track your progress through 450+ algorithmic problems.
+                                The heart of AXIOM. Start from `/app/dsa` for global progress and a GitHub-style yearly graph, then dive into focused sheet pages.
                             </p>
                             <ul className="list-disc pl-5 text-muted-foreground space-y-2 marker:text-foreground/50">
-                                <li>Blind 75 & NeetCode 150 Integration</li>
-                                <li>Spaced Repetition tracking</li>
-                                <li>Companies tag filter (Google, Meta, Amazon)</li>
+                                <li>1096 structured checklist entries across 99 topics</li>
+                                <li>Dedicated routes: `/app/dsa/love450`, `/app/dsa/striverSDE`, `/app/dsa/striverA2Z`</li>
+                                <li>Timezone-aware contribution graph with accurate date/year boundaries</li>
+                                <li>Search, difficulty filters, and direct question/solution links</li>
                             </ul>
                         </section>
 
