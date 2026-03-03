@@ -2,7 +2,7 @@ import React from 'react';
 
 const DsaFilters = ({ filters, onChange, onReset }) => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
             <div className="lg:col-span-2">
                 <input
                     type="text"
@@ -34,6 +34,14 @@ const DsaFilters = ({ filters, onChange, onReset }) => {
                 <option value="Hard">Hard</option>
                 <option value="Unknown">Unknown</option>
             </select>
+
+            <input
+                type="text"
+                value={filters.company}
+                onChange={(e) => onChange({ company: e.target.value })}
+                placeholder="Company tag (e.g. Amazon)"
+                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+            />
 
             <select
                 value={filters.sort}
