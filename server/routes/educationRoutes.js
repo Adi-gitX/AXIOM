@@ -7,6 +7,7 @@ import {
     getTopicProgress,
     getRecentlyWatched
 } from '../controllers/educationController.js';
+import { requireVerifiedUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -14,18 +15,18 @@ const router = express.Router();
 router.get('/catalog', getEducationCatalog);
 
 // Get user's education progress
-router.get('/progress/:email', getEducationProgress);
+router.get('/progress/:email', requireVerifiedUser, getEducationProgress);
 
 // Mark video as watched
-router.post('/watched', markVideoWatched);
+router.post('/watched', requireVerifiedUser, markVideoWatched);
 
 // Update watch progress (percentage)
-router.post('/progress', updateWatchProgress);
+router.post('/progress', requireVerifiedUser, updateWatchProgress);
 
 // Get progress by topic
-router.get('/topics/:email', getTopicProgress);
+router.get('/topics/:email', requireVerifiedUser, getTopicProgress);
 
 // Get recently watched
-router.get('/recent/:email', getRecentlyWatched);
+router.get('/recent/:email', requireVerifiedUser, getRecentlyWatched);
 
 export default router;
