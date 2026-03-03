@@ -39,7 +39,7 @@ As a self-taught developer, I experienced firsthand how fragmented the learning 
 |---------|-------------|
 | 🎛️ **Dashboard** | Personalized command center with progress stats, streak tracking, and quick navigation |
 | 📚 **Education Hub** | Curated video tutorials across 18+ topics (React, Python, System Design, AI/ML, DevOps, etc.) |
-| 🧮 **DSA Tracker** | Striver's A2Z Sheet with problem tracking, difficulty tags, and progress visualization |
+| 🧮 **DSA Tracker** | DSA Home (`/app/dsa`) with GitHub-style 365-day graph + dedicated sheet pages (`/app/dsa/:sheetId`) for Love 450, Striver SDE, and Striver A2Z |
 | 🎤 **Interview Prep** | Resources for behavioral, system design, coding, and resume preparation |
 | 💼 **Jobs Board** | Filterable job listings (Remote, Full-time, Contract) with save functionality |
 | 💬 **Developer Connect** | Real-time chat channels for networking (General, React, Jobs, Help) |
@@ -56,7 +56,7 @@ AXIOM/
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
 │   │   ├── contexts/       # React Context (Auth)
-│   │   ├── data/           # Static data (DSA sheet, education videos)
+│   │   ├── data/           # Frontend static data (education videos, shared constants)
 │   │   ├── lib/            # Utilities (API, Cloudinary, Firebase)
 │   │   ├── pages/          # Route pages
 │   │   └── stores/         # Zustand state management
