@@ -1,23 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ReactLenis } from '@studio-freight/react-lenis';
 import PublicNavbar from '../components/PublicNavbar';
-import { Terminal, Code2, Cpu, Globe, ArrowRight } from 'lucide-react';
+
+const SECTIONS = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'dsa', label: 'DSA Tracker' },
+    { id: 'oss', label: 'OSS Engine' },
+    { id: 'gsoc', label: 'GSOC Accelerator' },
+    { id: 'modules', label: 'Other Modules' },
+    { id: 'api', label: 'API Surface' },
+];
 
 const Docs = () => {
-    const [activeSection, setActiveSection] = useState('intro');
+    const [activeSection, setActiveSection] = useState('overview');
     const scrollRef = useRef(null);
 
-    // Scroll Spy Logic
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     setActiveSection(entry.target.id);
                 }
             });
         }, {
-            rootMargin: '-20% 0px -50% 0px',
-            threshold: 0.1
+            rootMargin: '-20% 0px -55% 0px',
+            threshold: 0.1,
         });
 
         const sections = document.querySelectorAll('section[id]');
@@ -26,193 +34,136 @@ const Docs = () => {
         return () => observer.disconnect();
     }, []);
 
-    const scrollToSection = (e, id) => {
-        e.preventDefault();
+    const scrollToSection = (id) => {
         const element = document.getElementById(id);
-        if (element) {
-            // Offset for fixed header
-            const headerOffset = 120;
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: "smooth"
-            });
-        }
+        if (!element) return;
+        const offset = 110;
+        const position = element.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: position, behavior: 'smooth' });
     };
-
-    const NavLink = ({ id, label }) => (
-        <button
-            onClick={(e) => scrollToSection(e, id)}
-            className={`w-full text-left block py-2 px-3 rounded-lg text-sm transition-all duration-300 ${activeSection === id
-                ? 'bg-accent/50 text-foreground font-semibold translate-x-1 shadow-glow border border-border'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-        >
-            {label}
-        </button>
-    );
 
     return (
         <ReactLenis root options={{ lerp: 0.05 }}>
-            <div className="min-h-screen font-sans">
+            <div className="min-h-screen">
                 <PublicNavbar />
 
-                <div className="max-w-7xl mx-auto pt-32 px-6 flex flex-col md:flex-row gap-12">
-
-                    {/* SIDEBAR */}
-                    <aside className="hidden md:block w-64 fixed h-[calc(100vh-8rem)] overflow-y-auto pt-8 pb-20 pr-4 border-r border-border custom-scrollbar">
-                        <div className="space-y-8">
-                            <div>
-                                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 font-display">Start Here</h3>
-                                <div className="space-y-1">
-                                    <NavLink id="intro" label="Introduction" />
-                                    <NavLink id="features" label="Core Features" />
-                                    <NavLink id="quickstart" label="Quick Start" />
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 font-display">Modules</h3>
-                                <div className="space-y-1">
-                                    <NavLink id="education" label="Education Hub" />
-                                    <NavLink id="dsa" label="DSA Tracker" />
-                                    <NavLink id="interview" label="Interview Prep" />
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 font-display">Reference</h3>
-                                <div className="space-y-1">
-                                    <NavLink id="cli" label="CLI Commands" />
-                                    <NavLink id="api" label="API Access" />
-                                </div>
-                            </div>
+                <div className="max-w-7xl mx-auto pt-32 px-6 flex flex-col md:flex-row gap-12" ref={scrollRef}>
+                    <aside className="hidden md:block w-64 fixed h-[calc(100vh-8rem)] overflow-y-auto pt-6 pb-16 pr-4 border-r border-border custom-scrollbar">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Documentation</p>
+                        <div className="space-y-1">
+                            {SECTIONS.map((item) => (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => scrollToSection(item.id)}
+                                    className={`w-full text-left py-2 px-3 rounded-lg text-sm transition-all ${activeSection === item.id
+                                        ? 'bg-accent/50 text-foreground font-semibold border border-border'
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                                        }`}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
                         </div>
                     </aside>
 
-                    {/* MAIN CONTENT */}
-                    <main className="md:ml-72 w-full py-8 space-y-24 pb-40">
-
-                        {/* Intro Section */}
-                        <section id="intro" className="space-y-6">
-                            <h1 className="text-5xl md:text-6xl font-bold text-foreground tracking-tighter font-display leading-[0.9] text-glow">
-                                Introduction
-                            </h1>
-                            <p className="text-xl text-muted-foreground leading-relaxed font-light max-w-2xl">
-                                AXIOM is the definitive ecosystem for software engineers. From mastering algorithms to system design, we provide the runtime environment for your career growth.
-                            </p>
-                            <div className="p-6 bg-muted/30 rounded-2xl border border-border shadow-sm backdrop-blur-md">
-                                <p className="text-muted-foreground">
-                                    <span className="font-semibold text-foreground">Note:</span> AXIOM is currently in Public Beta 1.0. Some features may evolve.
-                                </p>
-                            </div>
-                        </section>
-
-                        {/* Features Section */}
-                        <section id="features" className="space-y-8">
-                            <h2 className="text-3xl font-bold text-foreground tracking-tight font-display">Core Features</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {[
-                                    { icon: Code2, title: 'Interactive Runtime', desc: 'Execute code directly in the browser with our custom runtime.' },
-                                    { icon: Cpu, title: 'Performance Metrics', desc: 'Real-time time and space complexity analysis.' },
-                                    { icon: Globe, title: 'Global Sync', desc: 'Progress synchronized across all devices instantly.' },
-                                    { icon: Terminal, title: 'CLI Integration', desc: 'Manage your learning path via axiom-cli.' }
-                                ].map((item, i) => (
-                                    <div key={i} className="glass-card flex gap-4 p-5 rounded-2xl border border-border hover:border-border/80 transition-all group hover:bg-muted/50">
-                                        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-accent transition-colors">
-                                            <item.icon className="w-6 h-6 text-foreground" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-foreground mb-1">{item.title}</h3>
-                                            <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Quickstart Section */}
-                        <section id="quickstart" className="space-y-8">
-                            <h2 className="text-3xl font-bold text-foreground tracking-tight font-display">Quick Start</h2>
-                            <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl">
-                                Get up and running with AXIOM in less than 5 minutes.
-                            </p>
-                            <div className="bg-[#0D1117] rounded-2xl overflow-hidden font-mono text-sm text-white shadow-xl max-w-2xl border border-white/10">
-                                <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-red-500/50" />
-                                    <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-                                    <div className="w-3 h-3 rounded-full bg-green-500/50" />
-                                </div>
-                                <div className="p-6 space-y-4">
-                                    <div className="flex gap-2">
-                                        <span className="text-pink-400">$</span>
-                                        <span>npm install -g @axiom/cli</span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <span className="text-pink-400">$</span>
-                                        <span>axiom login</span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <span className="text-pink-400">$</span>
-                                        <span>axiom init my-workspace</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <div className="w-full h-px bg-border" />
-
-                        {/* Modules Section */}
-                        <section id="education" className="space-y-6">
-                            <h2 className="text-3xl font-bold text-foreground tracking-tight font-display">Education Hub</h2>
-                            <p className="text-muted-foreground leading-relaxed">
-                                Curated video courses covering System Design (LLD/HLD), Operating Systems, and DBMS.
+                    <main className="md:ml-72 w-full py-8 space-y-20 pb-28">
+                        <section id="overview" className="space-y-4">
+                            <h1 className="text-5xl font-bold tracking-tight text-foreground font-display">AXIOM Product Docs</h1>
+                            <p className="text-lg text-muted-foreground max-w-3xl">
+                                AXIOM is a student-focused engineering growth platform. The current product combines DSA execution,
+                                OSS contribution tracking, GSOC planning, learning modules, and a public portfolio surface.
                             </p>
                         </section>
 
-                        <section id="dsa" className="space-y-6">
-                            <h2 className="text-3xl font-bold text-foreground tracking-tight font-display">DSA Tracker</h2>
-                            <p className="text-muted-foreground leading-relaxed">
-                                The heart of AXIOM. Start from `/app/dsa` for global progress and a GitHub-style yearly graph, then dive into focused sheet pages.
-                            </p>
+                        <section id="dashboard" className="space-y-4">
+                            <h2 className="text-3xl font-bold text-foreground font-display">Dashboard Command Center</h2>
                             <ul className="list-disc pl-5 text-muted-foreground space-y-2 marker:text-foreground/50">
-                                <li>1096 structured checklist entries across 99 topics</li>
-                                <li>Dedicated routes: `/app/dsa/love450`, `/app/dsa/striverSDE`, `/app/dsa/striverA2Z`</li>
-                                <li>Timezone-aware contribution graph with accurate date/year boundaries</li>
-                                <li>Search, difficulty filters, and direct question/solution links</li>
+                                <li>Global KPI cards: problems solved, streak, study hours, completion percentage.</li>
+                                <li>GitHub-style 365-day DSA contribution graph with timezone-aware date alignment.</li>
+                                <li>Daily Focus with 3 recommended DSA problems and one good-first-issue suggestion.</li>
+                                <li>Weekly activity bars and quick access links to all major modules.</li>
                             </ul>
                         </section>
 
-                        <section id="cli" className="space-y-8 pt-12">
-                            <h2 className="text-3xl font-bold text-foreground tracking-tight font-display">CLI Commands</h2>
+                        <section id="dsa" className="space-y-4">
+                            <h2 className="text-3xl font-bold text-foreground font-display">DSA Tracker</h2>
+                            <ul className="list-disc pl-5 text-muted-foreground space-y-2 marker:text-foreground/50">
+                                <li>Home route `/app/dsa` for global progress and sheet entry cards.</li>
+                                <li>Dedicated sheet routes: `/app/dsa/love450`, `/app/dsa/striverSDE`, `/app/dsa/striverA2Z`.</li>
+                                <li>Search and filters: status, difficulty, and company tags.</li>
+                                <li>Spaced repetition queue with review scheduling and completion actions.</li>
+                                <li>Per-problem journal metadata: notes, time spent, attempts, interval planning.</li>
+                            </ul>
+                        </section>
+
+                        <section id="oss" className="space-y-4">
+                            <h2 className="text-3xl font-bold text-foreground font-display">OSS Contribution Engine</h2>
+                            <ul className="list-disc pl-5 text-muted-foreground space-y-2 marker:text-foreground/50">
+                                <li>One-click GitHub OAuth connect flow.</li>
+                                <li>Automatic first sync after OAuth callback with sync-status visibility.</li>
+                                <li>Contribution cards for opened PRs, merged PRs, stars, and merged streak.</li>
+                                <li>Recent PR timeline and smart good-first-issue recommendation (skills + DSA signal).</li>
+                                <li>Manual re-sync endpoint for live refresh.</li>
+                            </ul>
+                        </section>
+
+                        <section id="gsoc" className="space-y-4">
+                            <h2 className="text-3xl font-bold text-foreground font-display">GSOC Accelerator</h2>
+                            <ul className="list-disc pl-5 text-muted-foreground space-y-2 marker:text-foreground/50">
+                                <li>GSOC 2026 timeline with statuses and day offsets.</li>
+                                <li>Organization explorer with search and language/difficulty filters.</li>
+                                <li>Readiness score composed from DSA completion and OSS contribution signal.</li>
+                                <li>Reminder dismissal/restore workflow with active/dismissed views and urgency buckets.</li>
+                            </ul>
+                        </section>
+
+                        <section id="modules" className="space-y-4">
+                            <h2 className="text-3xl font-bold text-foreground font-display">Other Modules</h2>
+                            <ul className="list-disc pl-5 text-muted-foreground space-y-2 marker:text-foreground/50">
+                                <li>Education Hub: topic progress with In Progress / Completed status and DSA quick links.</li>
+                                <li>Interview Prep: categorized resources with mark-complete behavior and quick tips.</li>
+                                <li>Dev Connect: channel-based chat with online users list and default `#gsoc` channel.</li>
+                                <li>Profile + Portfolio: public username route `/u/:username`, ATS score, OSS showcase, resume PDF print export.</li>
+                                <li>Pricing: simplified Free Forever + Pro model.</li>
+                            </ul>
+                        </section>
+
+                        <section id="api" className="space-y-4">
+                            <h2 className="text-3xl font-bold text-foreground font-display">API Surface</h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">
                                     <thead className="border-b border-border">
                                         <tr>
-                                            <th className="py-3 font-bold text-foreground">Command</th>
-                                            <th className="py-3 font-bold text-foreground">Description</th>
+                                            <th className="py-3 text-foreground">Module</th>
+                                            <th className="py-3 text-foreground">Representative Endpoints</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-border">
+                                    <tbody className="divide-y divide-border text-muted-foreground">
                                         <tr>
-                                            <td className="py-3 font-mono text-pink-400">axiom sync</td>
-                                            <td className="py-3 text-muted-foreground">Syncs local progress with the cloud.</td>
+                                            <td className="py-3">Progress / DSA</td>
+                                            <td className="py-3">`/api/progress/catalog`, `/api/progress/focus/:email`, `/api/progress/review/:email`, `/api/progress/problem-meta`</td>
                                         </tr>
                                         <tr>
-                                            <td className="py-3 font-mono text-pink-400">axiom test</td>
-                                            <td className="py-3 text-muted-foreground">Runs test cases against the current solution.</td>
+                                            <td className="py-3">OSS</td>
+                                            <td className="py-3">`/api/oss/github/connect-url`, `/api/oss/sync-status/:email`, `/api/oss/sync/:email`, `/api/oss/contributions/:email`</td>
                                         </tr>
                                         <tr>
-                                            <td className="py-3 font-mono text-pink-400">axiom submit</td>
-                                            <td className="py-3 text-muted-foreground">Submits solution for verification.</td>
+                                            <td className="py-3">GSOC</td>
+                                            <td className="py-3">`/api/gsoc/timeline`, `/api/gsoc/orgs`, `/api/gsoc/readiness/:email`, `/api/gsoc/reminders/:email`</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-3">Users</td>
+                                            <td className="py-3">`/api/users/public/:username`, `/api/users/ats/:email`, `/api/users/username`</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-3">Chat</td>
+                                            <td className="py-3">`/api/chat/channels`, `/api/chat/online`, `/api/chat/messages/:channelId`</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </section>
-
                     </main>
                 </div>
             </div>
