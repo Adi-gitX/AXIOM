@@ -4,7 +4,9 @@
     "type": "module",
     "scripts": {
         "start": "node index.js",
-        "dev": "node --watch index.js",
+        "dev": "NODE_ENV=development node index.js",
+        "dev:safe": "NODE_ENV=development ENABLE_DEV_RATE_LIMIT=false ALLOW_LOCAL_RATE_LIMIT_BYPASS=true node index.js",
+        "dev:strict": "NODE_ENV=development ENABLE_DEV_RATE_LIMIT=true ALLOW_LOCAL_RATE_LIMIT_BYPASS=false node index.js",
         "build:dsa-catalog": "node scripts/buildDsaCatalogFrom450.js",
         "init-db": "node reset_db.js",
         "migrate": "node scripts/migrate.js",
