@@ -6,6 +6,7 @@ import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Education from './pages/Education';
 import DSATracker from './pages/DSATracker';
+import DSASheetPage from './pages/DSASheetPage';
 import InterviewPrep from './pages/InterviewPrep';
 import DeveloperConnect from './pages/DeveloperConnect';
 import Jobs from './pages/Jobs';
@@ -43,6 +44,7 @@ function App() {
                         <Route index element={<Dashboard />} />
                         <Route path="education" element={<Education />} />
                         <Route path="dsa" element={<DSATracker />} />
+                        <Route path="dsa/:sheetId" element={<DSASheetPage />} />
                         <Route path="interview" element={<InterviewPrep />} />
                         <Route path="connect" element={<DeveloperConnect />} />
                         <Route path="jobs" element={<Jobs />} />
