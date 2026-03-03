@@ -11,6 +11,13 @@ const InterviewPrep = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [savingId, setSavingId] = useState(null);
+    const [retryNonce, setRetryNonce] = useState(0);
+    const isTransientApiError = (err) => (
+        err?.status === 401
+        || err?.status === 429
+        || err?.status === 503
+        || err?.code === 'BACKEND_UNAVAILABLE'
+    );
 
     useEffect(() => {
         const loadResources = async () => {
@@ -23,7 +30,9 @@ const InterviewPrep = () => {
                 setResources(Array.isArray(data.resources) ? data.resources : []);
                 setTips(Array.isArray(data.tips) ? data.tips : []);
             } catch (err) {
-                console.error('Failed to load interview resources:', err);
+                if (!isTransientApiError(err)) {
+                    console.error('Failed to load interview resources:', err);
+                }
                 setError('Failed to load interview resources');
             } finally {
                 setLoading(false);
@@ -31,7 +40,7 @@ const InterviewPrep = () => {
         };
 
         loadResources();
-    }, [currentUser?.email]);
+    }, [currentUser?.email, retryNonce]);
 
     const categories = useMemo(
         () => ['All', ...new Set(resources.map((r) => r.category).filter(Boolean))],
@@ -86,7 +95,18 @@ const InterviewPrep = () => {
                 >
                     <h1 className="text-5xl font-light text-foreground text-glow font-display">Interview Prep</h1>
                     <p className="text-muted-foreground mt-2">Resources to ace your interviews</p>
-                    {error && <p className="text-sm text-rose-400 mt-3">{error}</p>}
+                    {error && (
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <p className="text-sm text-rose-400">{error}</p>
+                            <button
+                                type="button"
+                                onClick={() => setRetryNonce((prev) => prev + 1)}
+                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    )}
                 </motion.header>
 
                 <div className="flex flex-wrap gap-2 mb-8">
