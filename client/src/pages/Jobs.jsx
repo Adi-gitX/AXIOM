@@ -11,6 +11,14 @@ const Jobs = () => {
     const [loading, setLoading] = useState(true);
     const [savedJobIds, setSavedJobIds] = useState([]);
     const [appliedJobIds, setAppliedJobIds] = useState([]);
+    const [error, setError] = useState('');
+    const [retryNonce, setRetryNonce] = useState(0);
+    const isTransientApiError = (err) => (
+        err?.status === 401
+        || err?.status === 429
+        || err?.status === 503
+        || err?.code === 'BACKEND_UNAVAILABLE'
+    );
 
     const filters = ['All', 'Remote', 'Full-time', 'Contract', 'Internship'];
 
@@ -18,6 +26,7 @@ const Jobs = () => {
     useEffect(() => {
         const fetchJobs = async () => {
             setLoading(true);
+            setError('');
             try {
                 const params = {};
                 if (filter === 'Remote') params.remote = 'true';
@@ -30,18 +39,21 @@ const Jobs = () => {
                 setSavedJobIds(jobsList.filter((job) => job.is_saved).map((job) => job.id));
                 setAppliedJobIds(jobsList.filter((job) => job.is_applied).map((job) => job.id));
             } catch (err) {
-                console.error('Failed to fetch jobs:', err);
+                if (!isTransientApiError(err)) {
+                    console.error('Failed to fetch jobs:', err);
+                }
                 // Fallback to empty list on error
                 setJobs([]);
                 setSavedJobIds([]);
                 setAppliedJobIds([]);
+                setError('Unable to refresh jobs right now.');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchJobs();
-    }, [filter, currentUser?.email]);
+    }, [filter, currentUser?.email, retryNonce]);
 
     // Handle save job toggle
     const handleSaveJob = async (jobId) => {
@@ -119,6 +131,18 @@ const Jobs = () => {
                 >
                     <h1 className="text-5xl font-light text-foreground font-display tracking-tight">Jobs</h1>
                     <p className="text-muted-foreground text-lg font-light mt-2">Find your next opportunity</p>
+                    {error && (
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <p className="text-sm text-rose-400">{error}</p>
+                            <button
+                                type="button"
+                                onClick={() => setRetryNonce((prev) => prev + 1)}
+                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    )}
                 </motion.header>
 
                 {/* Filters */}
