@@ -34,11 +34,17 @@ Developers today face a **fragmented ecosystem** when trying to grow their caree
 
 #### 3. **DSA Tracker** (`/app/dsa`)
 - **Purpose:** To master Data Structures and Algorithms.
-- **Methodology:** Based on **Striver's A2Z Sheet**.
+- **Methodology:** Unified multi-sheet workflow using **Love 450**, **Striver A2Z**, and **Striver SDE**.
 - **Features:**
-    - Topics organized by difficulty (Arrays, Trees, Graphs, DP).
-    - Checkbox tracking for completed problems.
-    - "Revision Mode" to flag difficult problems.
+    - DSA home dashboard with global KPIs and a GitHub-style 365-day contribution graph.
+    - Timezone-aware contribution rendering (`tz`-aware backend + browser-local view semantics).
+    - 99 topics and 1096 trackable entries across three sheets.
+    - Dedicated sheet pages:
+      - `/app/dsa/love450`
+      - `/app/dsa/striverSDE`
+      - `/app/dsa/striverA2Z`
+    - Search, status filters, difficulty filters, and sortable topic views per sheet.
+    - Checkbox tracking, direct problem links, and optional solution links.
 
 #### 4. **Interview Prep** (`/app/interview`)
 - **Purpose:** Comprehensive preparation for technical interviews.
@@ -159,7 +165,8 @@ All these routes are rendered inside the Main Layout (Sidebar + Topbar):
 |----------|-----------|------------------------------|
 | `/app` | `Dashboard.jsx` | **Main Dashboard**. Shows stats heatmaps and quick links. |
 | `/app/education` | `Education.jsx` | **Learning Hub**. Video courses and progress tracking. (Frontend Mock) |
-| `/app/dsa` | `DSATracker.jsx` | **DSA Tracker**. Striver's A2Z DSA sheet progress. (Frontend Mock) |
+| `/app/dsa` | `DSATracker.jsx` | **DSA Home**. Global KPIs, yearly contribution graph, and sheet cards. |
+| `/app/dsa/:sheetId` | `DSASheetPage.jsx` | **DSA Sheet Detail**. Full list controls and topic/problem checklist for the selected sheet. |
 | `/app/interview` | `InterviewPrep.jsx` | **Interview Prep**. Guides for system design & behavioral. (Frontend Mock) |
 | `/app/connect` | `DeveloperConnect.jsx` | **Community Chat**. Real-time developer chat interface. (Frontend Mock) |
 | `/app/jobs` | `Jobs.jsx` | **Job Board**. Listings with filtering. **Implementation:** Uses hardcoded `JOBS` array. |
