@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '../components/ui/GlassCard';
 import Button from '../components/ui/Button';
@@ -171,12 +171,21 @@ const Posts = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newPost, setNewPost] = useState({ title: '', content: '', tags: '' });
     const [createLoading, setCreateLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [retryNonce, setRetryNonce] = useState(0);
+    const isTransientApiError = (err) => (
+        err?.status === 401
+        || err?.status === 429
+        || err?.status === 503
+        || err?.code === 'BACKEND_UNAVAILABLE'
+    );
 
     const filters = ['For You', 'Following', 'Popular', 'Recent'];
 
     // Fetch posts from API
-    const fetchPosts = async () => {
+    const fetchPosts = useCallback(async () => {
         setLoading(true);
+        setError('');
         try {
             let sort = 'recent';
             if (activeFilter === 'Popular') sort = 'popular';
@@ -189,16 +198,19 @@ const Posts = () => {
             // Handle both array response and object with posts property
             setPosts(Array.isArray(data) ? data : (data.posts || []));
         } catch (err) {
-            console.error('Failed to fetch posts:', err);
+            if (!isTransientApiError(err)) {
+                console.error('Failed to fetch posts:', err);
+            }
             setPosts([]);
+            setError('Unable to refresh posts right now.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeFilter, currentUser?.email]);
 
     useEffect(() => {
         fetchPosts();
-    }, [activeFilter, currentUser?.email]);
+    }, [fetchPosts, retryNonce]);
 
     // Handle vote
     const handleVote = async (postId, vote) => {
@@ -265,6 +277,18 @@ const Posts = () => {
                     <div>
                         <h1 className="text-5xl font-light text-foreground text-glow font-display tracking-tight mb-2">Posts</h1>
                         <p className="text-muted-foreground text-lg font-light">Discover developer articles and projects</p>
+                        {error && (
+                            <div className="mt-3 flex flex-wrap items-center gap-3">
+                                <p className="text-sm text-rose-400">{error}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => setRetryNonce((prev) => prev + 1)}
+                                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                >
+                                    Retry
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" strokeLinecap="round" /></svg>
