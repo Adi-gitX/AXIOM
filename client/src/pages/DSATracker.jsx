@@ -1,10 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../components/ui/GlassCard';
-import DsaContributionGraph from '../components/dsa/DsaContributionGraph';
 import DsaSheetCards from '../components/dsa/DsaSheetCards';
+import PremiumBadge from '../components/ui/PremiumBadge';
 import useDsaData from '../hooks/useDsaData';
 import { progressApi } from '../lib/api';
+import { HeatmapCalendar } from "@/components/heatmap-calendar";
+
+function makeData(rows = []) {
+    return (rows || [])
+        .map((row) => {
+            const rawDate = row?.activity_date ?? row?.date ?? '';
+            const date = String(rawDate).slice(0, 10);
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return null;
+            }
+
+            const rawValue = row?.problems_solved ?? row?.value ?? 0;
+            return {
+                date,
+                value: Number.parseInt(rawValue, 10) || 0,
+            };
+        })
+        .filter(Boolean);
+}
 
 const DSATracker = () => {
     const {
@@ -20,6 +39,7 @@ const DSATracker = () => {
         dsaMutationVersion,
         loading,
         error,
+        warning,
         refresh,
     } = useDsaData();
 
@@ -32,6 +52,17 @@ const DSATracker = () => {
     const [heatmapLoading, setHeatmapLoading] = useState(true);
     const [heatmapError, setHeatmapError] = useState('');
     const [heatmapNonce, setHeatmapNonce] = useState(0);
+    const hasHeatmapSnapshotRef = useRef(false);
+    const isTransientApiError = (err) => (
+        err?.status === 401
+        || err?.status === 429
+        || err?.status === 503
+        || err?.code === 'BACKEND_UNAVAILABLE'
+    );
+
+    useEffect(() => {
+        hasHeatmapSnapshotRef.current = Array.isArray(heatmapData.rows) && heatmapData.rows.length > 0;
+    }, [heatmapData.rows]);
 
     useEffect(() => {
         const loadHeatmap = async () => {
@@ -59,14 +90,20 @@ const DSATracker = () => {
                     to: data?.to || null,
                 });
             } catch (err) {
-                console.error('Failed to load heatmap:', err);
-                setHeatmapData({
-                    rows: [],
-                    timezone: 'UTC',
-                    from: null,
-                    to: null,
-                });
-                setHeatmapError('Unable to load contribution graph right now.');
+                if (!isTransientApiError(err)) {
+                    console.error('Failed to load heatmap:', err);
+                }
+                if (hasHeatmapSnapshotRef.current) {
+                    setHeatmapError('Contribution graph refresh is limited. Showing the last synced graph.');
+                } else {
+                    setHeatmapData({
+                        rows: [],
+                        timezone: 'UTC',
+                        from: null,
+                        to: null,
+                    });
+                    setHeatmapError('Unable to load contribution graph right now.');
+                }
             } finally {
                 setHeatmapLoading(false);
             }
@@ -76,6 +113,7 @@ const DSATracker = () => {
     }, [email, dsaMutationVersion, heatmapNonce]);
 
     const studyHours = Math.round(totalStudyMinutes / 60);
+    const data = useMemo(() => makeData(heatmapData.rows), [heatmapData.rows]);
 
     return (
         <div className="min-h-screen p-8 lg:p-12">
@@ -85,6 +123,10 @@ const DSATracker = () => {
                     animate={{ opacity: 1 }}
                     className="space-y-2"
                 >
+                    <div className="flex flex-wrap items-center gap-2">
+                        <PremiumBadge tone="subtle">DSA Command Center</PremiumBadge>
+                        <PremiumBadge tone="accent">Premium Focus</PremiumBadge>
+                    </div>
                     <h1 className="text-5xl font-light text-foreground font-display tracking-tight">DSA Tracker</h1>
                     <p className="text-muted-foreground text-lg font-light">
                         Track global progress, monitor yearly consistency, and jump into each sheet with focus.
@@ -107,17 +149,35 @@ const DSATracker = () => {
                     </GlassCard>
                 )}
 
+                {warning && !loading && (
+                    <GlassCard className="p-4" hoverEffect={false}>
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <p className="text-sm text-amber-500">{warning}</p>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    refresh();
+                                    setHeatmapNonce((value) => value + 1);
+                                }}
+                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    </GlassCard>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <GlassCard className="p-5" hoverEffect={false}>
                         <p className="text-xs uppercase tracking-widest text-muted-foreground">Global Solved</p>
                         <p className="text-3xl font-light mt-2">{loading ? '...' : `${totalSolved}/${totalProblems}`}</p>
                     </GlassCard>
 
-                    <GlassCard className="p-5" hoverEffect={false}>
+                    <GlassCard className="p-5" hoverEffect={false} premium>
                         <p className="text-xs uppercase tracking-widest text-muted-foreground">Completion</p>
                         <p className="text-3xl font-light mt-2">{loading ? '...' : `${overallProgress}%`}</p>
-                        <div className="h-2 w-full rounded-full bg-foreground/10 overflow-hidden mt-2">
-                            <div className="h-full rounded-full bg-foreground" style={{ width: `${overallProgress}%` }} />
+                        <div className="premium-progress-track h-2 w-full rounded-full bg-foreground/10 mt-2">
+                            <div className="premium-progress-fill h-full rounded-full bg-foreground" style={{ width: `${overallProgress}%` }} />
                         </div>
                     </GlassCard>
 
@@ -138,8 +198,20 @@ const DSATracker = () => {
                     {heatmapError && !heatmapLoading && (
                         <p className="text-sm text-amber-500">{heatmapError}</p>
                     )}
-                    <DsaContributionGraph
-                        rows={heatmapData.rows}
+                    <HeatmapCalendar
+                        title="Contribution Activity (Last 365 days)"
+                        data={data}
+                        weekStartsOn={1}
+                        interactionMode="hover"
+                        valueLabel={{ singular: 'question solved', plural: 'questions solved' }}
+                        legend={{ placement: 'bottom' }}
+                        axisLabels={{
+                            showMonths: true,
+                            showWeekdays: true,
+                            weekdayIndices: [1, 3, 5],
+                            monthFormat: "short",
+                            minWeekSpacing: 3,
+                        }}
                         loading={heatmapLoading || loading}
                         timezone={heatmapData.timezone}
                         from={heatmapData.from}
