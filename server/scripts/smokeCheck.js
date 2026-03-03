@@ -1,5 +1,11 @@
 import { createOrGetUser, updateUserProfile } from '../controllers/userController.js';
-import { getDsaCatalog, getUserProgress, toggleProblem, getDashboardStats } from '../controllers/progressController.js';
+import {
+    getDsaCatalog,
+    getUserProgress,
+    toggleProblem,
+    getActivityHeatmap,
+    getDashboardStats,
+} from '../controllers/progressController.js';
 import { getInterviewResources, setInterviewResourceCompletion, getInterviewProgress } from '../controllers/interviewController.js';
 import { getChannels, sendMessage, getMessages } from '../controllers/chatController.js';
 import { getAllJobs } from '../controllers/jobsController.js';
@@ -7,6 +13,12 @@ import { createPost, voteOnPost, addComment, getAllPosts } from '../controllers/
 import { getEducationCatalog, getEducationProgress } from '../controllers/educationController.js';
 
 const email = `smoke-${Date.now()}@example.com`;
+
+const assert = (condition, message) => {
+    if (!condition) {
+        throw new Error(message);
+    }
+};
 
 const invoke = async (label, handler, req = {}) => {
     const result = { statusCode: 200, body: null };
@@ -58,9 +70,66 @@ const run = async () => {
             },
         });
 
-        await invoke('progress.getDsaCatalog', getDsaCatalog);
+        const catalog = await invoke('progress.getDsaCatalog', getDsaCatalog);
+        assert(Array.isArray(catalog.body?.sheets), 'catalog.sheets must be present');
+        assert(catalog.body?.totalProblems === 1096, `catalog.totalProblems expected 1096, got ${catalog.body?.totalProblems}`);
+
         await invoke('progress.getUserProgress', getUserProgress, { params: { email } });
-        await invoke('progress.toggleProblem', toggleProblem, { body: { email, problemId: 'a1', topicId: 1 } });
+
+        const canonicalId = 'striverSDE:0:0';
+        const legacyId = 'a1';
+        await invoke('progress.toggleProblem.canonical', toggleProblem, {
+            body: { email, problemId: canonicalId, topicId: 201 },
+        });
+
+        const afterCanonicalSolve = await invoke('progress.getUserProgress.afterCanonical', getUserProgress, {
+            params: { email },
+        });
+        assert(
+            afterCanonicalSolve.body?.solvedProblems?.includes(canonicalId),
+            'canonical toggle should save canonical problem id'
+        );
+
+        const unsolveViaLegacy = await invoke('progress.toggleProblem.legacyUnsolve', toggleProblem, {
+            body: { email, problemId: legacyId },
+        });
+        assert(unsolveViaLegacy.body?.solved === false, 'legacy toggle should unsolve when canonical exists');
+
+        const afterLegacyUnsolve = await invoke('progress.getUserProgress.afterLegacyUnsolve', getUserProgress, {
+            params: { email },
+        });
+        assert(
+            !afterLegacyUnsolve.body?.solvedProblems?.includes(canonicalId),
+            'legacy unsolve should remove canonical solved state'
+        );
+
+        await invoke('progress.toggleProblem.legacySolve', toggleProblem, {
+            body: { email, problemId: legacyId },
+        });
+
+        const afterLegacySolve = await invoke('progress.getUserProgress.afterLegacySolve', getUserProgress, {
+            params: { email },
+        });
+        const canonicalCount = (afterLegacySolve.body?.solvedProblems || []).filter((id) => id === canonicalId).length;
+        assert(canonicalCount === 1, `canonical id should appear once, got ${canonicalCount}`);
+        assert(
+            !(afterLegacySolve.body?.solvedProblems || []).includes(legacyId),
+            'response solvedProblems should not expose legacy ids'
+        );
+
+        const heatmap = await invoke('progress.getActivityHeatmap', getActivityHeatmap, {
+            params: { email },
+            query: { days: '365', tz: 'Asia/Kolkata' },
+        });
+        assert(heatmap.body?.timezone === 'Asia/Kolkata', 'heatmap should echo requested timezone');
+        assert(Array.isArray(heatmap.body?.rows), 'heatmap rows should be an array');
+        assert(typeof heatmap.body?.from === 'string', 'heatmap.from should be a date key');
+        assert(typeof heatmap.body?.to === 'string', 'heatmap.to should be a date key');
+
+        await invoke('progress.toggleProblem.cleanup', toggleProblem, {
+            body: { email, problemId: canonicalId, topicId: 201 },
+        });
+
         await invoke('progress.getDashboardStats', getDashboardStats, { params: { email } });
 
         await invoke('education.getEducationCatalog', getEducationCatalog);
