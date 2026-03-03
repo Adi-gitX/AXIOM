@@ -157,6 +157,30 @@ export const schemas = {
         }
     },
 
+    problemMetaUpsert: {
+        body: {
+            email: { required: true, type: 'string', email: true },
+            problemId: { required: true, type: 'string' },
+            notes: { required: false, type: 'string', maxLength: 5000 },
+            timeSpentMinutes: { required: false, type: 'number', min: 0, max: 100000 },
+            attempts: { required: false, type: 'number', min: 0, max: 100000 },
+            reviewIntervalDays: { required: false, type: 'number', min: 1, max: 120 },
+            reviewDueDate: { required: false, type: 'string' },
+            lastAttemptedAt: { required: false, type: 'string' },
+            lastReviewedAt: { required: false, type: 'string' },
+            tz: { required: false, type: 'string' }
+        }
+    },
+
+    problemReviewComplete: {
+        body: {
+            email: { required: true, type: 'string', email: true },
+            problemId: { required: true, type: 'string' },
+            rating: { required: false, type: 'string', enum: ['again', 'hard', 'good', 'easy'] },
+            tz: { required: false, type: 'string' }
+        }
+    },
+
     jobSave: {
         body: {
             email: { required: true, type: 'string', email: true },
@@ -221,8 +245,28 @@ export const schemas = {
 
     channelCreate: {
         body: {
+            email: { required: true, type: 'string', email: true },
             name: { required: true, type: 'string', minLength: 1, maxLength: 100 },
-            description: { required: false, type: 'string', maxLength: 500 }
+            description: { required: false, type: 'string', maxLength: 500 },
+            isPrivate: { required: false, type: 'boolean' },
+        }
+    },
+
+    chatMemberInvite: {
+        params: {
+            channelId: { required: true, type: 'string', minLength: 1, maxLength: 100 },
+        },
+        body: {
+            memberEmail: { required: true, type: 'string', email: true },
+        }
+    },
+
+    chatMemberRemove: {
+        params: {
+            channelId: { required: true, type: 'string', minLength: 1, maxLength: 100 },
+        },
+        body: {
+            memberEmail: { required: true, type: 'string', email: true },
         }
     },
 
