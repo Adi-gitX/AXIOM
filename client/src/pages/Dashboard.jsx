@@ -15,7 +15,7 @@ const Dashboard = () => {
     const [stats, setStats] = useState(null);
     const [weeklyActivity, setWeeklyActivity] = useState([0, 0, 0, 0, 0, 0, 0]);
     const [loading, setLoading] = useState(true);
-    const [totalProblems, setTotalProblems] = useState(0);
+    const [totalProblems, setTotalProblems] = useState(1096);
 
     // Calculate local fallback
     const localSolvedCount = solvedProblems.length;
