@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { chatApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import GlassCard from '../components/ui/GlassCard';
+import { useUserStore } from '../stores/useUserStore';
 
 const DeveloperConnect = () => {
     const { currentUser } = useAuth();
+    const { user: profileData, fetchProfile } = useUserStore();
     const [channels, setChannels] = useState([]);
     const [activeChannel, setActiveChannel] = useState('');
     const [messageInput, setMessageInput] = useState('');
@@ -13,39 +14,66 @@ const DeveloperConnect = () => {
     const [loading, setLoading] = useState(true);
     const [channelsLoading, setChannelsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [onlineUsers, setOnlineUsers] = useState([]);
     const [showCreateChannel, setShowCreateChannel] = useState(false);
-    const [newChannel, setNewChannel] = useState({ name: '', description: '' });
+    const [newChannel, setNewChannel] = useState({ name: '', description: '', isPrivate: false });
     const [createLoading, setCreateLoading] = useState(false);
+    const [channelMembers, setChannelMembers] = useState([]);
+    const [membersLoading, setMembersLoading] = useState(false);
+    const [memberActionLoading, setMemberActionLoading] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [memberError, setMemberError] = useState('');
+    const [pollBlockedUntil, setPollBlockedUntil] = useState(0);
     const messagesEndRef = useRef(null);
     const pollIntervalRef = useRef(null);
+    const onlinePollRef = useRef(null);
+
+    const isTransientApiError = (err) => (
+        err?.status === 401
+        || err?.status === 429
+        || err?.status === 503
+        || err?.code === 'BACKEND_UNAVAILABLE'
+    );
 
     // Fetch channels from API
+    useEffect(() => {
+        if (currentUser?.email) {
+            fetchProfile(currentUser.email);
+        }
+    }, [currentUser?.email, fetchProfile]);
+
     useEffect(() => {
         const fetchChannels = async () => {
             setChannelsLoading(true);
             setError('');
             try {
-                const data = await chatApi.getChannels();
+                const data = await chatApi.getChannels(currentUser?.email || '');
                 if (data.channels && data.channels.length > 0) {
                     setChannels(data.channels);
-                    if (!activeChannel) {
-                        setActiveChannel(data.channels[0].id);
-                    }
+                    setActiveChannel((prev) => prev || data.channels[0].id);
                 } else {
                     setChannels([]);
                 }
             } catch (err) {
-                console.error('Failed to fetch channels:', err);
+                if (!isTransientApiError(err)) {
+                    console.error('Failed to fetch channels:', err);
+                }
+                if (err?.status === 429) {
+                    setPollBlockedUntil(Date.now() + 10_000);
+                }
                 setError('Failed to load channels');
             } finally {
                 setChannelsLoading(false);
             }
         };
         fetchChannels();
-    }, []);
+    }, [currentUser?.email]);
 
     // Fetch messages from API
-    const fetchMessages = async () => {
+    const fetchMessages = useCallback(async () => {
+        if (Date.now() < pollBlockedUntil) {
+            return;
+        }
         if (!activeChannel) {
             setMessages([]);
             setLoading(false);
@@ -53,33 +81,99 @@ const DeveloperConnect = () => {
         }
 
         try {
-            const data = await chatApi.getMessages(activeChannel);
+            const data = await chatApi.getMessages(activeChannel, 50, currentUser?.email || '');
             // Handle the wrapped response format
             const messageList = data.messages || data || [];
             setMessages(Array.isArray(messageList) ? messageList : []);
         } catch (err) {
-            console.error('Failed to fetch messages:', err);
+            if (!isTransientApiError(err)) {
+                console.error('Failed to fetch messages:', err);
+            }
+            if (err?.status === 429) {
+                setPollBlockedUntil(Date.now() + 10_000);
+            }
             setError('Failed to load messages');
             setMessages([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeChannel, currentUser?.email, pollBlockedUntil]);
+
+    const fetchOnlineUsers = useCallback(async () => {
+        if (Date.now() < pollBlockedUntil) {
+            return;
+        }
+        try {
+            const data = await chatApi.getOnlineUsers();
+            const users = Array.isArray(data?.users) ? data.users : [];
+            setOnlineUsers(users);
+        } catch (err) {
+            if (!isTransientApiError(err)) {
+                console.error('Failed to fetch online users:', err);
+            }
+            if (err?.status === 429) {
+                setPollBlockedUntil(Date.now() + 10_000);
+            }
+            setOnlineUsers([]);
+        }
+    }, [pollBlockedUntil]);
+
+    const fetchChannelMembers = useCallback(async (channelId) => {
+        if (!channelId) {
+            setChannelMembers([]);
+            setMemberError('');
+            return;
+        }
+
+        const selected = channels.find((channel) => channel.id === channelId);
+        if (!selected?.is_private) {
+            setChannelMembers([]);
+            setMemberError('');
+            return;
+        }
+
+        setMembersLoading(true);
+        setMemberError('');
+        try {
+            const response = await chatApi.getChannelMembers(channelId);
+            setChannelMembers(Array.isArray(response?.members) ? response.members : []);
+        } catch (err) {
+            if (!isTransientApiError(err)) {
+                console.error('Failed to load private room members:', err);
+            }
+            if (err?.status === 429) {
+                setPollBlockedUntil(Date.now() + 10_000);
+            }
+            setMemberError(err.message || 'Failed to load private room members');
+            setChannelMembers([]);
+        } finally {
+            setMembersLoading(false);
+        }
+    }, [channels]);
 
     // Load messages when channel changes
     useEffect(() => {
         setLoading(true);
         fetchMessages();
+        fetchOnlineUsers();
 
         // Set up polling for new messages (every 5 seconds)
         pollIntervalRef.current = setInterval(fetchMessages, 5000);
+        onlinePollRef.current = setInterval(fetchOnlineUsers, 15000);
 
         return () => {
             if (pollIntervalRef.current) {
                 clearInterval(pollIntervalRef.current);
             }
+            if (onlinePollRef.current) {
+                clearInterval(onlinePollRef.current);
+            }
         };
-    }, [activeChannel]);
+    }, [activeChannel, currentUser?.email, fetchMessages, fetchOnlineUsers]);
+
+    useEffect(() => {
+        fetchChannelMembers(activeChannel);
+    }, [activeChannel, fetchChannelMembers]);
 
     // Scroll to bottom when messages change
     useEffect(() => {
@@ -128,7 +222,8 @@ const DeveloperConnect = () => {
             const data = await chatApi.createChannel(
                 newChannel.name.trim(),
                 newChannel.description.trim(),
-                currentUser?.email
+                currentUser?.email,
+                Boolean(newChannel.isPrivate)
             );
 
             if (data.channel) {
@@ -136,13 +231,47 @@ const DeveloperConnect = () => {
                 setActiveChannel(data.channel.id);
             }
 
-            setNewChannel({ name: '', description: '' });
+            setNewChannel({ name: '', description: '', isPrivate: false });
             setShowCreateChannel(false);
         } catch (err) {
             console.error('Failed to create channel:', err);
             alert(err.message || 'Failed to create channel');
         } finally {
             setCreateLoading(false);
+        }
+    };
+
+    const handleInviteMember = async (event) => {
+        event.preventDefault();
+        const normalized = inviteEmail.trim().toLowerCase();
+        if (!normalized || !activeChannel) return;
+
+        setMemberActionLoading(true);
+        setMemberError('');
+        try {
+            await chatApi.inviteChannelMember(activeChannel, normalized);
+            setInviteEmail('');
+            await fetchChannelMembers(activeChannel);
+        } catch (err) {
+            console.error('Failed to invite member:', err);
+            setMemberError(err.message || 'Failed to invite member');
+        } finally {
+            setMemberActionLoading(false);
+        }
+    };
+
+    const handleRemoveMember = async (memberEmail) => {
+        if (!memberEmail || !activeChannel) return;
+        setMemberActionLoading(true);
+        setMemberError('');
+        try {
+            await chatApi.removeChannelMember(activeChannel, memberEmail);
+            await fetchChannelMembers(activeChannel);
+        } catch (err) {
+            console.error('Failed to remove member:', err);
+            setMemberError(err.message || 'Failed to remove member');
+        } finally {
+            setMemberActionLoading(false);
         }
     };
 
@@ -159,6 +288,27 @@ const DeveloperConnect = () => {
     };
 
     const activeChannelData = channels.find(c => c.id === activeChannel) || { name: activeChannel, description: '' };
+    const privateRooms = channels.filter((channel) => channel.is_private);
+    const ownedPrivateRooms = privateRooms.filter((channel) => channel.can_manage_members);
+    const joinedPrivateRooms = privateRooms.filter((channel) => !channel.can_manage_members);
+    const isPrivateChannel = Boolean(activeChannelData?.is_private);
+    const canManageMembers = Boolean(activeChannelData?.can_manage_members);
+    const currentUserEntry = {
+        email: currentUser?.email || '',
+        name: getUserName(),
+        avatar: currentUser?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.email || 'You'}`,
+    };
+    const combinedOnlineUsers = (() => {
+        const map = new Map();
+        for (const user of onlineUsers) {
+            if (!user?.email) continue;
+            map.set(user.email, user);
+        }
+        if (currentUserEntry.email) {
+            map.set(currentUserEntry.email, currentUserEntry);
+        }
+        return Array.from(map.values());
+    })();
 
     return (
         <div className="min-h-screen bg-transparent flex">
@@ -192,6 +342,11 @@ const DeveloperConnect = () => {
                         >
                             <span className="text-muted-foreground opacity-50 font-mono">#</span>
                             <span className="text-sm font-medium truncate">{channel.name}</span>
+                            {channel.is_private && (
+                                <span className="ml-auto text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+                                    {channel.can_manage_members ? 'Owner' : 'Private'}
+                                </span>
+                            )}
                         </button>
                     ))}
                     {!channelsLoading && channels.length === 0 && (
@@ -201,21 +356,38 @@ const DeveloperConnect = () => {
                     )}
                 </div>
 
+                {privateRooms.length > 0 && (
+                    <div className="mt-5 space-y-2">
+                        <div className="px-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+                            My Private Rooms
+                        </div>
+                        <div className="px-2 text-xs text-muted-foreground">
+                            {ownedPrivateRooms.length} owned • {joinedPrivateRooms.length} joined
+                        </div>
+                    </div>
+                )}
+
                 {/* Online Users */}
                 <div className="mt-8">
                     <h3 className="text-xs font-bold text-foreground uppercase tracking-widest mb-4 opacity-50">Online</h3>
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 px-2">
-                            <div className="relative">
-                                <img
-                                    src={currentUser?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.email}`}
-                                    alt=""
-                                    className="w-8 h-8 rounded-full bg-muted"
-                                />
-                                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-card" />
-                            </div>
-                            <span className="text-sm text-foreground">{getUserName()}</span>
-                        </div>
+                        {combinedOnlineUsers.length === 0 ? (
+                            <p className="text-xs text-muted-foreground px-2">No users active in the last 30 mins</p>
+                        ) : (
+                            combinedOnlineUsers.map((user) => (
+                                <div key={user.email} className="flex items-center gap-2 px-2">
+                                    <div className="relative">
+                                        <img
+                                            src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email || user.name}`}
+                                            alt=""
+                                            className="w-8 h-8 rounded-full bg-muted"
+                                        />
+                                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-card" />
+                                    </div>
+                                    <span className="text-sm text-foreground truncate">{user.name || user.email}</span>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
@@ -233,6 +405,74 @@ const DeveloperConnect = () => {
                     </p>
                     {error && (
                         <p className="text-xs text-rose-400 mt-2">{error}</p>
+                    )}
+                    {isPrivateChannel && (
+                        <div className="mt-4 rounded-2xl border border-border bg-background/40 px-4 py-3 space-y-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Private Room Members</p>
+                                    <p className="text-sm text-foreground">
+                                        {membersLoading ? 'Loading members...' : `${channelMembers.length} member${channelMembers.length === 1 ? '' : 's'}`}
+                                    </p>
+                                </div>
+                                <span className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full border border-border text-muted-foreground">
+                                    {canManageMembers ? 'Owner Controls' : 'Member Access'}
+                                </span>
+                            </div>
+
+                            {memberError && (
+                                <p className="text-xs text-rose-400">{memberError}</p>
+                            )}
+
+                            {!membersLoading && (
+                                <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
+                                    {channelMembers.length === 0 ? (
+                                        <p className="text-xs text-muted-foreground">No members added yet.</p>
+                                    ) : (
+                                        channelMembers.map((member) => (
+                                            <div
+                                                key={`${member.email}-${member.role}`}
+                                                className="flex items-center justify-between gap-3 rounded-xl border border-border px-3 py-2"
+                                            >
+                                                <div className="min-w-0">
+                                                    <p className="text-sm text-foreground truncate">{member.email}</p>
+                                                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider">{member.role}</p>
+                                                </div>
+                                                {canManageMembers && member.role !== 'owner' && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveMember(member.email)}
+                                                        className="text-xs text-rose-400 hover:text-rose-300"
+                                                        disabled={memberActionLoading}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+
+                            {canManageMembers && (
+                                <form onSubmit={handleInviteMember} className="flex flex-col sm:flex-row gap-2">
+                                    <input
+                                        type="email"
+                                        value={inviteEmail}
+                                        onChange={(event) => setInviteEmail(event.target.value)}
+                                        placeholder="Invite member by email"
+                                        className="flex-1 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={memberActionLoading || !inviteEmail.trim()}
+                                        className="rounded-xl bg-foreground text-background px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                                    >
+                                        {memberActionLoading ? 'Updating...' : 'Invite'}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
                     )}
                 </header>
 
@@ -361,6 +601,22 @@ const DeveloperConnect = () => {
                                         maxLength={500}
                                     />
                                 </div>
+
+                                <label className="flex items-start gap-3 p-3 rounded-xl border border-border bg-background/40">
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(newChannel.isPrivate)}
+                                        onChange={(event) => setNewChannel((prev) => ({ ...prev, isPrivate: event.target.checked }))}
+                                        disabled={!profileData?.is_pro}
+                                        className="mt-0.5"
+                                    />
+                                    <span className="text-sm text-foreground">
+                                        Private room (Pro)
+                                        <span className="block text-xs text-muted-foreground mt-0.5">
+                                            Invite-only collaboration room. {profileData?.is_pro ? 'Enabled for your plan.' : 'Upgrade to Pro to enable private rooms.'}
+                                        </span>
+                                    </span>
+                                </label>
 
                                 <div className="flex gap-3 pt-4">
                                     <button
