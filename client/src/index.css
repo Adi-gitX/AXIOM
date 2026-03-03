@@ -46,6 +46,18 @@
     --glass-hover-border: rgba(0, 0, 0, 0.12);
 
     --glow-color: rgba(56, 189, 248, 0.3);
+
+    /* DSA contribution graph tokens */
+    --contrib-l0: rgba(15, 23, 42, 0.07);
+    --contrib-b0: rgba(15, 23, 42, 0.12);
+    --contrib-l1: rgba(16, 185, 129, 0.2);
+    --contrib-b1: rgba(16, 185, 129, 0.32);
+    --contrib-l2: rgba(16, 185, 129, 0.34);
+    --contrib-b2: rgba(16, 185, 129, 0.44);
+    --contrib-l3: rgba(16, 185, 129, 0.52);
+    --contrib-b3: rgba(16, 185, 129, 0.6);
+    --contrib-l4: rgba(16, 185, 129, 0.78);
+    --contrib-b4: rgba(16, 185, 129, 0.9);
   }
 
   .dark {
@@ -91,6 +103,18 @@
     --glass-hover-border: rgba(255, 255, 255, 0.1);
 
     --glow-color: rgba(255, 255, 255, 0.3);
+
+    /* DSA contribution graph tokens */
+    --contrib-l0: rgba(255, 255, 255, 0.08);
+    --contrib-b0: rgba(255, 255, 255, 0.15);
+    --contrib-l1: rgba(16, 185, 129, 0.25);
+    --contrib-b1: rgba(16, 185, 129, 0.38);
+    --contrib-l2: rgba(16, 185, 129, 0.4);
+    --contrib-b2: rgba(16, 185, 129, 0.52);
+    --contrib-l3: rgba(16, 185, 129, 0.58);
+    --contrib-b3: rgba(16, 185, 129, 0.68);
+    --contrib-l4: rgba(16, 185, 129, 0.84);
+    --contrib-b4: rgba(16, 185, 129, 0.95);
   }
 }
 
