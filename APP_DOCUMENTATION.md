@@ -1,244 +1,453 @@
-# Skills (formerly AXIOM) - Application Documentation
+# AXIOM Technical Documentation
 
-## 1. Executive Overview
+This document is the engineering reference for AXIOM internals: architecture, module contracts, API behavior, data model, runtime configuration, and operational procedures.
 
-**Skills** (internal codename **AXIOM**) is a unified "Command Center" for developer careers. It consolidates learning, DSA practice, interview preparation, job hunting, and professional networking into a single, high-performance web application.
+## 1. System Overview
 
-The application is built as a **monorepo** containing a React frontend (`client`) and an Express/PostgreSQL backend (`server`).
+AXIOM is a monorepo application composed of:
 
-## 2. Product Vision & Feature Details
+- `client`: Vite + React application
+- `server`: Express API backed by SQL.js (SQLite)
 
-### Why This App Exists (The Problem)
-Developers today face a **fragmented ecosystem** when trying to grow their careers:
-- **Scattered Learning:** Tutorials are spread across YouTube, Udemy, and docs without a cohesive path.
-- **Fragmented Practice:** They use LeetCode for DSA, a separate site for mock interviews, and another for system design.
-- **Disconnected Job Hunting:** Job boards are generic and don't integrate with a developer's actual skills or practice history.
-- **Isolation:** Self-taught developers often lack a community to learn with.
+Primary product surfaces:
 
-### The Solution: A Unified Command Center
-**Skills** solves this by centralizing the entire developer lifecycle into one beautiful, "Glassmorphism" styled interface. It is designed to be the **single platform** a developer logs into every day.
+- Daily command center dashboard
+- DSA system with multi-sheet tracking and review scheduling
+- OSS contribution intelligence with GitHub OAuth
+- GSOC planning and reminders
+- Education, interview prep, jobs/posts, and developer community chat
+- Profile management and public portfolio route (`/u/:username`)
 
-### Detailed Feature Breakdown
+## 2. Architecture
 
-#### 1. **Dashboard** (`/app`)
-- **Purpose:** The "Home Base" for the user.
-- **Features:**
-    - **Activity Heatmap:** Visualizes coding/study streak (similar to GitHub).
-    - **Progress Stats:** Tracks DSA problems solved, hours studied, and interviews completed.
-    - **Quick Actions:** Instant access to resume current courses or daily challenges.
+```mermaid
+graph TD
+    CLIENT["React Client"] --> API["Express API"]
+    CLIENT --> FBSDK["Firebase JS SDK"]
 
-#### 2. **Education Hub** (`/app/education`)
-- **Purpose:** A structured learning environment.
-- **Content:** Curated paths for Frontend, Backend, DevOps, and System Design.
-- **Functionality:** Tracks progress through video courses (embedded) and text-based resources.
+    API --> AUTH["Auth Middleware"]
+    AUTH --> FBREST["Firebase Identity Toolkit"]
 
-#### 3. **DSA Tracker** (`/app/dsa`)
-- **Purpose:** To master Data Structures and Algorithms.
-- **Methodology:** Unified multi-sheet workflow using **Love 450**, **Striver A2Z**, and **Striver SDE**.
-- **Features:**
-    - DSA home dashboard with global KPIs and a GitHub-style 365-day contribution graph.
-    - Timezone-aware contribution rendering (`tz`-aware backend + browser-local view semantics).
-    - 99 topics and 1096 trackable entries across three sheets.
-    - Dedicated sheet pages:
-      - `/app/dsa/love450`
-      - `/app/dsa/striverSDE`
-      - `/app/dsa/striverA2Z`
-    - Search, status filters, difficulty filters, and sortable topic views per sheet.
-    - Checkbox tracking, direct problem links, and optional solution links.
+    API --> DB["SQL.js SQLite"]
+    API --> GITHUB["GitHub OAuth + REST"]
+    API --> CDN["Cloudinary (optional)"]
 
-#### 4. **Interview Prep** (`/app/interview`)
-- **Purpose:** Comprehensive preparation for technical interviews.
-- **Modules:**
-    - **Behavioral:** STAR method guides and common HR questions.
-    - **System Design:** Scalability, Load Balancing, Database Sharding concepts.
-    - **Resume Review:** checklists and templates.
-
-#### 5. **Jobs Board** (`/app/jobs`)
-- **Purpose:** A developer-first job finding experience.
-- **Features:**
-    - High-quality listings with salary transparency.
-    - Filters for Remote, Contract, and Visa Sponsorship.
-    - "Save Job" functionality to track applications.
-
-#### 6. **Developer Connect** (`/app/connect`)
-- **Purpose:** Real-time community interaction.
-- **Channels:** General chat, specialized framework discussions (React, Node), and career advice.
-
-#### 7. **User Profile** (`/app/profile`)
-- **Purpose:** The developer's professional identity.
-- **Features:**
-    - **Bio & Socials:** Central link for GitHub, LinkedIn, Portfolio.
-    - **Tech Stack:** Visual badges of known technologies.
-    - **Experience Timeline:** Interactive work history display.
-    - **Resume Upload:** Cloud-hosted PDF resume storage.
-
----
-
-## 3. Technical Stack
-
-### Frontend (`/client`)
-- **Framework:** React 18 (Vite)
-- **Styling:** TailwindCSS 3 + `tailwindcss-animate`
-- **Animations:** Framer Motion (`framer-motion`, `motion`)
-- **State Management:** Zustand
-- **Routing:** React Router v6
-- **Auth:** Firebase Authentication (Client SDK)
-- **Icons:** Lucide React
-
-### Backend (`/server`)
-- **Runtime:** Node.js
-- **Framework:** Express 5
-- **Database:** PostgreSQL (using strict SQL queries via `pg` driver)
-- **Security:** Helmet, Rate Limit, CORS
-- **Environment:** `dotenvx` for secure env var management
-- **Image Storage:** Cloudinary (Signed uploads)
-
----
-
-## 4. Complete Folder Structure
-
-### Root Directory
-- `appideaprd.md` - Product Requirements Document.
-- `client/` - Frontend application.
-- `server/` - Backend API.
-- `server_log.txt` - Server access logs.
-
-### Client Structure (`/client/src`)
-The frontend is organized cleanly by feature and function:
-
-```text
-client/src/
-├── assets/          # Static assets (images, global styles)
-├── components/      # Reusable UI components
-│   ├── Layout.jsx   # Main App Layout (Sidebar + Header + Content)
-│   └── ...          # Atoms/Molecules (Buttons, Cards, Modals)
-├── contexts/        # React Contexts
-│   └── AuthContext.jsx # Firebase Auth Provider
-├── lib/             # Utilities
-│   └── cloudinary.js # Cloudinary helper
-├── pages/           # Main Route/Tab Views
-│   ├── auth/        # Login/Signup Pages
-│   ├── Dashboard.jsx
-│   ├── DSATracker.jsx
-│   ├── Education.jsx
-│   ├── Jobs.jsx
-│   ├── Profile.jsx
-│   └── ... (See Tabs section)
-├── stores/          # Zustand Stores
-│   └── useUserStore.js # Global Client State
-├── App.jsx          # Main Router Configuration
-└── index.css        # Global Tailwind Directives
+    API --> RL["Rate Limiting Layer"]
+    RL --> CTRL["Domain Controllers"]
+    CTRL --> DB
 ```
 
-### Server Structure (`/server`)
-The backend is a focused REST API:
-
-```text
-server/
-├── config/
-│   └── db.js        # PostgreSQL Connection Pool
-├── controllers/
-│   └── userController.js # Logic for Profiles, Cloudinary, DB Init
-├── routes/
-│   └── userRoutes.js # API Route Definitions
-├── index.js         # Entry point, Middleware setup (CORS, Security)
-└── reset_db.js      # Utility script to wipe/reset database
+```mermaid
+flowchart LR
+    A["Browser request"] --> B["Vite /api proxy in dev"]
+    B --> C["Express server"]
+    C --> D{"Protected route?"}
+    D -- "No" --> E["Controller"]
+    D -- "Yes" --> F["requireVerifiedUser"]
+    F --> G{"Token or local fallback valid?"}
+    G -- "No" --> H["401/403"]
+    G -- "Yes" --> E
+    E --> I["DB + service logic"]
+    I --> J["JSON response"]
 ```
 
----
+## 3. Frontend Architecture
 
-## 5. Tabs & Routing Structure
+### 3.1 Routing
 
-The application uses a **protected route wrapper** (`/app`) that ensures users are authenticated before accessing the core dashboard.
+App router is defined in `/Users/kammatiaditya/AXIOM/client/src/App.jsx`.
 
-### Public Routes
-- **`/`** - Landing Page (Hero, Features, Call to Action)
-- **`/docs`** - Documentation View
-- **`/pricing`** - Pricing Tier Information
-- **`/login`** - Authentication (Login)
-- **`/signup`** - Authentication (Registration)
+Public routes:
 
-### App Routes (Protected)
-All these routes are rendered inside the Main Layout (Sidebar + Topbar):
+- `/`
+- `/docs`
+- `/pricing`
+- `/u/:username`
+- `/login`
+- `/signup`
 
-| URL Path | Component | Description & Current Status |
-|----------|-----------|------------------------------|
-| `/app` | `Dashboard.jsx` | **Main Dashboard**. Shows stats heatmaps and quick links. |
-| `/app/education` | `Education.jsx` | **Learning Hub**. Video courses and progress tracking. (Frontend Mock) |
-| `/app/dsa` | `DSATracker.jsx` | **DSA Home**. Global KPIs, yearly contribution graph, and sheet cards. |
-| `/app/dsa/:sheetId` | `DSASheetPage.jsx` | **DSA Sheet Detail**. Full list controls and topic/problem checklist for the selected sheet. |
-| `/app/interview` | `InterviewPrep.jsx` | **Interview Prep**. Guides for system design & behavioral. (Frontend Mock) |
-| `/app/connect` | `DeveloperConnect.jsx` | **Community Chat**. Real-time developer chat interface. (Frontend Mock) |
-| `/app/jobs` | `Jobs.jsx` | **Job Board**. Listings with filtering. **Implementation:** Uses hardcoded `JOBS` array. |
-| `/app/posts` | `Posts.jsx` | **Feed**. Developer news and articles. (Frontend Mock) |
-| `/app/profile` | `Profile.jsx` | **User Profile**. **Implementation:** FULLY CONNECTED. Fetches/Updates via API. |
-| `/app/settings` | `Settings.jsx` | **Settings**. App preferences (Theme, etc). |
+Protected routes under `/app`:
 
----
+- `/app` dashboard
+- `/app/dsa` DSA home
+- `/app/dsa/:sheetId` DSA sheet detail
+- `/app/oss`
+- `/app/gsoc`
+- `/app/education`
+- `/app/interview`
+- `/app/connect`
+- `/app/jobs`
+- `/app/posts`
+- `/app/profile`
+- `/app/settings`
 
-## 6. Backend Implementation & Connectivity
+React Router v7 future flags are enabled on `BrowserRouter`:
 
-### API Endpoints
-The backend is currently focused on **User Management** and **Profile Persistence**. It exposes the following REST endpoints under `/api`:
+- `v7_startTransition`
+- `v7_relativeSplatPath`
 
-| Method | Endpoint | Controller Function | Description |
-|--------|----------|---------------------|-------------|
-| **GET** | `/sign-cloudinary` | `getCloudinarySignature` | Generates secure signature for client-side image uploads. |
-| **GET** | `/users/:email` | `getUserProfile` | Fetches full user profile (bio, skills, xp) from PostgreSQL. |
-| **POST** | `/users/profile` | `updateUserProfile` | Upserts (Insert/Update) user profile data in Postgres. |
-| **GET** | `/init-db` | `initDb` | **Admin Utility:** Drops and Re-creates the `users` table. |
+### 3.2 State and Data Hooks
 
-### Database Schema
-The application uses a relational schema in PostgreSQL.
+Primary client state modules:
 
-#### Table: `users`
-| Column | Type | Details |
-|--------|------|---------|
-| `id` | SERIAL | Primary Key |
-| `email` | VARCHAR | Unique, Not Null |
-| `name` | VARCHAR | Display Name |
-| `role` | VARCHAR | Job Title (e.g. "Frontend Dev") |
-| `location` | VARCHAR | City/State |
-| `bio` | TEXT | About Me section |
-| `avatar` | TEXT | Cloudinary URL |
-| `banner` | TEXT | Cloudinary URL (Profile header) |
-| `experience` | JSONB | Array of work history objects |
-| `skills` | JSONB | Array of skills/tags |
-| `socials` | JSONB | Social media links |
-| `resume_url`| TEXT | Link to uploaded resume |
-| `timestamps`| TIMESTAMP | `created_at`, `updated_at` |
+- `useStore` (`client/src/store/useStore.js`): DSA solved state and mutation tracking
+- `useDsaData` (`client/src/hooks/useDsaData.js`): catalog + progress aggregation + sheet stats
+- `useUserStore` (`client/src/stores/useUserStore.js`): profile hydration with in-flight dedupe and cache semantics
+- `AuthContext` (`client/src/contexts/AuthContext.jsx`): Firebase auth lifecycle + backend sync
 
-### Connectivity
-1.  **Client-Side State:** `useUserStore.js` (Zustand) manages the user state.
-2.  **Data Fetching:** When `Profile.jsx` loads, it calls `fetchProfile(email)` from the store.
-3.  **API Call:** The store makes an HTTP GET request to `/api/users/:email`.
-4.  **Database:** The Express server queries the specific user in PostgreSQL.
-5.  **Updates:** When saving profile changes, the store sends a POST to `/api/users/profile`, which writes to the database.
+### 3.3 API Client Behavior
 
-## 7. Current Implementation Status Summary
+`client/src/lib/api.js` includes:
 
-- **Authentication:** ✅ **Working.** (Firebase Auth handles login/signup).
-- **Profile System:** ✅ **Working.** Full persistent profile with avatar uploads (Cloudinary) and data storage (Postgres).
-- **Navigation/Routing:** ✅ **Working.** Smooth client-side routing with layout persistence.
-- **UI/UX:** ✅ **Working.** High-fidelity "Glassmorphism" UI with dark mode and animations.
-- **Jobs/Education/DSA:** ⚠️ **Partially Implemented.** The UI and interactions are built, but they utilize **mock data** on the frontend and are not yet connected to a backend database table.
+- token acquisition with auth readiness wait
+- typed auth errors (`AUTH_MISSING_TOKEN`, `AUTH_INVALID_TOKEN`, `AUTH_EMAIL_MISMATCH`)
+- GET request de-duplication
+- bounded retry for GET `429`
+- global cooldown behavior for burst `429`
+- backend unavailable cooldown behavior for proxy/downstream failure
+- stale GET response caching for resilience
 
-## 8. How to Run
+## 4. Backend Architecture
 
-1.  **Backend:**
-    ```bash
-    cd server
-    npm install
-    npm run dev
-    # Runs on http://localhost:3000
-    ```
+### 4.1 Middleware Stack
 
-2.  **Frontend:**
-    ```bash
-    cd client
-    npm install
-    npm run dev
-    # Runs on http://localhost:5173
-    ```
+Server bootstrap in `/Users/kammatiaditya/AXIOM/server/index.js` applies:
 
-Ensure `.env` files are set up in both directories with PostgreSQL credentials, Cloudinary keys, and Firebase config.
+- `helmet`
+- read/write rate limiters (configurable)
+- `compression`
+- `morgan`
+- `cors`
+- `express.json`
+- request sanitation (`sanitizeBody`)
+
+### 4.2 Auth Model
+
+Auth middleware: `/Users/kammatiaditya/AXIOM/server/middleware/auth.js`.
+
+Key behaviors:
+
+- verifies Firebase bearer tokens via Identity Toolkit API
+- derives authoritative identity from token email (`req.authEmail`)
+- rejects cross-email access with `403`
+- supports explicit local dev fallback behavior via env toggles
+
+Production contract:
+
+- fail-closed token verification
+- no unauthenticated bypass behavior
+
+### 4.3 Rate Limiting
+
+Limiter is split by request class:
+
+- read limiter for `GET/HEAD/OPTIONS`
+- write limiter for mutating methods
+
+Key controls:
+
+- `ENABLE_DEV_RATE_LIMIT`
+- `ALLOW_LOCAL_RATE_LIMIT_BYPASS`
+- `DISABLE_RATE_LIMIT`
+
+`/health` includes limiter diagnostics in non-production mode.
+
+## 5. Domain Modules
+
+### 5.1 Dashboard
+
+Purpose:
+
+- consolidated daily command center for DSA and OSS momentum
+
+Main endpoints:
+
+- `GET /api/progress/dashboard/:email`
+- `GET /api/progress/heatmap/:email?days=365&tz=<IANA>`
+- `GET /api/progress/focus/:email?limit=<n>&tz=<IANA>`
+
+Notable behaviors:
+
+- heatmap uses DSA solved counts per day
+- focus limit is enforced server-side by plan entitlement
+
+### 5.2 DSA Engine
+
+Routes:
+
+- `GET /api/progress/catalog` (public)
+- `GET /api/progress/:email`
+- `POST /api/progress/problem`
+- `GET /api/progress/problem-meta/:email`
+- `POST /api/progress/problem-meta`
+- `GET /api/progress/review/:email`
+- `POST /api/progress/review/complete`
+- `GET /api/progress/heatmap/:email`
+
+Catalog characteristics:
+
+- 3 sheets: Love 450, Striver SDE, Striver A2Z
+- 99 topics, 1096 entries
+- deterministic problem IDs
+- legacy ID compatibility map
+
+Data integrity behaviors:
+
+- solve operation auto-seeds journal row (if missing)
+- unsolve path canonicalizes aliases and cleans review/journal consistency
+- streaks are recomputed from solved history by day keys
+- study-time aggregation is delta-based from journal updates
+
+### 5.3 OSS Contribution Engine
+
+Routes:
+
+- `GET /api/oss/github/connect-url`
+- `GET /api/oss/github/callback`
+- `GET /api/oss/github/profile/:email`
+- `GET /api/oss/sync-status/:email`
+- `POST /api/oss/sync/:email`
+- `POST /api/oss/github/disconnect`
+- `GET /api/oss/contributions/:email`
+- `GET /api/oss/activity/:email`
+- `GET /api/oss/issue/:email`
+
+Behavior:
+
+- OAuth callback triggers initial sync workflow
+- contribution summaries and PR history are persisted for dashboarding
+- issue recommendation logic combines skill and DSA signal sources
+
+### 5.4 GSOC Accelerator
+
+Routes:
+
+- `GET /api/gsoc/timeline`
+- `GET /api/gsoc/orgs`
+- `GET /api/gsoc/readiness/:email`
+- `GET /api/gsoc/reminders/:email?includeDismissed=true|false`
+- `POST /api/gsoc/reminders/dismiss`
+- `POST /api/gsoc/reminders/restore`
+
+Behavior:
+
+- readiness score combines DSA and OSS metrics
+- reminders support active + dismissed state management
+
+### 5.5 Dev Connect (Chat)
+
+Routes:
+
+- `GET /api/chat/channels`
+- `POST /api/chat/channels`
+- `GET /api/chat/messages/:channelId`
+- `GET /api/chat/messages/:channelId/new`
+- `POST /api/chat/messages`
+- `DELETE /api/chat/messages/:id`
+- `GET /api/chat/channels/:channelId/members`
+- `POST /api/chat/channels/:channelId/invite`
+- `POST /api/chat/channels/:channelId/members/remove`
+- `GET /api/chat/online`
+
+Private room model:
+
+- owner + accepted members can read/write private channels
+- non-members are denied
+
+### 5.6 Remaining Modules
+
+Education:
+
+- `GET /api/education/catalog` (public)
+- `GET /api/education/progress/:email`
+- `POST /api/education/watched`
+- `POST /api/education/progress`
+- `GET /api/education/topics/:email`
+- `GET /api/education/recent/:email`
+
+Interview:
+
+- `GET /api/interview/resources` (public)
+- `GET /api/interview/progress/:email`
+- `POST /api/interview/resources/:id/complete`
+
+Jobs:
+
+- listing endpoints are public
+- user save/apply endpoints are protected
+
+Posts:
+
+- public feed and comments
+- protected vote/save/comment/create actions
+
+Settings:
+
+- `GET /api/settings/:email`
+- `POST /api/settings`
+- `POST /api/settings/theme`
+- `POST /api/settings/notifications`
+
+Users:
+
+- `GET /api/users/public/:username` (public)
+- protected profile, ATS, username updates, create-or-get user
+
+## 6. Data Model
+
+Core schema file:
+
+- `/Users/kammatiaditya/AXIOM/server/migrations/001_sqlite_schema.sql`
+
+Runtime schema backfills:
+
+- `/Users/kammatiaditya/AXIOM/server/config/db.js`
+
+### 6.1 Key Tables by Domain
+
+| Domain | Tables |
+|---|---|
+| Identity/Profile | `users`, `user_settings` |
+| DSA | `solved_problems`, `dsa_problem_journal`, `user_progress`, `user_activity` |
+| OSS | `github_connections`, `github_pull_requests`, `github_contribution_daily`, `good_first_issue_cache` |
+| GSOC | `gsoc_reminder_state` |
+| Education | `education_progress` |
+| Interview | `interview_resources`, `user_interview_progress` |
+| Community | `chat_channels`, `chat_room_members`, `chat_messages`, `posts`, `post_comments`, `post_interactions` |
+| Jobs | `jobs`, `saved_jobs`, `applied_jobs` |
+
+## 7. Configuration Reference
+
+### 7.1 Server Runtime Modes
+
+- `npm run dev:safe`
+  - `NODE_ENV=development`
+  - local rate-limit bypass enabled
+  - dev rate-limit disabled
+- `npm run dev:strict`
+  - `NODE_ENV=development`
+  - local bypass disabled
+  - dev throttling enabled
+
+### 7.2 Production Guardrails
+
+- startup fails when Firebase API key is missing
+- production auth is fail-closed
+- rate limiting is active and split by method class
+
+## 8. Sequence Flows
+
+### 8.1 Login + Backend Sync
+
+```mermaid
+sequenceDiagram
+    participant UI as "Client"
+    participant FB as "Firebase Auth"
+    participant API as "API /api/users"
+    participant DB as "SQLite"
+
+    UI->>FB: "Sign in"
+    FB-->>UI: "idToken + user"
+    UI->>API: "POST /api/users (Bearer token)"
+    API->>DB: "Upsert user"
+    DB-->>API: "User row"
+    API-->>UI: "User profile payload"
+```
+
+### 8.2 DSA Toggle + Heatmap Impact
+
+```mermaid
+sequenceDiagram
+    participant UI as "DSA Sheet UI"
+    participant API as "POST /api/progress/problem"
+    participant DB as "SQLite"
+    participant DASH as "Dashboard/Heatmap Fetch"
+
+    UI->>API: "Toggle problem solved"
+    API->>DB: "Canonicalize id + upsert/delete solved row"
+    API->>DB: "Sync journal/activity/streak snapshot"
+    API-->>UI: "Updated solvedProblems"
+
+    DASH->>API: "GET /api/progress/heatmap/:email"
+    API->>DB: "Aggregate daily solved counts"
+    API-->>DASH: "rows + timezone + date range"
+```
+
+## 9. Error Model and Recovery
+
+Common API statuses:
+
+- `200`: success
+- `400`: validation/input errors
+- `401`: missing or invalid token
+- `403`: authenticated user/email mismatch
+- `404`: route not found
+- `429`: rate limited
+- `500`: internal error
+
+Client-side resilience patterns:
+
+- no silent mutation retries for non-idempotent writes
+- GET retry limited to one attempt for transient `429`
+- global cooldown to avoid request storms
+- stale data fallback when live fetch is temporarily blocked
+
+## 10. Local Development
+
+### 10.1 Start Commands
+
+```bash
+cd /Users/kammatiaditya/AXIOM
+npm run dev:server
+npm run dev:client
+```
+
+### 10.2 Smoke and Build
+
+```bash
+cd /Users/kammatiaditya/AXIOM/server && npm run smoke
+cd /Users/kammatiaditya/AXIOM/client && npm run lint && npm run build
+```
+
+### 10.3 Health Checks
+
+- API root: `http://localhost:3000/`
+- API health: `http://localhost:3000/health`
+- Client: `http://localhost:5173/`
+
+## 11. Troubleshooting Guide
+
+### 11.1 Repeated 401
+
+- verify Firebase env values in client
+- verify server Firebase key exists
+- verify request email matches signed-in token email
+- confirm local fallback settings if intentionally developing without token verification
+
+### 11.2 Repeated 429
+
+- run backend in `dev:safe`
+- avoid strict mode unless intentionally load-testing limiter behavior
+- inspect `/health` limiter diagnostics in non-production mode
+
+### 11.3 500 during `/api/users` sync
+
+- confirm backend process is running
+- inspect server logs for controller stack trace
+- run smoke test to isolate contract regression
+
+### 11.4 “No data unless logout/login” behavior
+
+- verify auth sync and profile store dedupe are active
+- ensure backend is healthy before opening multiple protected pages in parallel
+- verify no stale remote `VITE_API_URL` is forcing unreachable backend in dev
+
+## 12. Release Checklist
+
+- `npm run check` passes from repo root
+- backend auth behavior validated (`401`, `403`, and success paths)
+- DSA toggles persist and survive refresh
+- dashboard and DSA heatmaps reflect solved changes
+- OSS connect/sync/disconnect roundtrip validated
+- GSOC reminder dismiss/restore validated
+- no disconnected routes/assets remain
