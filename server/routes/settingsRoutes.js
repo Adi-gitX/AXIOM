@@ -10,8 +10,10 @@ import {
     updateTheme,
     updateNotifications
 } from '../controllers/settingsController.js';
+import { requireVerifiedUser } from '../middleware/auth.js';
 
 const router = Router();
+router.use(requireVerifiedUser);
 
 // Get user settings
 router.get('/:email', getSettings);
