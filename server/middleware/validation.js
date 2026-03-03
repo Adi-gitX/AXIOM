@@ -152,7 +152,8 @@ export const schemas = {
     problemToggle: {
         body: {
             email: { required: true, type: 'string', email: true },
-            problemId: { required: true, type: 'string' }
+            problemId: { required: true, type: 'string' },
+            tz: { required: false, type: 'string' }
         }
     },
 
