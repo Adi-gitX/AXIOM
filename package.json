@@ -1,0 +1,14 @@
+{
+  "name": "axiom-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev:safe",
+    "dev:server:strict": "npm --prefix server run dev:strict",
+    "lint": "npm --prefix client run lint",
+    "build": "npm --prefix client run build",
+    "smoke": "npm --prefix server run smoke",
+    "check": "npm run smoke && npm run lint && npm run build"
+  }
+}
