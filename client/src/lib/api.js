@@ -40,6 +40,18 @@ export const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
+export const getBrowserTimeZone = () => {
+    try {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (typeof timeZone === 'string' && timeZone.trim()) {
+            return timeZone;
+        }
+    } catch {
+        // no-op
+    }
+    return 'UTC';
+};
+
 /**
  * Base fetch wrapper with error handling
  */
@@ -145,13 +157,37 @@ export const progressApi = {
 
     getProgress: (email) => fetchApi(`/api/progress/${encodeURIComponent(email)}`),
 
-    toggleProblem: (email, problemId, topicId) => fetchApi('/api/progress/problem', {
+    toggleProblem: (email, problemId, topicId, tz = getBrowserTimeZone()) => fetchApi('/api/progress/problem', {
         method: 'POST',
-        body: { email, problemId, topicId },
+        body: { email, problemId, topicId, tz },
     }),
 
-    getHeatmap: (email, days = 30) =>
-        fetchApi(`/api/progress/heatmap/${encodeURIComponent(email)}?days=${days}`),
+    getHeatmap: async (email, days = 30, tz = getBrowserTimeZone()) => {
+        const params = new URLSearchParams({ days: String(days) });
+        if (tz) {
+            params.set('tz', tz);
+        }
+
+        const response = await fetchApi(
+            `/api/progress/heatmap/${encodeURIComponent(email)}?${params.toString()}`
+        );
+
+        if (Array.isArray(response)) {
+            return {
+                timezone: tz || 'UTC',
+                from: null,
+                to: null,
+                rows: response,
+            };
+        }
+
+        return {
+            timezone: response?.timezone || tz || 'UTC',
+            from: response?.from || null,
+            to: response?.to || null,
+            rows: Array.isArray(response?.rows) ? response.rows : [],
+        };
+    },
 
     logStudyTime: (email, minutes) => fetchApi('/api/progress/study-time', {
         method: 'POST',
