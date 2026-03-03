@@ -1,38 +1,33 @@
-import { query } from './config/db.js';
-import dotenvx from '@dotenvx/dotenvx';
-dotenvx.config();
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
+import { loadEnv } from './config/loadEnv.js';
 
-// Force SSL bypass
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+loadEnv();
 
-const reset = async () => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dbPath = path.join(__dirname, 'data', 'axiom.db');
+
+const run = async () => {
     try {
-        console.log('Dropping table...');
-        await query('DROP TABLE IF EXISTS users CASCADE');
-        console.log('Table dropped.');
+        if (fs.existsSync(dbPath)) {
+            fs.unlinkSync(dbPath);
+            console.log(`🧹 Removed database file: ${dbPath}`);
+        } else {
+            console.log('ℹ️ No existing database file found');
+        }
 
-        console.log('Creating table...');
-        await query(`
-            CREATE TABLE users (
-                id SERIAL PRIMARY KEY,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                name VARCHAR(255),
-                role VARCHAR(255),
-                location VARCHAR(255),
-                bio TEXT,
-                avatar TEXT,
-                banner TEXT,
-                experience JSONB,
-                skills JSONB,
-                socials JSONB
-            );
-        `);
-        console.log('Table created successfully with ROLE column.');
-        process.exit(0);
+        execSync('node scripts/migrate.js', { stdio: 'inherit', cwd: __dirname });
+        execSync('node scripts/seedJobs.js', { stdio: 'inherit', cwd: __dirname });
+        execSync('node scripts/seedPosts.js', { stdio: 'inherit', cwd: __dirname });
+
+        console.log('✅ Database reset complete');
     } catch (err) {
-        console.error('Reset Failed:', err);
+        console.error('❌ Database reset failed:', err.message);
         process.exit(1);
     }
 };
 
-reset();
+run();

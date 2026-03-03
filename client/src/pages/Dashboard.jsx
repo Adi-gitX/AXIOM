@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore';
-import { TOPICS } from '../data/dsaSheet';
 import GlassCard from '../components/ui/GlassCard';
 import { progressApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,13 +13,15 @@ const Dashboard = () => {
 
     // State for API data
     const [stats, setStats] = useState(null);
-    const [weeklyActivity, setWeeklyActivity] = useState([4, 7, 3, 9, 5, 8, 6]);
+    const [weeklyActivity, setWeeklyActivity] = useState([0, 0, 0, 0, 0, 0, 0]);
     const [loading, setLoading] = useState(true);
+    const [totalProblems, setTotalProblems] = useState(0);
 
     // Calculate local fallback
-    const totalProblems = TOPICS.reduce((acc, topic) => acc + topic.total, 0);
     const localSolvedCount = solvedProblems.length;
-    const localProgress = Math.round((localSolvedCount / totalProblems) * 100);
+    const localProgress = totalProblems > 0
+        ? Math.round((localSolvedCount / totalProblems) * 100)
+        : 0;
 
     // Fetch real stats from API
     useEffect(() => {
@@ -36,9 +37,20 @@ const Dashboard = () => {
                 if (data.weeklyActivity) {
                     setWeeklyActivity(data.weeklyActivity);
                 }
+                if (typeof data.totalProblems === 'number') {
+                    setTotalProblems(data.totalProblems);
+                } else {
+                    const catalog = await progressApi.getCatalog();
+                    setTotalProblems(catalog.totalProblems || 0);
+                }
             } catch (err) {
                 console.error('Failed to fetch dashboard stats:', err);
-                // Fall back to local data
+                try {
+                    const catalog = await progressApi.getCatalog();
+                    setTotalProblems(catalog.totalProblems || 0);
+                } catch {
+                    setTotalProblems(0);
+                }
             } finally {
                 setLoading(false);
             }
@@ -52,7 +64,13 @@ const Dashboard = () => {
         { label: 'Problems Solved', value: stats?.problemsSolved ?? localSolvedCount },
         { label: 'Day Streak', value: stats?.dayStreak ?? 0 },
         { label: 'Hours Studied', value: stats?.hoursStudied ?? 0 },
-        { label: 'Completion', value: `${stats ? Math.round((stats.problemsSolved / totalProblems) * 100) : localProgress}%` },
+        {
+            label: 'Completion',
+            value: `${stats
+                ? (totalProblems > 0 ? Math.round(((stats.problemsSolved || 0) / totalProblems) * 100) : 0)
+                : localProgress
+                }%`
+        },
     ];
 
     const links = [

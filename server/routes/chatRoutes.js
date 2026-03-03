@@ -4,7 +4,8 @@ import {
     getMessages,
     sendMessage,
     deleteMessage,
-    getNewMessages
+    getNewMessages,
+    createChannel
 } from '../controllers/chatController.js';
 import { validate, schemas } from '../middleware/validation.js';
 
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // Get all channels
 router.get('/channels', getChannels);
+
+// Create a new channel
+router.post('/channels', validate(schemas.channelCreate), createChannel);
 
 // Get messages for a channel
 router.get('/messages/:channelId', getMessages);
@@ -23,6 +27,6 @@ router.get('/messages/:channelId/new', getNewMessages);
 router.post('/messages', validate(schemas.chatMessage), sendMessage);
 
 // Delete a message
-router.delete('/messages/:id', deleteMessage);
+router.delete('/messages/:id', validate(schemas.chatDeleteMessage), deleteMessage);
 
 export default router;

@@ -14,12 +14,13 @@ import {
     Layout,
     CheckCircle2,
     Sparkles,
-    MousePointer2,
     MessageCircle,
     Github,
     Linkedin,
     Twitter,
-    Check
+    Check,
+    Briefcase,
+    FileText
 } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { ExpandableScreen, ExpandableScreenTrigger, ExpandableScreenContent } from '../components/ui/ExpandableScreen';
@@ -27,11 +28,10 @@ import { WaitlistForm } from '../components/WaitlistForm';
 import { AnimatedThemeToggler } from '../components/AnimatedThemeToggler';
 
 // Assets
-// Assets
-import landscapeBg from '../assets/axiom-landscape.png';
-import darkerLandscape from '../assets/darkerlandscape.png'; // Dark Theme Hero
+import landscapeBg from '../assets/-landscape.png';
+import darkerLandscape from '../assets/darkerlandscape.png';
 import footerBg from '../assets/footer.png';
-import nightFooter from '../assets/nightfooter.png'; // Dark Theme Footer
+import nightFooter from '../assets/footer.png';
 
 // --- COMPONENTS ---
 
@@ -96,7 +96,7 @@ const TiltCard = ({ children, className = "", delay = 0 }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
-            className={`relative overflow-hidden rounded-[2.5rem] bg-white border border-stone-100/50 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-shadow duration-500 ${className}`}
+            className={`relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/[0.03] border border-stone-100/50 dark:border-white/10 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-none dark:hover:shadow-none transition-shadow duration-500 ${className}`}
         >
             {children}
         </motion.div>
@@ -125,140 +125,7 @@ const Typewriter = ({ text, delay = 0 }) => {
     return <span>{displayText}</span>;
 }
 
-// --- INTERNAL COMPONENTS ---
-const WaitlistContent = () => {
-    const [status, setStatus] = useState('idle'); // idle, loading, success
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setStatus('loading');
-        setTimeout(() => setStatus('success'), 1500);
-    };
-
-    if (status === 'success') {
-        return (
-            <div className="h-full w-full flex flex-col justify-center items-center text-center px-6">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(34,197,94,0.4)]"
-                >
-                    <Check className="w-12 h-12 text-white" />
-                </motion.div>
-                <motion.h3
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-5xl md:text-7xl font-bold text-white font-display mb-6 tracking-tighter"
-                >
-                    Access Requested.
-                </motion.h3>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-xl text-gray-400 max-w-lg font-light"
-                >
-                    We've received your signal. Keep an eye on your inbox for your deployment keys.
-                </motion.p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="max-w-7xl mx-auto px-6 py-20 min-h-full flex flex-col lg:flex-row gap-16 justify-center items-center">
-
-            {/* Left Column: Context */}
-            <div className="flex-1 text-center lg:text-left max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8">
-                    <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                    </span>
-                    Spots filling fast
-                </div>
-                <h3 className="text-6xl md:text-8xl font-bold text-white font-display mb-6 tracking-tighter leading-[0.9]">
-                    Join the <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">vanguard.</span>
-                </h3>
-                <p className="text-xl text-gray-400 mb-12 font-light leading-relaxed">
-                    AXIOM is the new standard for engineering excellence. Secure your spot in the queue and get early access to:
-                </p>
-                <ul className="space-y-4 text-left hidden lg:block">
-                    {[
-                        'The Interactive Runtime Environment',
-                        'Advanced System Design Simulations',
-                        'Real-time Performance Metrics',
-                        'Exclusive "Founder Mode" Access'
-                    ].map((item, i) => (
-                        <motion.li
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.1 * i }}
-                            key={item}
-                            className="flex items-center gap-3 text-gray-300 font-medium"
-                        >
-                            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                                <Check className="w-3 h-3 text-white" />
-                            </div>
-                            {item}
-                        </motion.li>
-                    ))}
-                </ul>
-            </div>
-
-            {/* Right Column: Form */}
-            <div className="flex-1 w-full max-w-md">
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Identity</label>
-                            <div className="group relative">
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="Jane Doe"
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-black/40 transition-all font-display tracking-wide focus:ring-1 focus:ring-blue-500/20"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Coordinates</label>
-                            <div className="group relative">
-                                <input
-                                    type="email"
-                                    required
-                                    placeholder="jane@example.com"
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:bg-black/40 transition-all font-display tracking-wide focus:ring-1 focus:ring-blue-500/20"
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            disabled={status === 'loading'}
-                            className="w-full bg-white text-black font-bold text-lg py-4 rounded-xl hover:bg-gray-100 disabled:opacity-70 disabled:cursor-not-allowed transition-all font-display tracking-wide mt-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] relative overflow-hidden"
-                        >
-                            {status === 'loading' ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                                    Processing...
-                                </span>
-                            ) : (
-                                <span className="flex items-center justify-center gap-2">
-                                    Request Access <ArrowRight className="w-4 h-4" />
-                                </span>
-                            )}
-                        </button>
-                    </form>
-                    <p className="text-center text-xs text-gray-500 mt-6 leading-relaxed">
-                        By requesting access, you agree to join our private research cohort. <br />
-                        <span className="text-gray-400 cursor-pointer hover:text-white underline decoration-gray-600">Privacy Protocol</span> applied.
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
-};
+// --- MAIN COMPONENT ---
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -320,9 +187,9 @@ const LandingPage = () => {
                                 className="hidden md:flex gap-1 text-sm font-medium text-muted-foreground bg-background/50 backdrop-blur-xl py-2 px-3 rounded-full border border-border/20 shadow-sm"
                             >
                                 {[
-                                    { label: 'Product', action: () => { } },
+                                    { label: 'Product', action: () => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) },
                                     { label: 'Documentation', action: () => navigate('/docs') },
-                                    { label: 'Enterprise', action: () => { } },
+                                    { label: 'Jobs', action: () => navigate('/app/jobs') },
                                     { label: 'Pricing', action: () => navigate('/pricing') }
                                 ].map(item => (
                                     <button
@@ -339,7 +206,7 @@ const LandingPage = () => {
                                 <motion.button
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    onClick={() => navigate('/app')}
+                                    onClick={() => navigate('/login')}
                                     className="px-6 py-2.5 text-sm font-semibold bg-primary text-primary-foreground rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-primary/20 font-display tracking-wide"
                                 >
                                     Log in
@@ -424,7 +291,7 @@ const LandingPage = () => {
                                 {['Netflix', 'Amazon', 'Apple', 'Uber', 'Microsoft', 'Airbnb', 'Google', 'Meta'].map((brand, i) => (
                                     <span
                                         key={`a-${brand}-${i}`}
-                                        className="mx-12 text-4xl md:text-5xl font-bold font-display text-gray-300 hover:text-gray-900 transition-colors duration-300 cursor-default tracking-tight"
+                                        className="mx-12 text-4xl md:text-5xl font-bold font-display text-muted-foreground/30 hover:text-foreground transition-colors duration-300 cursor-default tracking-tight"
                                     >
                                         {brand}
                                     </span>
@@ -443,7 +310,7 @@ const LandingPage = () => {
                     </div>
 
                     {/* BENTO GRID (Active & Tilted) */}
-                    <div className="glass-panel py-40 px-6 relative border-y border-border">
+                    <div id="features" className="glass-panel py-40 px-6 relative border-y border-border">
                         <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-background/50 to-transparent pointer-events-none" />
 
                         <div className="max-w-7xl mx-auto relative z-10">
@@ -464,24 +331,35 @@ const LandingPage = () => {
                                 {/* Card 1: Education Hub */}
                                 <TiltCard className="md:col-span-2 p-12 bg-card/50">
                                     <div className="relative z-10 h-full flex flex-col justify-between">
-                                        <div className="w-16 h-16 rounded-3xl bg-white shadow-sm flex items-center justify-center mb-6">
-                                            <Globe className="w-8 h-8 text-blue-600" />
+                                        <div className="w-16 h-16 rounded-3xl bg-white dark:bg-blue-500/10 shadow-sm flex items-center justify-center mb-6">
+                                            <Globe className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <div>
                                             <h3 className="text-4xl font-bold mb-4 text-foreground tracking-tighter font-display">Education Hub</h3>
-                                            <p className="text-muted-foreground text-xl max-w-md leading-relaxed">Comprehensive video courses and interactive system design modules.</p>
+                                            <p className="text-muted-foreground text-xl max-w-[55%] leading-relaxed">Comprehensive video courses and interactive system design modules.</p>
                                         </div>
                                     </div>
-                                    <div className="absolute right-0 bottom-0 w-3/5 h-4/5 bg-white rounded-tl-[3rem] p-8 shadow-2xl translate-y-12 translate-x-12 group-hover:translate-y-6 group-hover:translate-x-6 transition-transform duration-700">
-                                        <div className="space-y-6 opacity-30 group-hover:opacity-100 transition-opacity duration-700">
-                                            <div className="flex gap-4">
-                                                <div className="w-12 h-12 rounded-full bg-gray-100" />
-                                                <div className="space-y-2 flex-1">
-                                                    <div className="h-3 w-3/4 bg-gray-200 rounded-full" />
-                                                    <div className="h-3 w-1/2 bg-gray-200 rounded-full" />
-                                                </div>
+                                    <div className="absolute right-0 bottom-0 w-3/5 h-4/5 bg-white dark:bg-gray-900 rounded-tl-[3rem] p-6 shadow-2xl translate-y-12 translate-x-12 group-hover:translate-y-6 group-hover:translate-x-6 transition-transform duration-700">
+                                        <div className="space-y-3 opacity-40 group-hover:opacity-100 transition-opacity duration-700">
+                                            <div className="flex gap-2 mb-4">
+                                                {['All', 'DSA', 'System Design', 'Web Dev'].map(cat => (
+                                                    <span key={cat} className={`text-[10px] px-2.5 py-1 rounded-full font-bold ${cat === 'All' ? 'bg-foreground text-background' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}`}>{cat}</span>
+                                                ))}
                                             </div>
-                                            <div className="h-32 w-full bg-blue-50 rounded-xl border border-blue-100" />
+                                            {['Graph Algorithms', 'Load Balancer Design', 'React Internals'].map((title, i) => (
+                                                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
+                                                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${['from-blue-500 to-cyan-400', 'from-purple-500 to-pink-400', 'from-emerald-500 to-teal-400'][i]} flex items-center justify-center`}>
+                                                        <span className="text-white text-[10px] font-bold">▶</span>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{title}</p>
+                                                        <p className="text-[10px] text-gray-400">12 lessons</p>
+                                                    </div>
+                                                    <div className="w-10 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                        <div className={`h-full rounded-full bg-blue-500`} style={{ width: `${[65, 30, 90][i]}%` }} />
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </TiltCard>
@@ -489,8 +367,8 @@ const LandingPage = () => {
                                 {/* Card 2: DSA Tracker */}
                                 <TiltCard delay={0.1} className="p-12 glass-card">
                                     <div className="h-full flex flex-col justify-between relative z-10">
-                                        <div className="w-16 h-16 rounded-3xl bg-purple-50 flex items-center justify-center">
-                                            <Cpu className="w-8 h-8 text-purple-600" />
+                                        <div className="w-16 h-16 rounded-3xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
+                                            <Cpu className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                                         </div>
                                         <div>
                                             <h3 className="text-3xl font-bold mb-2 text-foreground tracking-tighter font-display">DSA Tracker</h3>
@@ -498,7 +376,7 @@ const LandingPage = () => {
                                         </div>
                                     </div>
                                     {/* Animated Graph Bars */}
-                                    <div className="absolute bottom-12 right-12 flex items-end gap-2 h-24 opacity-20">
+                                    <div className="absolute bottom-12 right-12 flex items-end gap-2 h-24 opacity-40">
                                         {[40, 70, 50, 90, 60].map((h, i) => (
                                             <motion.div
                                                 key={i}
@@ -514,13 +392,30 @@ const LandingPage = () => {
                                 {/* Card 3: Interview Prep */}
                                 <TiltCard delay={0.2} className="p-12 glass-card">
                                     <div className="h-full flex flex-col justify-between relative z-10">
-                                        <div className="w-16 h-16 rounded-3xl bg-green-50 flex items-center justify-center">
-                                            <ShieldCheck className="w-8 h-8 text-green-600" />
+                                        <div className="w-16 h-16 rounded-3xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
+                                            <ShieldCheck className="w-8 h-8 text-green-600 dark:text-green-400" />
                                         </div>
                                         <div>
                                             <h3 className="text-3xl font-bold mb-2 text-foreground tracking-tighter font-display">Interview Prep</h3>
-                                            <p className="text-muted-foreground text-lg">Mock interviews with AI.</p>
+                                            <p className="text-muted-foreground text-lg">Categorized resources & tips.</p>
                                         </div>
+                                    </div>
+                                    {/* Checklist Preview */}
+                                    <div className="absolute top-12 right-12 space-y-2.5 opacity-50">
+                                        {['Behavioral', 'System Design', 'Coding', 'HR Round'].map((item, i) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, x: 10 }}
+                                                whileInView={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.3 + i * 0.1 }}
+                                                className="flex items-center gap-2 text-xs font-medium text-foreground"
+                                            >
+                                                <div className={`w-4 h-4 rounded-md border-2 flex items-center justify-center ${i < 2 ? 'border-green-500 bg-green-500/10' : 'border-muted-foreground/30'}`}>
+                                                    {i < 2 && <Check className="w-2.5 h-2.5 text-green-500" />}
+                                                </div>
+                                                {item}
+                                            </motion.div>
+                                        ))}
                                     </div>
                                 </TiltCard>
 
@@ -528,8 +423,8 @@ const LandingPage = () => {
                                 <TiltCard delay={0.3} className="md:col-span-2 p-12 bg-card/50">
                                     <div className="flex flex-col md:flex-row h-full items-start md:items-center justify-between gap-12 relative z-10">
                                         <div className="max-w-md">
-                                            <div className="w-16 h-16 rounded-3xl bg-orange-50 flex items-center justify-center mb-8">
-                                                <Users className="w-8 h-8 text-orange-600" />
+                                            <div className="w-16 h-16 rounded-3xl bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center mb-8">
+                                                <Users className="w-8 h-8 text-orange-600 dark:text-orange-400" />
                                             </div>
                                             <h3 className="text-4xl font-bold mb-4 text-foreground tracking-tighter font-display">Developer Connect</h3>
                                             <p className="text-muted-foreground text-xl text-balance leading-relaxed">Join a private community of elite engineers. Share knowledge, find mentors.</p>
@@ -541,18 +436,57 @@ const LandingPage = () => {
                                                 initial={{ opacity: 0, x: 20 }}
                                                 whileInView={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: 0.2 }}
-                                                className="bg-white p-5 rounded-2xl rounded-tr-none shadow-md border border-gray-100 self-end max-w-[90%]"
+                                                className="bg-white dark:bg-white/10 p-5 rounded-2xl rounded-tr-none shadow-md dark:shadow-none border border-gray-100 dark:border-white/10 self-end max-w-[90%]"
                                             >
-                                                <p className="text-sm text-gray-600">How do I optimize this graph query?</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-300">How do I optimize this graph query?</p>
                                             </motion.div>
                                             <motion.div
                                                 initial={{ opacity: 0, x: -20 }}
                                                 whileInView={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: 0.6 }}
-                                                className="bg-blue-600 p-5 rounded-2xl rounded-tl-none shadow-md shadow-blue-200 self-start max-w-[90%]"
+                                                className="bg-blue-600 p-5 rounded-2xl rounded-tl-none shadow-md shadow-blue-200 dark:shadow-none self-start max-w-[90%]"
                                             >
                                                 <p className="text-sm text-white">Use a bidirectional BFS.</p>
                                             </motion.div>
+                                        </div>
+                                    </div>
+                                </TiltCard>
+
+                                {/* Card 5: Jobs & Community */}
+                                <TiltCard delay={0.4} className="md:col-span-3 p-12 glass-card">
+                                    <div className="flex flex-col md:flex-row h-full items-start md:items-center justify-between gap-12 relative z-10">
+                                        <div className="max-w-md">
+                                            <div className="flex gap-4 mb-8">
+                                                <div className="w-16 h-16 rounded-3xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
+                                                    <Briefcase className="w-8 h-8 text-rose-600 dark:text-rose-400" />
+                                                </div>
+                                                <div className="w-16 h-16 rounded-3xl bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center">
+                                                    <FileText className="w-8 h-8 text-sky-600 dark:text-sky-400" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-4xl font-bold mb-4 text-foreground tracking-tighter font-display">Jobs & Community</h3>
+                                            <p className="text-muted-foreground text-xl text-balance leading-relaxed">Browse curated job listings, share knowledge through posts, and grow with the community.</p>
+                                        </div>
+                                        <div className="relative w-full md:w-[50%] space-y-3">
+                                            {[
+                                                { title: 'Senior Frontend Engineer', company: 'Google', tag: 'Remote', tagBg: 'bg-blue-100 dark:bg-blue-500/10', tagText: 'text-blue-600 dark:text-blue-400' },
+                                                { title: 'Staff Backend Engineer', company: 'Netflix', tag: 'Hybrid', tagBg: 'bg-red-100 dark:bg-red-500/10', tagText: 'text-red-600 dark:text-red-400' },
+                                                { title: 'Full Stack Developer', company: 'Stripe', tag: 'On-site', tagBg: 'bg-purple-100 dark:bg-purple-500/10', tagText: 'text-purple-600 dark:text-purple-400' },
+                                            ].map((job, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    whileInView={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.2 + i * 0.15 }}
+                                                    className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 shadow-sm"
+                                                >
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-foreground">{job.title}</p>
+                                                        <p className="text-xs text-muted-foreground">{job.company}</p>
+                                                    </div>
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${job.tagBg} ${job.tagText}`}>{job.tag}</span>
+                                                </motion.div>
+                                            ))}
                                         </div>
                                     </div>
                                 </TiltCard>
@@ -565,13 +499,13 @@ const LandingPage = () => {
                         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
                             <ScrollRevealText>
                                 <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-10 text-foreground leading-[0.9] font-display">
-                                    Build your future,<br /><span className="text-gray-300">line by line.</span>
+                                    Build your future,<br /><span className="text-foreground/50">line by line.</span>
                                 </h2>
                                 <p className="text-xl text-muted-foreground mb-12 leading-relaxed font-light max-w-lg">
                                     AXIOM provides the tools, runtime, and environment you need to prove your skills to the world's best companies.
                                 </p>
                                 <div className="space-y-5">
-                                    {['Real-time Execution', 'Verified Credentials', 'Global Leaderboards'].map((item, i) => (
+                                    {['450+ DSA Patterns & Tracking', 'Video Course Library', 'AI-powered Interview Prep'].map((item, i) => (
                                         <div key={i} className="flex items-center gap-4 text-lg font-medium text-foreground">
                                             <div className="w-2 h-2 rounded-full bg-blue-600" />
                                             {item}
@@ -623,7 +557,6 @@ const LandingPage = () => {
                     </div>
 
                     {/* PRE-FOOTER CTA */}
-                    {/* PRE-FOOTER CTA */}
                     <div className="relative py-60 flex flex-col items-center justify-center text-center px-6 overflow-hidden">
                         <div className="max-w-5xl z-10">
                             <ScrollRevealText>
@@ -663,11 +596,11 @@ const LandingPage = () => {
                             <div className="flex flex-col gap-6">
                                 <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Platform</h4>
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Education Hub</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">DSA Tracker</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Interview Prep</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Developer Connect</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Career Credentials</a></li>
+                                    <li><a href="/app/education" className="hover:text-white hover:underline transition-all">Education Hub</a></li>
+                                    <li><a href="/app/dsa" className="hover:text-white hover:underline transition-all">DSA Tracker</a></li>
+                                    <li><a href="/app/interview" className="hover:text-white hover:underline transition-all">Interview Prep</a></li>
+                                    <li><a href="/app/connect" className="hover:text-white hover:underline transition-all">Developer Connect</a></li>
+                                    <li><a href="/app/jobs" className="hover:text-white hover:underline transition-all">Jobs Board</a></li>
                                 </ul>
                             </div>
 
@@ -675,10 +608,10 @@ const LandingPage = () => {
                             <div className="flex flex-col gap-6">
                                 <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Resources</h4>
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">System Design Guide</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Engineering Blog</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Success Stories</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Community Guidelines</a></li>
+                                    <li><a href="/docs" className="hover:text-white hover:underline transition-all">Documentation</a></li>
+                                    <li><a href="/app/posts" className="hover:text-white hover:underline transition-all">Community Posts</a></li>
+                                    <li><a href="/pricing" className="hover:text-white hover:underline transition-all">Pricing</a></li>
+                                    <li><a href="/docs" className="hover:text-white hover:underline transition-all">System Design Guide</a></li>
                                 </ul>
                             </div>
 
@@ -686,9 +619,9 @@ const LandingPage = () => {
                             <div className="flex flex-col gap-6">
                                 <h4 className="font-bold text-xl text-white mb-2 font-display tracking-tight">Community</h4>
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Discord Server</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Events & Hackathons</a></li>
-                                    <li><a href="#" className="hover:text-white hover:underline transition-all">Mentorship Program</a></li>
+                                    <li><a href="/app/connect" className="hover:text-white hover:underline transition-all">Dev Connect Chat</a></li>
+                                    <li><a href="/app/posts" className="hover:text-white hover:underline transition-all">Posts & Discussions</a></li>
+                                    <li><a href="/app/profile" className="hover:text-white hover:underline transition-all">Your Profile</a></li>
                                 </ul>
                             </div>
 
@@ -713,10 +646,10 @@ const LandingPage = () => {
                         </div>
 
                         <div className="flex justify-between items-end text-white/60 text-xs font-medium tracking-wide drop-shadow-md pb-8">
-                            <div className="font-display tracking-widest">&copy; AXIOM 2025</div>
+                            <div className="font-display tracking-widest">&copy; AXIOM 2026</div>
                             <div className="flex gap-6">
-                                <a href="#" className="hover:text-white hover:underline transition-all">Privacy Policy</a>
-                                <a href="#" className="hover:text-white hover:underline transition-all">Security</a>
+                                <a href="/docs" className="hover:text-white hover:underline transition-all">Privacy Policy</a>
+                                <a href="/docs" className="hover:text-white hover:underline transition-all">Security</a>
                             </div>
                         </div>
                     </div>

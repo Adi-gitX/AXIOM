@@ -23,7 +23,7 @@ router.get('/:id', getJobById);
 router.post('/save', validate(schemas.jobSave), saveJob);
 
 // Unsave a job
-router.delete('/save/:jobId', unsaveJob);
+router.delete('/save/:jobId', validate(schemas.jobUnsave), unsaveJob);
 
 // Get user's saved jobs
 router.get('/saved/:email', getSavedJobs);
@@ -32,7 +32,7 @@ router.get('/saved/:email', getSavedJobs);
 router.get('/saved-ids/:email', getSavedJobIds);
 
 // Track job application
-router.post('/apply', applyToJob);
+router.post('/apply', validate(schemas.jobApply), applyToJob);
 
 // Get applied jobs
 router.get('/applied/:email', getAppliedJobs);

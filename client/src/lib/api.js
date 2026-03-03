@@ -7,9 +7,30 @@
 const PROD_BACKEND_URL = 'https://axiom-server-three.vercel.app';
 
 export const getApiUrl = () => {
-    if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL;
+    const configuredUrl = (import.meta.env.VITE_API_URL || '').trim();
+    const allowRemoteInDev = String(import.meta.env.VITE_ALLOW_REMOTE_API_IN_DEV || '').toLowerCase() === 'true';
+
+    if (import.meta.env.DEV) {
+        if (!configuredUrl) {
+            return '';
+        }
+
+        const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredUrl);
+        if (isLocal || allowRemoteInDev) {
+            return configuredUrl;
+        }
+
+        console.warn(
+            'Ignoring remote VITE_API_URL in development. Using local /api proxy. ' +
+            'Set VITE_ALLOW_REMOTE_API_IN_DEV=true to force remote API.'
+        );
+        return '';
     }
+
+    if (configuredUrl) {
+        return configuredUrl;
+    }
+
     if (import.meta.env.PROD) {
         console.warn('VITE_API_URL not set. Falling back to default backend:', PROD_BACKEND_URL);
         return PROD_BACKEND_URL;
@@ -22,8 +43,22 @@ const API_URL = getApiUrl();
 /**
  * Base fetch wrapper with error handling
  */
+const requestJson = async (url, config) => {
+    const response = await fetch(url, config);
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        const err = new Error(error.message || `Request failed: ${response.status}`);
+        err.status = response.status;
+        err.response = error;
+        throw err;
+    }
+
+    return response.json();
+};
+
 const fetchApi = async (endpoint, options = {}) => {
-    const url = `${API_URL}${endpoint}`;
+    const primaryUrl = `${API_URL}${endpoint}`;
 
     const config = {
         headers: {
@@ -38,15 +73,24 @@ const fetchApi = async (endpoint, options = {}) => {
     }
 
     try {
-        const response = await fetch(url, config);
+        return await requestJson(primaryUrl, config);
+    } catch (error) {
+        // Dev fallback: if configured API host is stale/unreachable, retry through local proxy.
+        const shouldRetryLocally = Boolean(
+            API_URL &&
+            import.meta.env.DEV &&
+            endpoint.startsWith('/api/')
+        );
 
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || `Request failed: ${response.status}`);
+        if (shouldRetryLocally) {
+            try {
+                return await requestJson(endpoint, config);
+            } catch (fallbackErr) {
+                console.error(`API Error (${endpoint}) [primary+fallback]:`, fallbackErr.message);
+                throw fallbackErr;
+            }
         }
 
-        return await response.json();
-    } catch (error) {
         console.error(`API Error (${endpoint}):`, error.message);
         throw error;
     }
@@ -64,6 +108,31 @@ export const userApi = {
         body: data,
     }),
 
+    createOrGet: async (userData) => {
+        try {
+            return await fetchApi('/api/users', {
+                method: 'POST',
+                body: userData,
+            });
+        } catch (err) {
+            // Backward compatibility with older backend deployments without POST /api/users.
+            if (err?.status === 404 || err?.status >= 500) {
+                return fetchApi('/api/users/profile', {
+                    method: 'POST',
+                    body: {
+                        email: userData.email,
+                        name: userData.name,
+                        avatar: userData.avatar,
+                        experience: [],
+                        skills: [],
+                        socials: [],
+                    },
+                });
+            }
+            throw err;
+        }
+    },
+
     getCloudinarySignature: () => fetchApi('/api/sign-cloudinary'),
 };
 
@@ -72,6 +141,8 @@ export const userApi = {
 // ========================================
 
 export const progressApi = {
+    getCatalog: () => fetchApi('/api/progress/catalog'),
+
     getProgress: (email) => fetchApi(`/api/progress/${encodeURIComponent(email)}`),
 
     toggleProblem: (email, problemId, topicId) => fetchApi('/api/progress/problem', {
@@ -108,10 +179,11 @@ export const jobsApi = {
         body: { email, jobId },
     }),
 
-    unsave: (email, jobId) => fetchApi(`/api/jobs/save/${jobId}`, {
-        method: 'DELETE',
-        body: { email },
-    }),
+    unsave: (email, jobId) =>
+        fetchApi(`/api/jobs/save/${jobId}?email=${encodeURIComponent(email)}`, {
+            method: 'DELETE',
+            body: { email },
+        }),
 
     getSavedIds: (email) => fetchApi(`/api/jobs/saved-ids/${encodeURIComponent(email)}`),
 
@@ -121,6 +193,8 @@ export const jobsApi = {
         method: 'POST',
         body: { email, jobId, notes },
     }),
+
+    getApplied: (email) => fetchApi(`/api/jobs/applied/${encodeURIComponent(email)}`),
 };
 
 // ========================================
@@ -128,6 +202,11 @@ export const jobsApi = {
 // ========================================
 
 export const educationApi = {
+    getCatalog: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return fetchApi(`/api/education/catalog${query ? `?${query}` : ''}`);
+    },
+
     getProgress: (email) => fetchApi(`/api/education/progress/${encodeURIComponent(email)}`),
 
     markWatched: (email, videoId, topicId) => fetchApi('/api/education/watched', {
@@ -135,10 +214,19 @@ export const educationApi = {
         body: { email, videoId, topicId },
     }),
 
-    updateProgress: (email, videoId, topicId, percentage) => fetchApi('/api/education/progress', {
-        method: 'POST',
-        body: { email, videoId, topicId, percentage },
-    }),
+    updateProgress: (email, videoId, topicId, percentageOrPayload) => {
+        const payload = (percentageOrPayload && typeof percentageOrPayload === 'object')
+            ? {
+                percentage: percentageOrPayload.progress ?? percentageOrPayload.percentage ?? 0,
+                completed: percentageOrPayload.completed,
+            }
+            : { percentage: percentageOrPayload };
+
+        return fetchApi('/api/education/progress', {
+            method: 'POST',
+            body: { email, videoId, topicId, ...payload },
+        });
+    },
 
     getRecent: (email, limit = 5) =>
         fetchApi(`/api/education/recent/${encodeURIComponent(email)}?limit=${limit}`),
@@ -150,6 +238,11 @@ export const educationApi = {
 
 export const chatApi = {
     getChannels: () => fetchApi('/api/chat/channels'),
+
+    createChannel: (name, description, email) => fetchApi('/api/chat/channels', {
+        method: 'POST',
+        body: { name, description, email },
+    }),
 
     getMessages: (channelId, limit = 50) =>
         fetchApi(`/api/chat/messages/${channelId}?limit=${limit}`),
@@ -163,10 +256,11 @@ export const chatApi = {
             body: { email, channelId, content, userName, userAvatar },
         }),
 
-    deleteMessage: (id, email) => fetchApi(`/api/chat/messages/${id}`, {
-        method: 'DELETE',
-        body: { email },
-    }),
+    deleteMessage: (id, email) =>
+        fetchApi(`/api/chat/messages/${id}?email=${encodeURIComponent(email)}`, {
+            method: 'DELETE',
+            body: { email },
+        }),
 };
 
 // ========================================
@@ -174,12 +268,30 @@ export const chatApi = {
 // ========================================
 
 export const postsApi = {
-    getAll: (params = {}) => {
+    getAll: async (params = {}) => {
         const query = new URLSearchParams(params).toString();
-        return fetchApi(`/api/posts${query ? `?${query}` : ''}`);
+        const endpoint = `/api/posts${query ? `?${query}` : ''}`;
+
+        try {
+            return await fetchApi(endpoint);
+        } catch (err) {
+            // Compatibility retry: older backend versions can fail when `email` hydration is requested.
+            if (params.email) {
+                const retryParams = { ...params };
+                delete retryParams.email;
+                const retryQuery = new URLSearchParams(retryParams).toString();
+                return fetchApi(`/api/posts${retryQuery ? `?${retryQuery}` : ''}`);
+            }
+            throw err;
+        }
     },
 
     getById: (id) => fetchApi(`/api/posts/${id}`),
+
+    create: (postData) => fetchApi('/api/posts', {
+        method: 'POST',
+        body: postData,
+    }),
 
     getUserInteractions: (email) =>
         fetchApi(`/api/posts/interactions/${encodeURIComponent(email)}`),
@@ -226,6 +338,25 @@ export const settingsApi = {
     }),
 };
 
+// ========================================
+// Interview API
+// ========================================
+
+export const interviewApi = {
+    getResources: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return fetchApi(`/api/interview/resources${query ? `?${query}` : ''}`);
+    },
+
+    getProgress: (email) => fetchApi(`/api/interview/progress/${encodeURIComponent(email)}`),
+
+    setCompleted: (resourceId, email, completed = true, notes = null) =>
+        fetchApi(`/api/interview/resources/${resourceId}/complete`, {
+            method: 'POST',
+            body: { email, completed, notes },
+        }),
+};
+
 export default {
     user: userApi,
     progress: progressApi,
@@ -234,4 +365,5 @@ export default {
     chat: chatApi,
     posts: postsApi,
     settings: settingsApi,
+    interview: interviewApi,
 };

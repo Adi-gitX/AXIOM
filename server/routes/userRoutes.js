@@ -3,7 +3,8 @@ import {
     getUserProfile,
     updateUserProfile,
     getCloudinarySignature,
-    initDb
+    initDb,
+    createOrGetUser
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -11,6 +12,7 @@ const router = express.Router();
 router.get('/sign-cloudinary', getCloudinarySignature);
 router.get('/users/:email', getUserProfile);
 router.post('/users/profile', updateUserProfile);
+router.post('/users', createOrGetUser);
 router.get('/init-db', initDb);
 
 export default router;

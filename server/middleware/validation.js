@@ -11,64 +11,84 @@
 export const validate = (schema) => {
     return (req, res, next) => {
         const errors = [];
-        const source = schema.body ? req.body :
-            schema.params ? req.params :
-                schema.query ? req.query : {};
-        const rules = schema.body || schema.params || schema.query || {};
+        const sourceSchemas = [
+            ['params', req.params, schema.params || {}],
+            ['query', req.query, schema.query || {}],
+            ['body', req.body, schema.body || {}],
+        ];
 
-        for (const [field, rule] of Object.entries(rules)) {
-            const value = source[field];
-
-            // Required check
-            if (rule.required && (value === undefined || value === null || value === '')) {
-                errors.push(`${field} is required`);
-                continue;
+        const isTypeMatch = (value, expectedType) => {
+            if (expectedType === 'number') {
+                if (typeof value === 'number') return Number.isFinite(value);
+                if (typeof value === 'string' && value.trim() !== '') return Number.isFinite(Number(value));
+                return false;
             }
-
-            // Skip optional empty fields
-            if (!rule.required && (value === undefined || value === null)) {
-                continue;
-            }
-
-            // Type check
-            if (rule.type) {
-                const actualType = Array.isArray(value) ? 'array' : typeof value;
-                if (actualType !== rule.type) {
-                    errors.push(`${field} must be of type ${rule.type}`);
+            if (expectedType === 'boolean') {
+                if (typeof value === 'boolean') return true;
+                if (value === 0 || value === 1) return true;
+                if (typeof value === 'string') {
+                    return ['true', 'false', '0', '1'].includes(value.toLowerCase());
                 }
+                return false;
             }
+            if (expectedType === 'array') return Array.isArray(value);
+            return typeof value === expectedType;
+        };
 
-            // Min length
-            if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
-                errors.push(`${field} must be at least ${rule.minLength} characters`);
-            }
+        for (const [sourceName, source, rules] of sourceSchemas) {
+            if (!rules || Object.keys(rules).length === 0) continue;
 
-            // Max length  
-            if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
-                errors.push(`${field} must be at most ${rule.maxLength} characters`);
-            }
+            for (const [field, rule] of Object.entries(rules)) {
+                const value = source?.[field];
+                const fieldName = `${sourceName}.${field}`;
 
-            // Email validation
-            if (rule.email && typeof value === 'string') {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    errors.push(`${field} must be a valid email`);
+                // Required check
+                if (rule.required && (value === undefined || value === null || value === '')) {
+                    errors.push(`${fieldName} is required`);
+                    continue;
                 }
-            }
 
-            // Enum validation
-            if (rule.enum && !rule.enum.includes(value)) {
-                errors.push(`${field} must be one of: ${rule.enum.join(', ')}`);
-            }
+                // Skip optional empty fields
+                if (!rule.required && (value === undefined || value === null)) {
+                    continue;
+                }
 
-            // Min value (for numbers)
-            if (rule.min !== undefined && typeof value === 'number' && value < rule.min) {
-                errors.push(`${field} must be at least ${rule.min}`);
-            }
+                // Type check
+                if (rule.type && !isTypeMatch(value, rule.type)) {
+                    errors.push(`${fieldName} must be of type ${rule.type}`);
+                    continue;
+                }
 
-            // Max value (for numbers)
-            if (rule.max !== undefined && typeof value === 'number' && value > rule.max) {
-                errors.push(`${field} must be at most ${rule.max}`);
+                // Min length
+                if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
+                    errors.push(`${fieldName} must be at least ${rule.minLength} characters`);
+                }
+
+                // Max length
+                if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
+                    errors.push(`${fieldName} must be at most ${rule.maxLength} characters`);
+                }
+
+                // Email validation
+                if (rule.email && typeof value === 'string') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        errors.push(`${fieldName} must be a valid email`);
+                    }
+                }
+
+                // Enum validation
+                if (rule.enum && !rule.enum.includes(value)) {
+                    errors.push(`${fieldName} must be one of: ${rule.enum.join(', ')}`);
+                }
+
+                const numericValue = typeof value === 'number' ? value : Number(value);
+                if (rule.min !== undefined && Number.isFinite(numericValue) && numericValue < rule.min) {
+                    errors.push(`${fieldName} must be at least ${rule.min}`);
+                }
+                if (rule.max !== undefined && Number.isFinite(numericValue) && numericValue > rule.max) {
+                    errors.push(`${fieldName} must be at most ${rule.max}`);
+                }
             }
         }
 
@@ -95,20 +115,28 @@ export const sanitize = (str) => {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;')
-        .replace(/\//g, '&#x2F;');
+        .replace(/'/g, '&#x27;');
 };
 
 /**
  * Sanitize request body middleware
  */
 export const sanitizeBody = (req, res, next) => {
-    if (req.body && typeof req.body === 'object') {
-        for (const key of Object.keys(req.body)) {
-            if (typeof req.body[key] === 'string') {
-                req.body[key] = sanitize(req.body[key]);
+    const sanitizeValue = (value) => {
+        if (typeof value === 'string') return sanitize(value);
+        if (Array.isArray(value)) return value.map(sanitizeValue);
+        if (value && typeof value === 'object') {
+            const clean = {};
+            for (const [key, nestedValue] of Object.entries(value)) {
+                clean[key] = sanitizeValue(nestedValue);
             }
+            return clean;
         }
+        return value;
+    };
+
+    if (req.body && typeof req.body === 'object') {
+        req.body = sanitizeValue(req.body);
     }
     next();
 };
@@ -135,6 +163,26 @@ export const schemas = {
         }
     },
 
+    jobApply: {
+        body: {
+            email: { required: true, type: 'string', email: true },
+            jobId: { required: true, type: 'number' },
+            notes: { required: false, type: 'string', maxLength: 3000 }
+        }
+    },
+
+    jobUnsave: {
+        params: {
+            jobId: { required: true, type: 'number' },
+        },
+        body: {
+            email: { required: false, type: 'string', email: true },
+        },
+        query: {
+            email: { required: false, type: 'string', email: true },
+        }
+    },
+
     chatMessage: {
         body: {
             email: { required: true, type: 'string', email: true },
@@ -143,10 +191,45 @@ export const schemas = {
         }
     },
 
+    chatDeleteMessage: {
+        params: {
+            id: { required: true, type: 'number' },
+        },
+        body: {
+            email: { required: false, type: 'string', email: true },
+        },
+        query: {
+            email: { required: false, type: 'string', email: true },
+        }
+    },
+
     postVote: {
         body: {
             email: { required: true, type: 'string', email: true },
             voteType: { required: true, type: 'string', enum: ['up', 'down', 'none'] }
+        }
+    },
+
+    postCreate: {
+        body: {
+            email: { required: true, type: 'string', email: true },
+            title: { required: true, type: 'string', minLength: 1, maxLength: 300 },
+            content: { required: false, type: 'string', maxLength: 10000 }
+        }
+    },
+
+    channelCreate: {
+        body: {
+            name: { required: true, type: 'string', minLength: 1, maxLength: 100 },
+            description: { required: false, type: 'string', maxLength: 500 }
+        }
+    },
+
+    interviewComplete: {
+        body: {
+            email: { required: true, type: 'string', email: true },
+            completed: { required: false, type: 'boolean' },
+            notes: { required: false, type: 'string', maxLength: 2000 }
         }
     }
 };

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
     User,
     Bell,
     Shield,
     Palette,
     LogOut,
-    ChevronRight,
     Monitor,
     Moon,
     Sun,
@@ -17,10 +15,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { settingsApi, userApi } from '../lib/api';
+import { useTheme } from '../components/theme-provider';
+
+const normalizeBool = (value) => value === true || value === 1 || value === '1';
 
 const Settings = () => {
     const [activeTab, setActiveTab] = useState('account');
     const { currentUser, logout } = useAuth();
+    const { theme: appTheme, setTheme: applyTheme } = useTheme();
     const navigate = useNavigate();
 
     // Settings state
@@ -55,14 +57,23 @@ const Settings = () => {
                 ]);
 
                 if (settingsData) {
-                    setSettings(prev => ({ ...prev, ...settingsData }));
+                    const normalized = {
+                        ...settingsData,
+                        theme: settingsData.theme || appTheme || 'system',
+                        email_notifications: normalizeBool(settingsData.email_notifications),
+                        push_notifications: normalizeBool(settingsData.push_notifications),
+                        weekly_digest: normalizeBool(settingsData.weekly_digest),
+                        product_updates: normalizeBool(settingsData.product_updates),
+                    };
+                    setSettings(prev => ({ ...prev, ...normalized }));
+                    applyTheme(normalized.theme);
                 }
 
-                if (userData?.user) {
+                if (userData) {
                     setProfile({
-                        name: userData.user.name || currentUser.displayName || '',
-                        email: userData.user.email || currentUser.email || '',
-                        username: userData.user.role ? `@${userData.user.role.toLowerCase().replace(/\s+/g, '')}` : ''
+                        name: userData.name || currentUser.displayName || '',
+                        email: userData.email || currentUser.email || '',
+                        username: userData.role ? `@${userData.role.toLowerCase().replace(/\s+/g, '')}` : ''
                     });
                 } else {
                     setProfile({
@@ -79,7 +90,7 @@ const Settings = () => {
         };
 
         loadSettings();
-    }, [currentUser]);
+    }, [appTheme, applyTheme, currentUser]);
 
     const handleLogout = async () => {
         try {
@@ -129,15 +140,19 @@ const Settings = () => {
     };
 
     // Set theme
-    const setTheme = async (theme) => {
+    const handleThemeChange = async (theme) => {
         if (!currentUser?.email) return;
 
+        const previousTheme = settings.theme;
         setSettings(prev => ({ ...prev, theme }));
+        applyTheme(theme);
 
         try {
             await settingsApi.updateTheme(currentUser.email, theme);
         } catch (err) {
             console.error('Failed to update theme:', err);
+            setSettings(prev => ({ ...prev, theme: previousTheme }));
+            applyTheme(previousTheme || 'system');
         }
     };
 
@@ -273,19 +288,19 @@ const Settings = () => {
 
                                                 <div className="flex bg-muted/50 p-1 rounded-full border border-border">
                                                     <button
-                                                        onClick={() => setTheme('light')}
+                                                        onClick={() => handleThemeChange('light')}
                                                         className={`p-2 rounded-full transition-all ${settings.theme === 'light' ? 'bg-background shadow-sm' : 'hover:bg-background/50'}`}
                                                     >
                                                         <Sun className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => setTheme('dark')}
+                                                        onClick={() => handleThemeChange('dark')}
                                                         className={`p-2 rounded-full transition-all ${settings.theme === 'dark' ? 'bg-background shadow-sm' : 'hover:bg-background/50'}`}
                                                     >
                                                         <Moon className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => setTheme('system')}
+                                                        onClick={() => handleThemeChange('system')}
                                                         className={`p-2 rounded-full transition-all ${settings.theme === 'system' ? 'bg-background shadow-sm' : 'hover:bg-background/50'}`}
                                                     >
                                                         <Laptop className="w-4 h-4" />

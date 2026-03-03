@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import dotenvx from '@dotenvx/dotenvx';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
 import morgan from 'morgan';
+import { loadEnv } from './config/loadEnv.js';
 
 // Route imports
 import userRoutes from './routes/userRoutes.js';
@@ -14,11 +14,12 @@ import educationRoutes from './routes/educationRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import postsRoutes from './routes/postsRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
+import interviewRoutes from './routes/interviewRoutes.js';
 
 // Middleware imports
 import { sanitizeBody } from './middleware/validation.js';
 
-dotenvx.config();
+loadEnv();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,13 +44,39 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // CORS configuration
+const configuredOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174', // Vite fallback port
+    'http://localhost:3000',
+    'https://axiomdev.vercel.app',
+    'https://axiom-client.vercel.app',
+    ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
+].map((origin) => origin.trim()).filter(Boolean);
+
+const allowedOrigins = new Set(configuredOrigins);
+const isLocalOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+const isVercelPreview = (origin) => {
+    try {
+        return new URL(origin).hostname.endsWith('.vercel.app');
+    } catch {
+        return false;
+    }
+};
+
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'https://axiomdev.vercel.app',
-        'https://axiom-client.vercel.app'
-    ],
+    origin: (origin, callback) => {
+        if (!origin) {
+            callback(null, true);
+            return;
+        }
+
+        if (allowedOrigins.has(origin) || isLocalOrigin(origin) || isVercelPreview(origin)) {
+            callback(null, true);
+            return;
+        }
+
+        callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true
 }));
 
@@ -82,6 +109,9 @@ app.use('/api/posts', postsRoutes);
 // Settings routes
 app.use('/api/settings', settingsRoutes);
 
+// Interview prep routes
+app.use('/api/interview', interviewRoutes);
+
 // ========================================
 // Health & Root Endpoints
 // ========================================
@@ -96,6 +126,7 @@ app.get('/', (req, res) => {
             progress: '/api/progress',
             jobs: '/api/jobs',
             education: '/api/education',
+            interview: '/api/interview',
             chat: '/api/chat',
             posts: '/api/posts'
         }

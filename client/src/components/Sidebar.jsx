@@ -29,7 +29,7 @@ const Sidebar = () => {
 
   return (
     <div className="h-screen sticky top-0 flex flex-col w-72 shrink-0 z-40 p-4 transition-all duration-300">
-      <div className="h-full flex flex-col rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-2xl overflow-hidden transition-all duration-500">
+      <div className="h-full flex flex-col rounded-[2rem] bg-background border border-border shadow-2xl overflow-hidden transition-all duration-500">
         <div className="h-24 flex items-center px-6">
           <NavLink to="/" className="flex items-center gap-4 group w-full py-2">
             <div className="w-10 h-10 rounded-2xl bg-foreground/5 border border-foreground/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -66,7 +66,7 @@ const Sidebar = () => {
           ))}
         </nav>
 
-        <div className="mt-auto p-4 border-t border-white/10 dark:border-white/5 bg-background/20 backdrop-blur-md">
+        <div className="mt-auto p-4 border-t border-border">
           <div className="flex items-center gap-3">
             <NavLink to="/app/profile" className="flex-1 flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-foreground/5 transition-all duration-300 cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center text-foreground text-xs font-bold relative overflow-hidden">

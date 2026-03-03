@@ -1,31 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import useStore, { setUserEmail } from '../store/useStore';
-import { TOPICS } from '../data/dsaSheet';
 import GlassCard from '../components/ui/GlassCard';
 import { useAuth } from '../contexts/AuthContext';
+import { progressApi } from '../lib/api';
 
 const DSATracker = () => {
     const { currentUser } = useAuth();
     const { solvedProblems, toggleProblem, loadSolvedProblems } = useStore();
+    const [topics, setTopics] = useState([]);
     const [expandedTopic, setExpandedTopic] = useState(null);
+    const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // Load solved problems from backend on mount
+    // Load catalog + solved problems from backend
     useEffect(() => {
         const initProgress = async () => {
-            if (currentUser?.email) {
-                setUserEmail(currentUser.email);
-                await loadSolvedProblems(currentUser.email);
+            setLoading(true);
+            setError('');
+            try {
+                const catalogData = await progressApi.getCatalog();
+                setTopics(Array.isArray(catalogData.topics) ? catalogData.topics : []);
+
+                if (currentUser?.email) {
+                    setUserEmail(currentUser.email);
+                    await loadSolvedProblems(currentUser.email);
+                }
+            } catch (err) {
+                console.error('Failed to initialize DSA tracker:', err);
+                setError('Failed to load DSA catalog');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
         initProgress();
     }, [currentUser?.email, loadSolvedProblems]);
 
-    const totalProblems = TOPICS.reduce((acc, t) => acc + t.total, 0);
+    const totalProblems = topics.reduce((acc, t) => acc + (t.total || 0), 0);
     const totalSolved = solvedProblems.length;
-    const overallProgress = Math.round((totalSolved / totalProblems) * 100);
+    const overallProgress = totalProblems > 0
+        ? Math.round((totalSolved / totalProblems) * 100)
+        : 0;
 
     const handleToggleProblem = (problemId, topicId) => {
         toggleProblem(problemId, topicId);
@@ -73,7 +88,7 @@ const DSATracker = () => {
 
                 {/* Topics List */}
                 <div className="space-y-4">
-                    {TOPICS.map((topic, i) => {
+                    {topics.map((topic, i) => {
                         const solved = topic.problems.filter(p => solvedProblems.includes(p.id)).length;
                         const progress = Math.round((solved / topic.total) * 100);
                         const isExpanded = expandedTopic === topic.id;
@@ -152,6 +167,12 @@ const DSATracker = () => {
                         );
                     })}
                 </div>
+
+                {!loading && topics.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                        {error || 'No DSA topics available'}
+                    </div>
+                )}
             </div>
         </div>
     );

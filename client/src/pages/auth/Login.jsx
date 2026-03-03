@@ -34,7 +34,7 @@ const Login = () => {
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/20 rounded-full blur-[120px] animate-pulse delay-1000" />
             </div>
 
-            <div className="w-full max-w-md p-8 rounded-[2rem] bg-background/50 backdrop-blur-3xl border border-white/20 dark:border-white/5 shadow-2xl relative z-10">
+            <div className="w-full max-w-md p-8 rounded-[2rem] bg-background/50 backdrop-blur-3xl border border-border/30 dark:border-white/5 shadow-2xl relative z-10">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold font-display text-foreground mb-2">Welcome Back</h1>
                     <p className="text-muted-foreground">Sign in to continue your journey</p>
@@ -80,7 +80,7 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-4 rounded-xl bg-foreground text-background font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
+                        className="w-full py-4 rounded-xl bg-foreground text-background font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
                     >
                         {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "Sign In"}
                     </button>

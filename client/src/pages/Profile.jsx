@@ -26,7 +26,7 @@ import {
 import { updateProfile } from 'firebase/auth';
 import { cn } from '../lib/utils';
 import { uploadToCloudinary } from '../lib/cloudinary';
-import { getApiUrl } from '../lib/api';
+import { getApiUrl, userApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserStore } from '../stores/useUserStore';
 
@@ -57,6 +57,19 @@ const Profile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [toast, setToast] = useState(null);
     const fileInputRef = useRef(null);
+
+    const parseJsonArray = (value, fallback = []) => {
+        if (Array.isArray(value)) return value;
+        if (value && typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value);
+                return Array.isArray(parsed) ? parsed : fallback;
+            } catch {
+                return fallback;
+            }
+        }
+        return fallback;
+    };
 
     const defaultUser = {
         name: currentUser?.displayName || 'Aditya Kammati',
@@ -112,7 +125,7 @@ const Profile = () => {
             if (!data) {
                 try {
                     const API_URL = getApiUrl();
-                    const response = await fetch(`${API_URL}/api/users/${currentUser.email}`);
+                    const response = await fetch(`${API_URL}/api/users/${encodeURIComponent(currentUser.email)}`);
                     if (response.ok) {
                         data = await response.json();
                         setStoreUser(data);
@@ -135,9 +148,9 @@ const Profile = () => {
             });
 
             if (data) {
-                setExperience(data.experience || defaultExperience);
-                setSkills(data.skills || defaultSkills);
-                setSocials(data.socials || defaultSocials);
+                setExperience(parseJsonArray(data.experience, defaultExperience));
+                setSkills(parseJsonArray(data.skills, defaultSkills));
+                setSocials(parseJsonArray(data.socials, defaultSocials));
             }
             setIsLoading(false);
         };
@@ -191,28 +204,60 @@ const Profile = () => {
                 resume_name: user.resumeName
             };
 
-            const API_URL = getApiUrl();
-            const response = await fetch(`${API_URL}/api/users/profile`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            let savedUser;
+            try {
+                savedUser = await userApi.updateProfile(payload);
+            } catch (primaryErr) {
+                const compatibilityPayload = {
+                    email: payload.email,
+                    name: payload.name,
+                    role: payload.role,
+                    location: payload.location,
+                    bio: payload.bio,
+                    avatar: payload.avatar,
+                    experience: payload.experience,
+                    skills: payload.skills,
+                    socials: payload.socials,
+                };
 
-            if (!response.ok) throw new Error('Failed to save');
+                try {
+                    savedUser = await userApi.updateProfile(compatibilityPayload);
+                } catch {
+                    const minimalPayload = {
+                        email: payload.email,
+                        name: payload.name,
+                        role: payload.role,
+                        location: payload.location,
+                        bio: payload.bio,
+                        avatar: payload.avatar,
+                    };
+                    savedUser = await userApi.updateProfile(minimalPayload);
+                }
+            }
 
-            const savedUser = await response.json();
             setStoreUser(savedUser);
 
-            await updateProfile(currentUser, {
-                displayName: user.name,
-                photoURL: user.avatar
-            });
+            let authSynced = true;
+            try {
+                await updateProfile(currentUser, {
+                    displayName: user.name,
+                    photoURL: user.avatar
+                });
+            } catch (authError) {
+                authSynced = false;
+                console.warn('Firebase profile sync failed after backend save:', authError);
+            }
 
             setIsEditing(false);
-            showNotification('Profile saved successfully!');
+            showNotification(
+                authSynced
+                    ? 'Profile saved successfully!'
+                    : 'Profile saved (auth sync skipped).',
+                authSynced ? 'success' : 'error'
+            );
         } catch (error) {
             console.error(error);
-            showNotification('Error saving profile', 'error');
+            showNotification(error.message || 'Error saving profile', 'error');
         }
     };
 

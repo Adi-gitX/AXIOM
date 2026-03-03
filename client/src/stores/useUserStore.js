@@ -13,7 +13,7 @@ export const useUserStore = create((set) => ({
         set({ loading: true, error: null });
         try {
             const API_URL = getApiUrl();
-            const response = await fetch(`${API_URL}/api/users/${email}`);
+            const response = await fetch(`${API_URL}/api/users/${encodeURIComponent(email)}`);
             if (response.ok) {
                 const data = await response.json();
                 set({ user: data, loading: false });

@@ -1,94 +1,118 @@
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
-import dotenvx from '@dotenvx/dotenvx';
+import mysql from 'mysql2/promise';
+import { loadEnv } from '../config/loadEnv.js';
 
-dotenvx.config();
+loadEnv();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const migrationsDir = join(__dirname, '..', 'migrations');
 
-// Configure connection
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const schemaFiles = {
+    sqlite: '001_sqlite_schema.sql',
+    postgres: '001_initial_schema.sql',
+    mysql: '001_mysql_schema.sql',
+};
 
-const { Pool } = pg;
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const resolveProvider = () => {
+    const raw = (
+        process.env.AXIOM_DB_PROVIDER ||
+        process.env.DB_PROVIDER ||
+        process.env.DATABASE_PROVIDER ||
+        'sqlite'
+    ).toLowerCase();
 
-async function runMigrations() {
-    const client = await pool.connect();
+    if (['postgres', 'postgresql', 'pg'].includes(raw)) return 'postgres';
+    if (['mysql', 'mariadb'].includes(raw)) return 'mysql';
+    return 'sqlite';
+};
+
+const loadSchema = (provider) => {
+    const filename = schemaFiles[provider];
+    if (!filename) {
+        throw new Error(`Unsupported provider: ${provider}`);
+    }
+    return readFileSync(join(migrationsDir, filename), 'utf8');
+};
+
+const runSqliteMigration = async () => {
+    const sql = loadSchema('sqlite');
+    const { query } = await import('../config/db.js');
+    await query(sql);
+    console.log('✅ SQLite schema applied successfully');
+};
+
+const runPostgresMigration = async () => {
+    if (!process.env.DATABASE_URL) {
+        throw new Error('DATABASE_URL is required for PostgreSQL migrations');
+    }
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    const pool = new pg.Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+    });
 
     try {
-        console.log('🚀 Starting database migrations...\n');
+        const client = await pool.connect();
+        try {
+            const sql = loadSchema('postgres');
+            await client.query('BEGIN');
+            await client.query(sql);
+            await client.query('COMMIT');
+            console.log('✅ PostgreSQL schema applied successfully');
+        } catch (err) {
+            await client.query('ROLLBACK');
+            throw err;
+        } finally {
+            client.release();
+        }
+    } finally {
+        await pool.end();
+    }
+};
 
-        // Ensure migrations table exists
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS migrations (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL UNIQUE,
-                applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
+const runMysqlMigration = async () => {
+    if (!process.env.DATABASE_URL) {
+        throw new Error('DATABASE_URL is required for MySQL migrations');
+    }
 
-        // Get applied migrations
-        const { rows: appliedMigrations } = await client.query(
-            'SELECT name FROM migrations ORDER BY id'
-        );
-        const appliedSet = new Set(appliedMigrations.map(m => m.name));
+    const connection = await mysql.createConnection({
+        uri: process.env.DATABASE_URL,
+        multipleStatements: true,
+    });
 
-        // Get migration files
-        const files = readdirSync(migrationsDir)
-            .filter(f => f.endsWith('.sql'))
-            .sort();
+    try {
+        const sql = loadSchema('mysql');
+        await connection.query(sql);
+        console.log('✅ MySQL schema applied successfully');
+    } finally {
+        await connection.end();
+    }
+};
 
-        if (files.length === 0) {
-            console.log('No migration files found.');
+const run = async () => {
+    try {
+        const provider = resolveProvider();
+        console.log(`🚀 Running migrations for provider: ${provider}`);
+
+        if (provider === 'postgres') {
+            await runPostgresMigration();
             return;
         }
 
-        let migrationsRun = 0;
-
-        for (const file of files) {
-            const migrationName = file.replace('.sql', '');
-
-            if (appliedSet.has(migrationName)) {
-                console.log(`⏭️  Skipping ${migrationName} (already applied)`);
-                continue;
-            }
-
-            console.log(`📦 Running ${migrationName}...`);
-
-            const sql = readFileSync(join(migrationsDir, file), 'utf8');
-
-            await client.query('BEGIN');
-            try {
-                await client.query(sql);
-                await client.query(
-                    'INSERT INTO migrations (name) VALUES ($1) ON CONFLICT DO NOTHING',
-                    [migrationName]
-                );
-                await client.query('COMMIT');
-                console.log(`✅ ${migrationName} completed successfully`);
-                migrationsRun++;
-            } catch (err) {
-                await client.query('ROLLBACK');
-                console.error(`❌ Migration ${migrationName} failed:`, err.message);
-                throw err;
-            }
+        if (provider === 'mysql') {
+            await runMysqlMigration();
+            return;
         }
 
-        console.log(`\n🎉 Migrations complete! ${migrationsRun} migration(s) applied.`);
-
+        await runSqliteMigration();
     } catch (err) {
-        console.error('Migration error:', err);
+        console.error('❌ Migration failed:', err.message);
         process.exit(1);
-    } finally {
-        client.release();
-        await pool.end();
     }
-}
+};
 
-runMigrations();
+run();

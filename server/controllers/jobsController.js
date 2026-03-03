@@ -1,5 +1,40 @@
 import { query } from '../config/db.js';
 
+const toInt = (value, fallback = 0) => {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeJob = (row) => ({
+    ...row,
+    id: toInt(row.id),
+    is_remote: row.is_remote === true || row.is_remote === 1 || row.is_remote === '1',
+    is_active: row.is_active === true || row.is_active === 1 || row.is_active === '1',
+});
+
+const shiftParamRefs = (sql, shiftBy) =>
+    sql.replace(/\$(\d+)/g, (_match, index) => `$${Number(index) + shiftBy}`);
+
+const isTruthy = (value) =>
+    value === true || value === 1 || value === '1' || value === 'true';
+
+const assertJobExistsAndActive = async (jobId) => {
+    const result = await query(
+        'SELECT id, is_active FROM jobs WHERE id = $1 LIMIT 1',
+        [jobId]
+    );
+
+    if (result.rows.length === 0) {
+        return { ok: false, status: 404, message: 'Job not found' };
+    }
+
+    if (!isTruthy(result.rows[0].is_active)) {
+        return { ok: false, status: 400, message: 'Job is no longer active' };
+    }
+
+    return { ok: true };
+};
+
 /**
  * Get all jobs with filtering and pagination
  */
@@ -9,49 +44,70 @@ export const getAllJobs = async (req, res) => {
             type,
             remote,
             search,
+            email,
             limit = 20,
             offset = 0
         } = req.query;
 
-        let sql = `
-            SELECT * FROM jobs 
-            WHERE is_active = true
-        `;
+        const safeLimit = Math.min(100, Math.max(1, toInt(limit, 20)));
+        const safeOffset = Math.max(0, toInt(offset, 0));
+
+        const where = ['is_active = 1'];
         const params = [];
         let paramIndex = 1;
 
-        // Filter by job type
         if (type && type !== 'All') {
-            sql += ` AND job_type = $${paramIndex++}`;
+            where.push(`job_type = $${paramIndex++}`);
             params.push(type);
         }
 
-        // Filter by remote
         if (remote === 'true') {
-            sql += ` AND is_remote = true`;
+            where.push('is_remote = 1');
         }
 
-        // Search by title or company
         if (search) {
-            sql += ` AND (title ILIKE $${paramIndex} OR company ILIKE $${paramIndex++})`;
-            params.push(`%${search}%`);
+            where.push(`(title LIKE $${paramIndex} OR company LIKE $${paramIndex + 1})`);
+            params.push(`%${search}%`, `%${search}%`);
+            paramIndex += 2;
         }
 
-        sql += ` ORDER BY posted_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex}`;
-        params.push(parseInt(limit), parseInt(offset));
+        const whereSql = where.join(' AND ');
+        const listWhereSql = email ? shiftParamRefs(whereSql, 1) : whereSql;
 
-        const result = await query(sql, params);
+        const sql = `
+            SELECT
+                jobs.*,
+                ${email ? 'CASE WHEN saved_jobs.id IS NULL THEN 0 ELSE 1 END as is_saved,' : '0 as is_saved,'}
+                ${email ? 'CASE WHEN applied_jobs.id IS NULL THEN 0 ELSE 1 END as is_applied' : '0 as is_applied'}
+            FROM jobs
+            ${email ? 'LEFT JOIN saved_jobs ON saved_jobs.job_id = jobs.id AND saved_jobs.user_email = $1' : ''}
+            ${email ? 'LEFT JOIN applied_jobs ON applied_jobs.job_id = jobs.id AND applied_jobs.user_email = $1' : ''}
+            WHERE ${listWhereSql}
+            ORDER BY posted_at DESC
+            LIMIT $${email ? paramIndex + 1 : paramIndex} OFFSET $${email ? paramIndex + 2 : paramIndex + 1}
+        `;
+        const listParams = email
+            ? [email, ...params, safeLimit, safeOffset]
+            : [...params, safeLimit, safeOffset];
 
-        // Get total count for pagination
-        const countResult = await query(
-            'SELECT COUNT(*) FROM jobs WHERE is_active = true'
-        );
+        const result = await query(sql, listParams);
+
+        const countSql = `
+            SELECT COUNT(*) as count
+            FROM jobs
+            WHERE ${whereSql}
+        `;
+        const countResult = await query(countSql, params);
 
         res.json({
-            jobs: result.rows,
-            total: parseInt(countResult.rows[0].count),
-            limit: parseInt(limit),
-            offset: parseInt(offset)
+            jobs: result.rows.map((row) => ({
+                ...normalizeJob(row),
+                is_saved: row.is_saved === true || row.is_saved === 1 || row.is_saved === '1',
+                is_applied: row.is_applied === true || row.is_applied === 1 || row.is_applied === '1',
+            })),
+            total: toInt(countResult.rows[0]?.count),
+            limit: safeLimit,
+            offset: safeOffset
         });
     } catch (err) {
         console.error('getAllJobs error:', err.message);
@@ -71,7 +127,7 @@ export const getJobById = async (req, res) => {
             return res.status(404).json({ error: 'Job not found' });
         }
 
-        res.json(result.rows[0]);
+        res.json(normalizeJob(result.rows[0]));
     } catch (err) {
         console.error('getJobById error:', err.message);
         res.status(500).json({ error: 'Failed to get job' });
@@ -83,15 +139,26 @@ export const getJobById = async (req, res) => {
  */
 export const saveJob = async (req, res) => {
     try {
-        const { email, jobId } = req.body;
+        const email = req.body.email || req.query.email;
+        const jobId = req.body.jobId || req.query.jobId;
+        const safeJobId = toInt(jobId);
+
+        if (!email || !safeJobId) {
+            return res.status(400).json({ error: 'email and valid jobId are required' });
+        }
+
+        const jobCheck = await assertJobExistsAndActive(safeJobId);
+        if (!jobCheck.ok) {
+            return res.status(jobCheck.status).json({ error: jobCheck.message });
+        }
 
         await query(`
             INSERT INTO saved_jobs (user_email, job_id)
             VALUES ($1, $2)
             ON CONFLICT (user_email, job_id) DO NOTHING
-        `, [email, jobId]);
+        `, [email, safeJobId]);
 
-        res.json({ saved: true, jobId });
+        res.json({ saved: true, jobId: safeJobId });
     } catch (err) {
         console.error('saveJob error:', err.message);
         res.status(500).json({ error: 'Failed to save job' });
@@ -103,15 +170,19 @@ export const saveJob = async (req, res) => {
  */
 export const unsaveJob = async (req, res) => {
     try {
-        const { email } = req.body;
-        const { jobId } = req.params;
+        const email = req.body.email || req.query.email;
+        const safeJobId = toInt(req.params.jobId);
+
+        if (!email || !safeJobId) {
+            return res.status(400).json({ error: 'email and valid jobId are required' });
+        }
 
         await query(`
             DELETE FROM saved_jobs 
             WHERE user_email = $1 AND job_id = $2
-        `, [email, parseInt(jobId)]);
+        `, [email, safeJobId]);
 
-        res.json({ saved: false, jobId: parseInt(jobId) });
+        res.json({ saved: false, jobId: safeJobId });
     } catch (err) {
         console.error('unsaveJob error:', err.message);
         res.status(500).json({ error: 'Failed to unsave job' });
@@ -133,7 +204,7 @@ export const getSavedJobs = async (req, res) => {
             ORDER BY sj.saved_at DESC
         `, [email]);
 
-        res.json(result.rows);
+        res.json(result.rows.map(normalizeJob));
     } catch (err) {
         console.error('getSavedJobs error:', err.message);
         res.status(500).json({ error: 'Failed to get saved jobs' });
@@ -151,7 +222,7 @@ export const getSavedJobIds = async (req, res) => {
             SELECT job_id FROM saved_jobs WHERE user_email = $1
         `, [email]);
 
-        res.json(result.rows.map(r => r.job_id));
+        res.json(result.rows.map((r) => toInt(r.job_id)));
     } catch (err) {
         console.error('getSavedJobIds error:', err.message);
         res.status(500).json({ error: 'Failed to get saved job IDs' });
@@ -163,16 +234,28 @@ export const getSavedJobIds = async (req, res) => {
  */
 export const applyToJob = async (req, res) => {
     try {
-        const { email, jobId, notes } = req.body;
+        const email = req.body.email || req.query.email;
+        const jobId = req.body.jobId || req.query.jobId;
+        const { notes } = req.body;
+        const safeJobId = toInt(jobId);
+
+        if (!email || !safeJobId) {
+            return res.status(400).json({ error: 'email and valid jobId are required' });
+        }
+
+        const jobCheck = await assertJobExistsAndActive(safeJobId);
+        if (!jobCheck.ok) {
+            return res.status(jobCheck.status).json({ error: jobCheck.message });
+        }
 
         await query(`
             INSERT INTO applied_jobs (user_email, job_id, notes)
             VALUES ($1, $2, $3)
             ON CONFLICT (user_email, job_id) DO UPDATE SET
                 notes = EXCLUDED.notes
-        `, [email, jobId, notes || null]);
+        `, [email, safeJobId, notes || null]);
 
-        res.json({ applied: true, jobId });
+        res.json({ applied: true, jobId: safeJobId });
     } catch (err) {
         console.error('applyToJob error:', err.message);
         res.status(500).json({ error: 'Failed to track application' });
@@ -194,7 +277,7 @@ export const getAppliedJobs = async (req, res) => {
             ORDER BY aj.applied_at DESC
         `, [email]);
 
-        res.json(result.rows);
+        res.json(result.rows.map(normalizeJob));
     } catch (err) {
         console.error('getAppliedJobs error:', err.message);
         res.status(500).json({ error: 'Failed to get applied jobs' });

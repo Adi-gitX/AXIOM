@@ -4,11 +4,15 @@ import {
     toggleProblem,
     getActivityHeatmap,
     logStudyTime,
-    getDashboardStats
+    getDashboardStats,
+    getDsaCatalog
 } from '../controllers/progressController.js';
 import { validate, schemas } from '../middleware/validation.js';
 
 const router = express.Router();
+
+// Get user progress data
+router.get('/catalog', getDsaCatalog);
 
 // Get user progress data
 router.get('/:email', getUserProgress);

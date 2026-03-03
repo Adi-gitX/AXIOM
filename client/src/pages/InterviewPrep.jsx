@@ -1,35 +1,84 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-
-const RESOURCES = [
-    { id: 1, cat: 'Behavioral', title: 'STAR Method Guide', desc: 'Structure your answers' },
-    { id: 2, cat: 'Behavioral', title: 'Common Questions', desc: '50 most asked questions' },
-    { id: 3, cat: 'System Design', title: 'Design Patterns', desc: 'Essential patterns' },
-    { id: 4, cat: 'System Design', title: 'Scalability Basics', desc: 'How to scale systems' },
-    { id: 5, cat: 'Coding', title: 'Time Complexity', desc: 'Big O notation' },
-    { id: 6, cat: 'Coding', title: 'Problem Solving', desc: 'Approach any problem' },
-    { id: 7, cat: 'Resume', title: 'Tech Resume Guide', desc: 'Craft the perfect resume' },
-    { id: 8, cat: 'Resume', title: 'Project Showcase', desc: 'Present your work' },
-];
-
-const CATS = ['All', 'Behavioral', 'System Design', 'Coding', 'Resume'];
-
-const TIPS = [
-    "Research the company's engineering blog before interviews",
-    "Practice explaining your thought process out loud",
-    "Prepare 2-3 questions to ask your interviewer",
-    "Review your past projects and be ready to discuss them",
-];
+import { interviewApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const InterviewPrep = () => {
+    const { currentUser } = useAuth();
     const [cat, setCat] = useState('All');
-    const filtered = cat === 'All' ? RESOURCES : RESOURCES.filter(r => r.cat === cat);
+    const [resources, setResources] = useState([]);
+    const [tips, setTips] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [savingId, setSavingId] = useState(null);
+
+    useEffect(() => {
+        const loadResources = async () => {
+            setLoading(true);
+            setError('');
+            try {
+                const data = await interviewApi.getResources({
+                    email: currentUser?.email || '',
+                });
+                setResources(Array.isArray(data.resources) ? data.resources : []);
+                setTips(Array.isArray(data.tips) ? data.tips : []);
+            } catch (err) {
+                console.error('Failed to load interview resources:', err);
+                setError('Failed to load interview resources');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadResources();
+    }, [currentUser?.email]);
+
+    const categories = useMemo(
+        () => ['All', ...new Set(resources.map((r) => r.category).filter(Boolean))],
+        [resources]
+    );
+
+    const filtered = useMemo(
+        () => (cat === 'All' ? resources : resources.filter((r) => r.category === cat)),
+        [cat, resources]
+    );
+
+    const toggleCompleted = async (resource) => {
+        if (!currentUser?.email || !resource?.id) return;
+        const nextCompleted = !resource.completed;
+        setSavingId(resource.id);
+
+        // Optimistic state update
+        setResources((prev) =>
+            prev.map((item) =>
+                item.id === resource.id
+                    ? { ...item, completed: nextCompleted }
+                    : item
+            )
+        );
+
+        try {
+            await interviewApi.setCompleted(resource.id, currentUser.email, nextCompleted);
+        } catch (err) {
+            console.error('Failed to update resource completion:', err);
+            // Revert on error
+            setResources((prev) =>
+                prev.map((item) =>
+                    item.id === resource.id
+                        ? { ...item, completed: resource.completed }
+                        : item
+                )
+            );
+            setError('Failed to save progress');
+        } finally {
+            setSavingId(null);
+        }
+    };
 
     return (
         <div className="min-h-screen p-8 lg:p-12">
             <div className="max-w-5xl mx-auto">
 
-                {/* Header */}
                 <motion.header
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -37,11 +86,11 @@ const InterviewPrep = () => {
                 >
                     <h1 className="text-5xl font-light text-foreground text-glow font-display">Interview Prep</h1>
                     <p className="text-muted-foreground mt-2">Resources to ace your interviews</p>
+                    {error && <p className="text-sm text-rose-400 mt-3">{error}</p>}
                 </motion.header>
 
-                {/* Filters */}
                 <div className="flex flex-wrap gap-2 mb-8">
-                    {CATS.map((c) => (
+                    {categories.map((c) => (
                         <button
                             key={c}
                             onClick={() => setCat(c)}
@@ -55,36 +104,60 @@ const InterviewPrep = () => {
                     ))}
                 </div>
 
-                {/* Resources */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-12">
-                    {filtered.map((r, i) => (
-                        <motion.div
-                            key={r.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.03 }}
-                            className="glass-card p-6 rounded-2xl hover:bg-accent/50 transition-all cursor-pointer group border border-border hover:border-border/80"
-                        >
-                            <span className="text-xs text-muted-foreground font-mono group-hover:text-foreground transition-colors">{r.cat}</span>
-                            <h3 className="font-medium text-foreground mt-1 group-hover:text-glow transition-all">{r.title}</h3>
-                            <p className="text-sm text-muted-foreground mt-2">{r.desc}</p>
-                        </motion.div>
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="text-muted-foreground py-8">Loading resources...</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-12">
+                        {filtered.map((r, i) => (
+                            <motion.div
+                                key={r.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.03 }}
+                                className="glass-card p-6 rounded-2xl hover:bg-accent/50 transition-all border border-border hover:border-border/80"
+                            >
+                                <div className="flex items-start justify-between gap-2">
+                                    <span className="text-xs text-muted-foreground font-mono">{r.category}</span>
+                                    <span className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded-full border ${r.completed
+                                        ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10'
+                                        : 'border-border text-muted-foreground bg-muted/50'
+                                        }`}>
+                                        {r.completed ? 'Completed' : 'Pending'}
+                                    </span>
+                                </div>
+                                <h3 className="font-medium text-foreground mt-2">{r.title}</h3>
+                                <p className="text-sm text-muted-foreground mt-2">{r.description}</p>
+                                <div className="mt-4">
+                                    <button
+                                        onClick={() => toggleCompleted(r)}
+                                        disabled={!currentUser?.email || savingId === r.id}
+                                        className={`w-full px-3 py-2 text-xs rounded-xl border transition-all ${r.completed
+                                            ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10'
+                                            : 'border-border text-foreground bg-muted hover:bg-accent'
+                                            } disabled:opacity-60`}
+                                    >
+                                        {savingId === r.id ? 'Saving...' : (r.completed ? 'Mark Pending' : 'Mark Complete')}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
 
-                {/* Tips */}
                 <div className="glass-panel p-8 rounded-3xl border border-border">
                     <h2 className="text-xs font-bold text-foreground uppercase tracking-widest mb-6 opacity-50">Quick Tips</h2>
                     <div className="space-y-4">
-                        {TIPS.map((tip, i) => (
+                        {(tips.length ? tips : ['No tips available']).map((tip, i) => (
                             <motion.div
-                                key={i}
+                                key={`${tip}-${i}`}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: i * 0.05 }}
                                 className="flex items-start gap-4 p-4 rounded-xl hover:bg-muted/50 transition-colors"
                             >
-                                <span className="text-xs text-muted-foreground font-mono pt-1">{String(i + 1).padStart(2, '0')}</span>
+                                <span className="text-xs text-muted-foreground font-mono pt-1">
+                                    {String(i + 1).padStart(2, '0')}
+                                </span>
                                 <p className="text-foreground/80 text-sm leading-relaxed">{tip}</p>
                             </motion.div>
                         ))}

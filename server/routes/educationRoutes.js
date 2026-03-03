@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+    getEducationCatalog,
     getEducationProgress,
     markVideoWatched,
     updateWatchProgress,
@@ -8,6 +9,9 @@ import {
 } from '../controllers/educationController.js';
 
 const router = express.Router();
+
+// Get education catalog
+router.get('/catalog', getEducationCatalog);
 
 // Get user's education progress
 router.get('/progress/:email', getEducationProgress);

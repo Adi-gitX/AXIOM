@@ -11,6 +11,17 @@ const formatNumber = (num) => {
     return num?.toString() || '0';
 };
 
+const safeParseJson = (value, fallback) => {
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === 'object') return value;
+    if (typeof value !== 'string') return fallback;
+    try {
+        return JSON.parse(value);
+    } catch {
+        return fallback;
+    }
+};
+
 // Post Card
 const PostCard = ({ post, index, onClick, onVote, onSave, userEmail }) => {
     const [upvotes, setUpvotes] = useState(post.upvotes || 0);
@@ -58,17 +69,16 @@ const PostCard = ({ post, index, onClick, onVote, onSave, userEmail }) => {
     };
 
     // Parse tags
-    const tags = Array.isArray(post.tags) ? post.tags :
-        typeof post.tags === 'string' ? JSON.parse(post.tags || '[]') : [];
+    const tags = Array.isArray(post.tags) ? post.tags : safeParseJson(post.tags, []);
 
     // Parse preview
-    const preview = typeof post.preview === 'string' ? JSON.parse(post.preview || '{}') : (post.preview || {});
+    const preview = safeParseJson(post.preview, {});
 
     // Parse source
-    const source = typeof post.source === 'string' ? JSON.parse(post.source || '{}') : (post.source || { name: 'AXIOM', icon: 'A', color: '#6366f1' });
+    const source = safeParseJson(post.source, { name: 'AXIOM', icon: 'A', color: '#6366f1' });
 
     // Parse author
-    const author = typeof post.author === 'string' ? JSON.parse(post.author || '{}') : (post.author || { name: 'Anonymous' });
+    const author = safeParseJson(post.author, { name: 'Anonymous' });
 
     return (
         <GlassCard
@@ -158,31 +168,35 @@ const Posts = () => {
     const [selectedPost, setSelectedPost] = useState(null);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newPost, setNewPost] = useState({ title: '', content: '', tags: '' });
+    const [createLoading, setCreateLoading] = useState(false);
 
     const filters = ['For You', 'Following', 'Popular', 'Recent'];
 
     // Fetch posts from API
+    const fetchPosts = async () => {
+        setLoading(true);
+        try {
+            let sort = 'recent';
+            if (activeFilter === 'Popular') sort = 'popular';
+            else if (activeFilter === 'For You') sort = 'trending';
+
+            const data = await postsApi.getAll({
+                sort,
+                email: currentUser?.email
+            });
+            // Handle both array response and object with posts property
+            setPosts(Array.isArray(data) ? data : (data.posts || []));
+        } catch (err) {
+            console.error('Failed to fetch posts:', err);
+            setPosts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchPosts = async () => {
-            setLoading(true);
-            try {
-                let sort = 'recent';
-                if (activeFilter === 'Popular') sort = 'popular';
-                else if (activeFilter === 'For You') sort = 'trending';
-
-                const data = await postsApi.getAll({
-                    sort,
-                    email: currentUser?.email
-                });
-                setPosts(data.posts || []);
-            } catch (err) {
-                console.error('Failed to fetch posts:', err);
-                setPosts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchPosts();
     }, [activeFilter, currentUser?.email]);
 
@@ -190,7 +204,7 @@ const Posts = () => {
     const handleVote = async (postId, vote) => {
         if (!currentUser?.email) return;
         try {
-            const voteType = vote === 1 ? 'up' : vote === -1 ? 'down' : null;
+            const voteType = vote === 1 ? 'up' : vote === -1 ? 'down' : 'none';
             await postsApi.vote(postId, currentUser.email, voteType);
         } catch (err) {
             console.error('Failed to vote:', err);
@@ -207,6 +221,43 @@ const Posts = () => {
         }
     };
 
+    // Handle create post
+    const handleCreatePost = async (e) => {
+        e.preventDefault();
+        if (!currentUser?.email) {
+            alert('You need to log in to create a post.');
+            return;
+        }
+        if (!newPost.title.trim()) return;
+
+        setCreateLoading(true);
+        try {
+            const tagsArray = newPost.tags
+                .split(',')
+                .map(t => t.trim())
+                .filter(t => t.length > 0);
+
+            const postData = {
+                email: currentUser.email,
+                title: newPost.title.trim(),
+                content: newPost.content.trim(),
+                tags: tagsArray,
+                userName: currentUser.displayName || currentUser.email.split('@')[0],
+                userAvatar: currentUser.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.email}`
+            };
+
+            const created = await postsApi.create(postData);
+            setPosts(prev => [created, ...prev]);
+            setNewPost({ title: '', content: '', tags: '' });
+            setShowCreateModal(false);
+        } catch (err) {
+            console.error('Failed to create post:', err);
+            alert(err.message || 'Failed to create post. Please try again.');
+        } finally {
+            setCreateLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen p-8 lg:p-12">
             <div className="max-w-5xl mx-auto space-y-12">
@@ -215,7 +266,7 @@ const Posts = () => {
                         <h1 className="text-5xl font-light text-foreground text-glow font-display tracking-tight mb-2">Posts</h1>
                         <p className="text-muted-foreground text-lg font-light">Discover developer articles and projects</p>
                     </div>
-                    <Button variant="primary">
+                    <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" strokeLinecap="round" /></svg>
                         New Post
                     </Button>
@@ -238,8 +289,13 @@ const Posts = () => {
                         <p className="text-muted-foreground">Loading posts...</p>
                     </div>
                 ) : posts.length === 0 ? (
-                    <div className="text-center py-12">
-                        <p className="text-muted-foreground">No posts yet. Be the first to share something!</p>
+                    <div className="text-center py-24">
+                        <div className="w-16 h-16 rounded-2xl bg-muted/50 border border-border flex items-center justify-center mx-auto mb-6">
+                            <svg className="w-8 h-8 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>
+                        </div>
+                        <h3 className="text-lg font-medium text-foreground mb-2">No posts yet</h3>
+                        <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-6">Share your ideas, projects, or discoveries with the community.</p>
+                        <button onClick={() => setShowCreateModal(true)} className="px-5 py-2.5 rounded-xl bg-foreground text-background font-medium text-sm hover:opacity-90 transition-all">Write the first post</button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -257,6 +313,94 @@ const Posts = () => {
                     </div>
                 )}
             </div>
+
+            {/* Create Post Modal */}
+            <AnimatePresence>
+                {showCreateModal && (
+                    <motion.div
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setShowCreateModal(false)}
+                    >
+                        <motion.div
+                            className="w-full max-w-lg bg-card border border-border rounded-3xl shadow-2xl p-6"
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold text-foreground">Create Post</h2>
+                                <button
+                                    onClick={() => setShowCreateModal(false)}
+                                    className="p-2 rounded-xl hover:bg-muted transition-colors"
+                                >
+                                    <svg className="w-5 h-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleCreatePost} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Title *</label>
+                                    <input
+                                        type="text"
+                                        value={newPost.title}
+                                        onChange={e => setNewPost(prev => ({ ...prev, title: e.target.value }))}
+                                        placeholder="What's on your mind?"
+                                        className="w-full px-4 py-3 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground"
+                                        required
+                                        maxLength={300}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Content</label>
+                                    <textarea
+                                        value={newPost.content}
+                                        onChange={e => setNewPost(prev => ({ ...prev, content: e.target.value }))}
+                                        placeholder="Share your thoughts, code snippets, or ideas..."
+                                        rows={5}
+                                        className="w-full px-4 py-3 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground resize-none"
+                                        maxLength={10000}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Tags (comma separated)</label>
+                                    <input
+                                        type="text"
+                                        value={newPost.tags}
+                                        onChange={e => setNewPost(prev => ({ ...prev, tags: e.target.value }))}
+                                        placeholder="react, javascript, tutorial"
+                                        className="w-full px-4 py-3 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground"
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCreateModal(false)}
+                                        className="flex-1 px-4 py-3 rounded-xl border border-border text-foreground hover:bg-muted transition-colors font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={createLoading || !newPost.title.trim()}
+                                        className="flex-1 px-4 py-3 rounded-xl bg-foreground text-background font-bold hover:opacity-90 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {createLoading ? 'Posting...' : 'Post'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

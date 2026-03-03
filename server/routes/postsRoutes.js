@@ -6,7 +6,8 @@ import {
     toggleSavePost,
     getUserPostInteractions,
     getComments,
-    addComment
+    addComment,
+    createPost
 } from '../controllers/postsController.js';
 import { validate, schemas } from '../middleware/validation.js';
 
@@ -20,6 +21,9 @@ router.get('/interactions/:email', getUserPostInteractions);
 
 // Get single post
 router.get('/:id', getPostById);
+
+// Create a new post
+router.post('/', validate(schemas.postCreate), createPost);
 
 // Vote on a post
 router.post('/:id/vote', validate(schemas.postVote), voteOnPost);

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TOPICS, VIDEOS_BY_TOPIC } from '../data/education';
 import { educationApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import GlassCard from '../components/ui/GlassCard';
@@ -9,39 +8,65 @@ const Education = () => {
     const { currentUser } = useAuth();
     const [topic, setTopic] = useState(null);
     const [video, setVideo] = useState(null);
+    const [topics, setTopics] = useState([]);
+    const [videosByTopic, setVideosByTopic] = useState({});
     const [watchedVideos, setWatchedVideos] = useState({});
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const getTopic = (id) => TOPICS.find(t => t.id === id);
-    const videos = topic ? (VIDEOS_BY_TOPIC[topic] || []) : [];
+    const getTopic = (id) => topics.find((t) => t.id === id);
+    const videos = topic ? (videosByTopic[topic] || []) : [];
 
-    // Load user progress from API
+    // Load catalog and user progress from API
     useEffect(() => {
-        const loadProgress = async () => {
-            if (!currentUser?.email) {
-                setLoading(false);
-                return;
-            }
+        const loadData = async () => {
+            setLoading(true);
+            setError('');
 
             try {
-                const progress = await educationApi.getProgress(currentUser.email);
+                const catalog = await educationApi.getCatalog();
+
+                const catalogTopics = Array.isArray(catalog?.topics) ? catalog.topics : [];
+                const catalogVideos = (catalog?.videosByTopic && typeof catalog.videosByTopic === 'object')
+                    ? catalog.videosByTopic
+                    : {};
+                setTopics(catalogTopics);
+                setVideosByTopic(catalogVideos);
+
+                let progress = [];
+                if (currentUser?.email) {
+                    try {
+                        progress = await educationApi.getProgress(currentUser.email);
+                    } catch (progressErr) {
+                        console.error('Failed to load education progress:', progressErr);
+                        setError('Failed to load watch progress');
+                    }
+                }
+
                 // Convert array to lookup object
                 const progressMap = {};
                 (progress || []).forEach(p => {
+                    const progressValue = Number(
+                        p.watch_percentage ?? p.progress ?? 0
+                    ) || 0;
+                    const completedValue = p.is_completed ?? p.completed ?? false;
                     progressMap[p.video_id] = {
-                        progress: p.progress || 0,
-                        completed: p.completed || false
+                        progress: progressValue,
+                        completed: completedValue === true || completedValue === 1 || completedValue === '1'
                     };
                 });
                 setWatchedVideos(progressMap);
             } catch (err) {
-                console.error('Failed to load education progress:', err);
+                console.error('Failed to load education data:', err);
+                setError('Failed to load education content');
+                setTopics([]);
+                setVideosByTopic({});
             } finally {
                 setLoading(false);
             }
         };
 
-        loadProgress();
+        loadData();
     }, [currentUser?.email]);
 
     // Track video progress when video is opened
@@ -53,10 +78,7 @@ const Education = () => {
         // Mark as started if not already
         if (!watchedVideos[v.id]) {
             try {
-                await educationApi.updateProgress(currentUser.email, v.id, topic, {
-                    progress: 0,
-                    completed: false
-                });
+                await educationApi.updateProgress(currentUser.email, v.id, topic, 0);
                 setWatchedVideos(prev => ({
                     ...prev,
                     [v.id]: { progress: 0, completed: false }
@@ -72,10 +94,7 @@ const Education = () => {
         if (!video || !currentUser?.email) return;
 
         try {
-            await educationApi.updateProgress(currentUser.email, video.id, topic, {
-                progress: 100,
-                completed: true
-            });
+            await educationApi.markWatched(currentUser.email, video.id, topic);
             setWatchedVideos(prev => ({
                 ...prev,
                 [video.id]: { progress: 100, completed: true }
@@ -87,7 +106,7 @@ const Education = () => {
 
     // Calculate topic progress
     const getTopicProgress = (topicId) => {
-        const topicVideos = VIDEOS_BY_TOPIC[topicId] || [];
+        const topicVideos = videosByTopic[topicId] || [];
         if (topicVideos.length === 0) return 0;
         const completed = topicVideos.filter(v => watchedVideos[v.id]?.completed).length;
         return Math.round((completed / topicVideos.length) * 100);
@@ -113,50 +132,61 @@ const Education = () => {
                         <>
                             <h1 className="text-5xl font-light text-foreground font-display tracking-tight">Education</h1>
                             <p className="text-muted-foreground text-lg font-light mt-2">Choose what to learn</p>
+                            {error && <p className="text-sm text-rose-400 mt-3">{error}</p>}
                         </>
                     )}
                 </motion.header>
 
                 {/* Topics Grid */}
                 {!topic && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {TOPICS.map((t, i) => {
-                            const progress = getTopicProgress(t.id);
-                            const videoCount = VIDEOS_BY_TOPIC[t.id]?.length || 0;
+                    loading ? (
+                        <div className="text-muted-foreground py-8">Loading topics...</div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {topics.map((t, i) => {
+                                const progress = getTopicProgress(t.id);
+                                const videoCount = videosByTopic[t.id]?.length || 0;
 
-                            return (
-                                <GlassCard
-                                    key={t.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.02 }}
-                                    onClick={() => setTopic(t.id)}
-                                    hoverEffect={true}
-                                    className="p-5 text-left"
-                                >
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-xs text-muted-foreground font-mono">{String(i + 1).padStart(2, '0')}</span>
-                                        {progress > 0 && (
-                                            <span className={`text-xs font-bold ${progress === 100 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                                {progress}%
-                                            </span>
-                                        )}
-                                    </div>
-                                    <h3 className="font-medium text-foreground">{t.name}</h3>
-                                    <p className="text-xs text-muted-foreground mt-1">{videoCount} videos</p>
-
-                                    {/* Progress bar */}
-                                    {progress > 0 && (
-                                        <div className="mt-3 h-1 w-full rounded-full bg-foreground/10 overflow-hidden">
-                                            <div
-                                                className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-emerald-400' : 'bg-amber-400'}`}
-                                                style={{ width: `${progress}%` }}
-                                            />
+                                return (
+                                    <GlassCard
+                                        key={t.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.02 }}
+                                        onClick={() => setTopic(t.id)}
+                                        hoverEffect={true}
+                                        className="p-5 text-left"
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs text-muted-foreground font-mono">{String(i + 1).padStart(2, '0')}</span>
+                                            {progress > 0 && (
+                                                <span className={`text-xs font-bold ${progress === 100 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                                    {progress}%
+                                                </span>
+                                            )}
                                         </div>
-                                    )}
-                                </GlassCard>
-                            );
-                        })}
+                                        <h3 className="font-medium text-foreground">{t.name}</h3>
+                                        <p className="text-xs text-muted-foreground mt-1">{videoCount} {videoCount === 1 ? 'video' : 'videos'}</p>
+
+                                        {/* Progress bar */}
+                                        {progress > 0 && (
+                                            <div className="mt-3 h-1 w-full rounded-full bg-foreground/10 overflow-hidden">
+                                                <div
+                                                    className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                                                    style={{ width: `${progress}%` }}
+                                                />
+                                            </div>
+                                        )}
+                                    </GlassCard>
+                                );
+                            })}
+                        </div>
+                    )
+                )}
+
+                {!loading && !topic && topics.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                        {error || 'No education topics available'}
                     </div>
                 )}
 
@@ -256,8 +286,8 @@ const Education = () => {
                                 <button
                                     onClick={markComplete}
                                     className={`px-4 py-2 rounded-xl font-medium transition-all ${watchedVideos[video.id]?.completed
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                            : 'bg-foreground text-background'
+                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                        : 'bg-foreground text-background'
                                         }`}
                                 >
                                     {watchedVideos[video.id]?.completed ? '✓ Completed' : 'Mark Complete'}

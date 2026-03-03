@@ -1,6 +1,6 @@
-import dotenvx from '@dotenvx/dotenvx';
+import { loadEnv } from './loadEnv.js';
 
-dotenvx.config();
+loadEnv();
 
 /**
  * Centralized configuration with environment variable validation

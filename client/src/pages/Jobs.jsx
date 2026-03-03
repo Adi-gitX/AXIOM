@@ -1,53 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import useStore from '../store/useStore';
 import { jobsApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import GlassCard from '../components/ui/GlassCard';
 
 const Jobs = () => {
     const { currentUser } = useAuth();
-    const { savedJobs, saveJob } = useStore();
     const [filter, setFilter] = useState('All');
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [savedJobIds, setSavedJobIds] = useState([]);
+    const [appliedJobIds, setAppliedJobIds] = useState([]);
 
     const filters = ['All', 'Remote', 'Full-time', 'Contract', 'Internship'];
 
     // Fetch jobs from API
     useEffect(() => {
         const fetchJobs = async () => {
+            setLoading(true);
             try {
                 const params = {};
                 if (filter === 'Remote') params.remote = 'true';
                 else if (filter !== 'All') params.type = filter;
+                if (currentUser?.email) params.email = currentUser.email;
 
                 const data = await jobsApi.getAll(params);
-                setJobs(data.jobs || []);
+                const jobsList = data.jobs || [];
+                setJobs(jobsList);
+                setSavedJobIds(jobsList.filter((job) => job.is_saved).map((job) => job.id));
+                setAppliedJobIds(jobsList.filter((job) => job.is_applied).map((job) => job.id));
             } catch (err) {
                 console.error('Failed to fetch jobs:', err);
                 // Fallback to empty list on error
                 setJobs([]);
+                setSavedJobIds([]);
+                setAppliedJobIds([]);
             } finally {
                 setLoading(false);
             }
         };
 
-        // Fetch saved job IDs
-        const fetchSavedIds = async () => {
-            if (currentUser?.email) {
-                try {
-                    const ids = await jobsApi.getSavedIds(currentUser.email);
-                    setSavedJobIds(ids);
-                } catch (err) {
-                    console.error('Failed to fetch saved job IDs:', err);
-                }
-            }
-        };
-
         fetchJobs();
-        fetchSavedIds();
     }, [filter, currentUser?.email]);
 
     // Handle save job toggle
@@ -57,7 +50,6 @@ const Jobs = () => {
         setSavedJobIds(prev =>
             wasSaved ? prev.filter(id => id !== jobId) : [...prev, jobId]
         );
-        saveJob(jobId); // Also update local store
 
         if (currentUser?.email) {
             try {
@@ -76,8 +68,28 @@ const Jobs = () => {
         }
     };
 
-    // Combine local and server saved jobs
-    const isJobSaved = (jobId) => savedJobIds.includes(jobId) || savedJobs.includes(jobId);
+    const isJobSaved = (jobId) => savedJobIds.includes(jobId);
+    const isJobApplied = (jobId) => appliedJobIds.includes(jobId);
+
+    const handleApplyJob = async (job) => {
+        const alreadyApplied = isJobApplied(job.id);
+        if (alreadyApplied) return;
+
+        setAppliedJobIds(prev => [...prev, job.id]);
+
+        if (currentUser?.email) {
+            try {
+                await jobsApi.apply(currentUser.email, job.id, null);
+            } catch (err) {
+                console.error('Failed to track job application:', err);
+                setAppliedJobIds(prev => prev.filter(id => id !== job.id));
+            }
+        }
+
+        if (job.apply_url) {
+            window.open(job.apply_url, '_blank', 'noopener,noreferrer');
+        }
+    };
 
     // Format posted date
     const formatPosted = (date) => {
@@ -132,8 +144,12 @@ const Jobs = () => {
                             <p className="text-muted-foreground">Loading jobs...</p>
                         </div>
                     ) : jobs.length === 0 ? (
-                        <div className="text-center py-12">
-                            <p className="text-muted-foreground">No jobs found. Check back later!</p>
+                        <div className="text-center py-24">
+                            <div className="w-16 h-16 rounded-2xl bg-muted/50 border border-border flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-8 h-8 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" /></svg>
+                            </div>
+                            <h3 className="text-lg font-medium text-foreground mb-2">No opportunities yet</h3>
+                            <p className="text-muted-foreground text-sm max-w-xs mx-auto">New positions are posted regularly. Check back soon for the latest openings.</p>
                         </div>
                     ) : (
                         jobs.map((job, i) => {
@@ -159,14 +175,24 @@ const Jobs = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => handleApplyJob(job)}
+                                                    disabled={isJobApplied(job.id)}
+                                                    className={`px-3 py-2 rounded-xl text-xs font-medium transition-all ${isJobApplied(job.id)
+                                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default'
+                                                        : 'bg-muted text-foreground hover:bg-accent border border-border'
+                                                        }`}
+                                                >
+                                                    {isJobApplied(job.id) ? 'Applied' : 'Apply'}
+                                                </button>
                                                 <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
                                                     {job.job_type}
                                                 </span>
                                                 <button
                                                     onClick={() => handleSaveJob(job.id)}
                                                     className={`p-2 rounded-xl transition-all ${saved
-                                                            ? 'bg-foreground text-background hover:opacity-90'
-                                                            : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-accent'
+                                                        ? 'bg-foreground text-background hover:opacity-90'
+                                                        : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-accent'
                                                         }`}
                                                 >
                                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
