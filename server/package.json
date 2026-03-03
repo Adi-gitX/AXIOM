@@ -5,6 +5,7 @@
     "scripts": {
         "start": "node index.js",
         "dev": "node --watch index.js",
+        "build:dsa-catalog": "node scripts/buildDsaCatalogFrom450.js",
         "init-db": "node reset_db.js",
         "migrate": "node scripts/migrate.js",
         "seed:jobs": "node scripts/seedJobs.js",
