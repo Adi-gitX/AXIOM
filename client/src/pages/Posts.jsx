@@ -92,7 +92,7 @@ const PostCard = ({ post, index, onClick, onVote, onSave, userEmail }) => {
             <div className="flex flex-col h-full">
                 <div className="flex-1 flex flex-col">
                     <div className="p-6 pb-0">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg ring-1 ring-border/10" style={{ backgroundColor: source.color }}>
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-foreground text-background font-bold text-xl mb-4">
                             {source.icon}
                         </div>
                         <h2 className="text-xl font-bold text-foreground leading-tight mb-3 group-hover:text-glow transition-all">{post.title}</h2>
@@ -275,7 +275,7 @@ const Posts = () => {
             <div className="max-w-5xl mx-auto space-y-12">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-5xl font-light text-foreground text-glow font-display tracking-tight mb-2">Posts</h1>
+                        <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight mb-2">Posts</h1>
                         <p className="text-muted-foreground text-lg font-light">Discover developer articles and projects</p>
                         {error && (
                             <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -296,12 +296,12 @@ const Posts = () => {
                     </Button>
                 </header>
 
-                <div className="flex items-center gap-2 border-b border-border pb-4">
+                <div className="flex items-center gap-6 border-b border-border pt-2 mb-6">
                     {filters.map(filter => (
                         <button
                             key={filter}
                             onClick={() => setActiveFilter(filter)}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeFilter === filter ? 'bg-foreground text-background shadow-lg' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                            className={`pb-3 text-sm font-medium transition-all border-b-2 ${activeFilter === filter ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                         >
                             {filter}
                         </button>
