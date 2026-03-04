@@ -122,3 +122,6 @@ Pods/
 # macOS
 .DS_Store
 .env.keys
+
+# AXIOM runtime database (generated locally)
+server/data/axiom.db
