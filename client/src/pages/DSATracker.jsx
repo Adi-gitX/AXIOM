@@ -127,7 +127,7 @@ const DSATracker = () => {
                         <PremiumBadge tone="subtle">DSA Command Center</PremiumBadge>
                         <PremiumBadge tone="accent">Premium Focus</PremiumBadge>
                     </div>
-                    <h1 className="text-5xl font-light text-foreground font-display tracking-tight">DSA Tracker</h1>
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">DSA Tracker</h1>
                     <p className="text-muted-foreground text-lg font-light">
                         Track global progress, monitor yearly consistency, and jump into each sheet with focus.
                     </p>
