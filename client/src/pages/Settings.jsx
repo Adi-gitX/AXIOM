@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     User,
     Bell,
@@ -22,8 +22,10 @@ const normalizeBool = (value) => value === true || value === 1 || value === '1';
 const Settings = () => {
     const [activeTab, setActiveTab] = useState('account');
     const { currentUser, logout } = useAuth();
-    const { theme: appTheme, setTheme: applyTheme } = useTheme();
+    const { setTheme: applyTheme } = useTheme();
     const navigate = useNavigate();
+    const currentEmail = currentUser?.email || '';
+    const currentDisplayName = currentUser?.displayName || '';
 
     // Settings state
     const [settings, setSettings] = useState({
@@ -36,61 +38,69 @@ const Settings = () => {
     const [profile, setProfile] = useState({
         name: '',
         email: '',
-        username: ''
+        username: '',
+        role: '',
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [loadError, setLoadError] = useState('');
+
+    const loadSettings = useCallback(async () => {
+        if (!currentEmail) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        setLoadError('');
+        try {
+            const [settingsData, userData] = await Promise.all([
+                settingsApi.get(currentEmail).catch(() => null),
+                userApi.getProfile(currentEmail).catch(() => null)
+            ]);
+
+            if (settingsData) {
+                const normalized = {
+                    ...settingsData,
+                    theme: settingsData.theme || 'system',
+                    email_notifications: normalizeBool(settingsData.email_notifications),
+                    push_notifications: normalizeBool(settingsData.push_notifications),
+                    weekly_digest: normalizeBool(settingsData.weekly_digest),
+                    product_updates: normalizeBool(settingsData.product_updates),
+                };
+                setSettings((prev) => ({ ...prev, ...normalized }));
+                applyTheme(normalized.theme);
+            }
+
+            if (userData) {
+                const normalizedUsername = String(userData.username || '').trim();
+                setProfile({
+                    name: userData.name || currentDisplayName || '',
+                    email: userData.email || currentEmail || '',
+                    username: normalizedUsername ? `@${normalizedUsername}` : '',
+                    role: userData.role || '',
+                });
+            } else {
+                setProfile({
+                    name: currentDisplayName || '',
+                    email: currentEmail || '',
+                    username: '',
+                    role: '',
+                });
+            }
+        } catch (err) {
+            console.error('Failed to load settings:', err);
+            setLoadError('Live settings refresh is limited right now. Showing last synced values.');
+        } finally {
+            setLoading(false);
+        }
+    }, [applyTheme, currentDisplayName, currentEmail]);
 
     // Load settings from API
     useEffect(() => {
-        const loadSettings = async () => {
-            if (!currentUser?.email) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const [settingsData, userData] = await Promise.all([
-                    settingsApi.get(currentUser.email).catch(() => null),
-                    userApi.getProfile(currentUser.email).catch(() => null)
-                ]);
-
-                if (settingsData) {
-                    const normalized = {
-                        ...settingsData,
-                        theme: settingsData.theme || appTheme || 'system',
-                        email_notifications: normalizeBool(settingsData.email_notifications),
-                        push_notifications: normalizeBool(settingsData.push_notifications),
-                        weekly_digest: normalizeBool(settingsData.weekly_digest),
-                        product_updates: normalizeBool(settingsData.product_updates),
-                    };
-                    setSettings(prev => ({ ...prev, ...normalized }));
-                    applyTheme(normalized.theme);
-                }
-
-                if (userData) {
-                    setProfile({
-                        name: userData.name || currentUser.displayName || '',
-                        email: userData.email || currentUser.email || '',
-                        username: userData.role ? `@${userData.role.toLowerCase().replace(/\s+/g, '')}` : ''
-                    });
-                } else {
-                    setProfile({
-                        name: currentUser.displayName || '',
-                        email: currentUser.email || '',
-                        username: ''
-                    });
-                }
-            } catch (err) {
-                console.error('Failed to load settings:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         loadSettings();
-    }, [appTheme, applyTheme, currentUser]);
+    }, [loadSettings]);
 
     const handleLogout = async () => {
         try {
@@ -103,14 +113,19 @@ const Settings = () => {
 
     // Save profile changes
     const saveProfile = async () => {
-        if (!currentUser?.email) return;
+        if (!currentEmail) return;
 
         setSaving(true);
         try {
+            const normalizedUsername = profile.username
+                ? profile.username.replace(/^@+/, '').trim()
+                : '';
+
             await userApi.updateProfile({
-                email: currentUser.email,
+                email: currentEmail,
                 name: profile.name,
-                role: profile.username?.replace('@', '') || ''
+                role: profile.role || '',
+                username: normalizedUsername,
             });
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 2000);
@@ -123,13 +138,13 @@ const Settings = () => {
 
     // Toggle notification setting
     const toggleNotification = async (key) => {
-        if (!currentUser?.email) return;
+        if (!currentEmail) return;
 
         const newValue = !settings[key];
         setSettings(prev => ({ ...prev, [key]: newValue }));
 
         try {
-            await settingsApi.updateNotifications(currentUser.email, {
+            await settingsApi.updateNotifications(currentEmail, {
                 [key]: newValue
             });
         } catch (err) {
@@ -141,14 +156,14 @@ const Settings = () => {
 
     // Set theme
     const handleThemeChange = async (theme) => {
-        if (!currentUser?.email) return;
+        if (!currentEmail) return;
 
         const previousTheme = settings.theme;
         setSettings(prev => ({ ...prev, theme }));
         applyTheme(theme);
 
         try {
-            await settingsApi.updateTheme(currentUser.email, theme);
+            await settingsApi.updateTheme(currentEmail, theme);
         } catch (err) {
             console.error('Failed to update theme:', err);
             setSettings(prev => ({ ...prev, theme: previousTheme }));
@@ -174,6 +189,19 @@ const Settings = () => {
         <div className="flex-1 min-h-screen bg-background text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar">
             <div className="max-w-5xl mx-auto">
                 <h1 className="text-4xl font-bold font-display tracking-tight mb-8">Settings</h1>
+
+                {loadError && (
+                    <div className="mb-4 rounded-2xl border border-border bg-background/40 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-sm text-amber-500">{loadError}</p>
+                        <button
+                            type="button"
+                            onClick={loadSettings}
+                            className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
 
                 <div className="flex flex-col md:flex-row gap-8">
 
