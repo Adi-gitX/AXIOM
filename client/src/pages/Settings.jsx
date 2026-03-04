@@ -234,7 +234,7 @@ const Settings = () => {
 
                     {/* Main Content Area */}
                     <div className="flex-1">
-                        <div className="bg-background/50 backdrop-blur-3xl border border-white/20 dark:border-white/5 rounded-[2.5rem] p-8 shadow-sm min-h-[500px]">
+                        <div className="bg-background border border-border rounded-2xl p-8 shadow-sm min-h-[500px]">
 
                             {loading ? (
                                 <div className="flex items-center justify-center h-64">
