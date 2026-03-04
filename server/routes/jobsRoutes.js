@@ -10,6 +10,7 @@ import {
     getAppliedJobs
 } from '../controllers/jobsController.js';
 import { validate, schemas } from '../middleware/validation.js';
+import { requireVerifiedUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -20,21 +21,21 @@ router.get('/', getAllJobs);
 router.get('/:id', getJobById);
 
 // Save a job
-router.post('/save', validate(schemas.jobSave), saveJob);
+router.post('/save', requireVerifiedUser, validate(schemas.jobSave), saveJob);
 
 // Unsave a job
-router.delete('/save/:jobId', validate(schemas.jobUnsave), unsaveJob);
+router.delete('/save/:jobId', requireVerifiedUser, validate(schemas.jobUnsave), unsaveJob);
 
 // Get user's saved jobs
-router.get('/saved/:email', getSavedJobs);
+router.get('/saved/:email', requireVerifiedUser, getSavedJobs);
 
 // Get saved job IDs only
-router.get('/saved-ids/:email', getSavedJobIds);
+router.get('/saved-ids/:email', requireVerifiedUser, getSavedJobIds);
 
 // Track job application
-router.post('/apply', validate(schemas.jobApply), applyToJob);
+router.post('/apply', requireVerifiedUser, validate(schemas.jobApply), applyToJob);
 
 // Get applied jobs
-router.get('/applied/:email', getAppliedJobs);
+router.get('/applied/:email', requireVerifiedUser, getAppliedJobs);
 
 export default router;
