@@ -34,7 +34,7 @@ const Login = () => {
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/20 rounded-full blur-[120px] animate-pulse delay-1000" />
             </div>
 
-            <div className="w-full max-w-md p-8 rounded-[2rem] bg-background/50 backdrop-blur-3xl border border-border/30 dark:border-white/5 shadow-2xl relative z-10">
+            <div className="w-full max-w-md p-8 rounded-2xl bg-background border border-border shadow-2xl relative z-10">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold font-display text-foreground mb-2">Welcome Back</h1>
                     <p className="text-muted-foreground">Sign in to continue your journey</p>
