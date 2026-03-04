@@ -190,7 +190,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex flex-wrap items-end justify-between gap-4">
                         <div>
-                            <h1 className="text-5xl font-light text-foreground font-display tracking-tight">Dashboard</h1>
+                            <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Dashboard</h1>
                             <p className="text-muted-foreground text-lg font-light mt-1">
                                 Execution view for DSA, OSS, and GSOC momentum.
                             </p>
@@ -234,8 +234,9 @@ const Dashboard = () => {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                    <div className="xl:col-span-2">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+                    {/* Left Column (Heatmap + Weekly Activity) */}
+                    <div className="xl:col-span-2 flex flex-col gap-6">
                         <HeatmapCalendar
                             title="Contribution Activity (Last 365 days)"
                             data={contributionData}
@@ -255,144 +256,148 @@ const Dashboard = () => {
                             from={heatmapData.from}
                             to={heatmapData.to}
                         />
+
+                        <GlassCard className="p-5" hoverEffect={false} premium>
+                            <p className="text-sm font-semibold text-foreground">Weekly Activity</p>
+                            <p className="text-xs text-muted-foreground mt-1">Composite score from DSA solves, study sessions, and education progress.</p>
+                            <div className="mt-4 grid grid-cols-7 gap-3 items-end h-36">
+                                {WEEK_DAYS.map((day, index) => {
+                                    const value = weeklyActivity[index] || 0;
+                                    const today = new Date();
+                                    const todayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
+                                    const isToday = todayIndex === index;
+                                    const barHeight = Math.max(10, Math.round((value / maxWeekly) * 100));
+
+                                    return (
+                                        <div key={`${day}-${index}`} className="flex flex-col items-center gap-2">
+                                            <div className="w-full h-24 flex items-end">
+                                                <div
+                                                    className={`w-full rounded-lg ${isToday ? 'bg-foreground' : 'bg-foreground/20'}`}
+                                                    style={{ height: `${barHeight}%` }}
+                                                />
+                                            </div>
+                                            <span className={`text-xs font-mono ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                                {day}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </GlassCard>
                     </div>
 
-                    <GlassCard className="p-5 space-y-4" hoverEffect={false}>
-                        <div className="flex items-center gap-2">
-                            <Target className="w-4 h-4 text-foreground" />
-                            <p className="text-sm font-semibold text-foreground">Daily Focus</p>
-                        </div>
-
-                        {focusLoading ? (
-                            <div className="space-y-2">
-                                {[1, 2, 3].map((item) => (
-                                    <div key={item} className="h-10 rounded-xl bg-foreground/10 animate-pulse" />
-                                ))}
+                    {/* Right Column (Daily Focus + Advanced Analytics) */}
+                    <div className="flex flex-col gap-6">
+                        <GlassCard className="p-5 space-y-4" hoverEffect={false}>
+                            <div className="flex items-center gap-2">
+                                <Target className="w-4 h-4 text-foreground" />
+                                <p className="text-sm font-semibold text-foreground">Daily Focus</p>
                             </div>
-                        ) : (
-                            <>
-                                <div className="space-y-2">
-                                    {focus.focusProblems.length === 0 ? (
-                                        <p className="text-sm text-muted-foreground">All tracked problems are solved. Time to review and teach.</p>
-                                    ) : (
-                                        focus.focusProblems.map((problem) => (
-                                            <button
-                                                key={problem.id}
-                                                type="button"
-                                                onClick={() => navigate(`/app/dsa/${problem.sheetId}`)}
-                                                className="w-full text-left rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
-                                            >
-                                                <p className="text-sm font-medium text-foreground line-clamp-1">{problem.title}</p>
-                                                <p className="text-[11px] text-muted-foreground mt-1">
-                                                    {problem.sheetName} • {problem.topicName}
-                                                </p>
-                                            </button>
-                                        ))
-                                    )}
-                                </div>
 
-                                <div className="pt-2 border-t border-border/70 space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <Sparkles className="w-4 h-4 text-foreground" />
-                                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Good First Issue</p>
+                            {focusLoading ? (
+                                <div className="space-y-2">
+                                    {[1, 2, 3].map((item) => (
+                                        <div key={item} className="h-10 rounded-xl bg-foreground/10 animate-pulse" />
+                                    ))}
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="divide-y divide-border/50">
+                                        {focus.focusProblems.length === 0 ? (
+                                            <p className="text-sm text-muted-foreground py-2">All tracked problems are solved. Time to review and teach.</p>
+                                        ) : (
+                                            focus.focusProblems.map((problem) => (
+                                                <button
+                                                    key={problem.id}
+                                                    type="button"
+                                                    onClick={() => navigate(`/app/dsa/${problem.sheetId}`)}
+                                                    className="w-full flex items-center justify-between py-3 group hover:px-2 transition-all"
+                                                >
+                                                    <div className="text-left min-w-0">
+                                                        <p className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-glow transition-all">{problem.title}</p>
+                                                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                                                            {problem.sheetName} • {problem.topicName}
+                                                        </p>
+                                                    </div>
+                                                    <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </button>
+                                            ))
+                                        )}
                                     </div>
-                                    {focus.issueRecommendation ? (
-                                        <a
-                                            href={focus.issueRecommendation.html_url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="block rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+
+                                    <div className="pt-2 border-t border-border/70 space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <Sparkles className="w-4 h-4 text-foreground" />
+                                            <p className="text-xs uppercase tracking-widest text-muted-foreground">Good First Issue</p>
+                                        </div>
+                                        {focus.issueRecommendation ? (
+                                            <a
+                                                href={focus.issueRecommendation.html_url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="block py-2 group hover:px-2 transition-all"
+                                            >
+                                                <p className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-glow transition-all">{focus.issueRecommendation.title}</p>
+                                                <p className="text-[11px] text-muted-foreground mt-0.5">
+                                                    {focus.issueRecommendation.repo_full_name}
+                                                </p>
+                                            </a>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">Connect GitHub in OSS Engine to unlock issue matching.</p>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/app/oss')}
+                                            className="text-xs font-semibold text-foreground inline-flex items-center gap-1 hover:underline"
                                         >
-                                            <p className="text-sm font-medium text-foreground line-clamp-2">{focus.issueRecommendation.title}</p>
-                                            <p className="text-[11px] text-muted-foreground mt-1">
-                                                {focus.issueRecommendation.repo_full_name}
-                                            </p>
-                                        </a>
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground">Connect GitHub in OSS Engine to unlock issue matching.</p>
-                                    )}
+                                            Open OSS Engine <ArrowUpRight className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </GlassCard>
+
+                        <GlassCard className="p-5" hoverEffect={false} premium>
+                            <p className="text-sm font-semibold text-foreground">Advanced Analytics</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {isPro
+                                    ? 'Pro-only momentum diagnostics'
+                                    : 'Available on Pro plan'}
+                            </p>
+
+                            {isPro ? (
+                                <div className="mt-4 divide-y divide-border/50">
+                                    <div className="py-3 flex items-center justify-between">
+                                        <p className="text-xs uppercase tracking-wider text-muted-foreground">Active Contribution Days</p>
+                                        <p className="text-lg font-semibold text-foreground">{activeContributionDays}</p>
+                                    </div>
+                                    <div className="py-3 flex items-center justify-between">
+                                        <p className="text-xs uppercase tracking-wider text-muted-foreground">Average Weekly Score</p>
+                                        <p className="text-lg font-semibold text-foreground">{avgWeeklyScore}</p>
+                                    </div>
+                                    <div className="py-3 flex items-center justify-between">
+                                        <p className="text-xs uppercase tracking-wider text-muted-foreground">Focus Completion</p>
+                                        <p className="text-lg font-semibold text-foreground">
+                                            {focus.focusProblems.length === 0 ? '100%' : `${Math.max(0, 100 - (focus.focusProblems.length * 25))}%`}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-4 rounded-xl border border-border bg-background/40 px-3 py-3">
+                                    <p className="text-sm text-muted-foreground">
+                                        Upgrade to Pro to unlock deeper analytics panels and unlimited AI suggestions.
+                                    </p>
                                     <button
                                         type="button"
-                                        onClick={() => navigate('/app/oss')}
-                                        className="text-xs font-semibold text-foreground inline-flex items-center gap-1 hover:underline"
+                                        onClick={() => navigate('/pricing')}
+                                        className="mt-3 text-xs font-semibold text-foreground hover:underline"
                                     >
-                                        Open OSS Engine <ArrowUpRight className="w-3 h-3" />
+                                        View Pro plan
                                     </button>
                                 </div>
-                            </>
-                        )}
-                    </GlassCard>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <GlassCard className="p-5 lg:col-span-2" hoverEffect={false} premium>
-                        <p className="text-sm font-semibold text-foreground">Weekly Activity</p>
-                        <p className="text-xs text-muted-foreground mt-1">Composite score from DSA solves, study sessions, and education progress.</p>
-                        <div className="mt-4 grid grid-cols-7 gap-3 items-end h-36">
-                            {WEEK_DAYS.map((day, index) => {
-                                const value = weeklyActivity[index] || 0;
-                                const today = new Date();
-                                const todayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
-                                const isToday = todayIndex === index;
-                                const barHeight = Math.max(10, Math.round((value / maxWeekly) * 100));
-
-                                return (
-                                    <div key={`${day}-${index}`} className="flex flex-col items-center gap-2">
-                                        <div className="w-full h-24 flex items-end">
-                                            <div
-                                                className={`w-full rounded-lg ${isToday ? 'bg-foreground' : 'bg-foreground/20'}`}
-                                                style={{ height: `${barHeight}%` }}
-                                            />
-                                        </div>
-                                        <span className={`text-xs font-mono ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
-                                            {day}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </GlassCard>
-
-                    <GlassCard className="p-5" hoverEffect={false} premium>
-                        <p className="text-sm font-semibold text-foreground">Advanced Analytics</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {isPro
-                                ? 'Pro-only momentum diagnostics'
-                                : 'Available on Pro plan'}
-                        </p>
-
-                        {isPro ? (
-                            <div className="mt-4 space-y-3">
-                                <div className="rounded-xl border border-border bg-background/40 px-3 py-2">
-                                    <p className="text-xs uppercase tracking-wider text-muted-foreground">Active Contribution Days</p>
-                                    <p className="text-lg font-semibold text-foreground mt-1">{activeContributionDays}</p>
-                                </div>
-                                <div className="rounded-xl border border-border bg-background/40 px-3 py-2">
-                                    <p className="text-xs uppercase tracking-wider text-muted-foreground">Average Weekly Score</p>
-                                    <p className="text-lg font-semibold text-foreground mt-1">{avgWeeklyScore}</p>
-                                </div>
-                                <div className="rounded-xl border border-border bg-background/40 px-3 py-2">
-                                    <p className="text-xs uppercase tracking-wider text-muted-foreground">Focus Completion</p>
-                                    <p className="text-lg font-semibold text-foreground mt-1">
-                                        {focus.focusProblems.length === 0 ? '100%' : `${Math.max(0, 100 - (focus.focusProblems.length * 25))}%`}
-                                    </p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="mt-4 rounded-xl border border-border bg-background/40 px-3 py-3">
-                                <p className="text-sm text-muted-foreground">
-                                    Upgrade to Pro to unlock deeper analytics panels and unlimited AI suggestions.
-                                </p>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/pricing')}
-                                    className="mt-3 text-xs font-semibold text-foreground hover:underline"
-                                >
-                                    View Pro plan
-                                </button>
-                            </div>
-                        )}
-                    </GlassCard>
+                            )}
+                        </GlassCard>
+                    </div>
                 </div>
 
                 <GlassCard className="p-5" hoverEffect={false}>
@@ -404,9 +409,9 @@ const Dashboard = () => {
                                 key={link.path}
                                 type="button"
                                 onClick={() => navigate(link.path)}
-                                className="text-left rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+                                className="text-left rounded-xl p-3 bg-muted/10 hover:bg-muted/30 transition-all group"
                             >
-                                <p className="text-sm font-medium text-foreground">{link.name}</p>
+                                <p className="text-sm font-medium text-foreground group-hover:text-glow transition-all">{link.name}</p>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">{link.desc}</p>
                             </button>
                         ))}
