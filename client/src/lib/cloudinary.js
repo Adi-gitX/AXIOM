@@ -1,4 +1,4 @@
-import { getApiUrl } from './api';
+import { userApi } from './api';
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
@@ -26,14 +26,12 @@ export const uploadToCloudinary = async (file) => {
     if (!file) return null;
 
     try {
-        const API_URL = getApiUrl();
         let resolvedCloudName = CLOUD_NAME;
 
         // Prefer signed upload when backend signature endpoint is available.
         try {
-            const sigResponse = await fetch(`${API_URL}/api/sign-cloudinary`);
-            if (sigResponse.ok) {
-                const sigData = await sigResponse.json();
+            const sigData = await userApi.getCloudinarySignature();
+            if (sigData) {
                 const signature = sigData.signature;
                 const timestamp = sigData.timestamp;
                 const signedPreset = sigData.upload_preset || UPLOAD_PRESET;
