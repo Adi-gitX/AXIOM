@@ -9,6 +9,10 @@ import { auth } from '../lib/firebase';
 import { userApi } from '../lib/api';
 
 const AuthContext = createContext();
+const syncInFlightByEmail = new Map();
+const syncTimestampByEmail = new Map();
+const SYNC_CACHE_TTL_MS = 60 * 1000;
+const SYNC_FAILURE_BACKOFF_MS = 90 * 1000;
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -16,34 +20,49 @@ export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Sync user to PostgreSQL database
     const syncUserToDatabase = async (user) => {
-        if (!user?.email) return;
+        const email = String(user?.email || '').trim().toLowerCase();
+        if (!email) return null;
 
-        try {
-            await userApi.createOrGet({
-                email: user.email,
-                name: user.displayName || user.email.split('@')[0],
-                avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`
-            });
-        } catch (err) {
-            console.error('Failed to sync user to database:', err);
-            // Don't block auth flow if DB sync fails
+        const now = Date.now();
+        const lastSyncedAt = syncTimestampByEmail.get(email) || 0;
+        if (now - lastSyncedAt < SYNC_CACHE_TTL_MS) {
+            return null;
         }
+
+        if (syncInFlightByEmail.has(email)) {
+            return syncInFlightByEmail.get(email);
+        }
+
+        const promise = userApi.createOrGet({
+            email,
+            name: user.displayName || email.split('@')[0],
+            avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+        }).then((response) => {
+            syncTimestampByEmail.set(email, Date.now());
+            return response;
+        }).catch((err) => {
+            console.error('Failed to sync user to database:', err);
+            if (err?.status === 429 || err?.status === 401 || err?.status === 403) {
+                // Prevent repeated startup sync storms after transient auth/rate-limit failures.
+                syncTimestampByEmail.set(email, Date.now() - SYNC_CACHE_TTL_MS + SYNC_FAILURE_BACKOFF_MS);
+            }
+            // Don't block auth flow if DB sync fails
+            return null;
+        }).finally(() => {
+            syncInFlightByEmail.delete(email);
+        });
+
+        syncInFlightByEmail.set(email, promise);
+        return promise;
     };
 
     const signup = async (email, password) => {
-        const result = await createUserWithEmailAndPassword(auth, email, password);
-        // Sync new user to PostgreSQL
-        await syncUserToDatabase(result.user);
-        return result;
+        return createUserWithEmailAndPassword(auth, email, password);
     };
 
     const login = async (email, password) => {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        // Sync user to PostgreSQL (creates if not exists)
-        await syncUserToDatabase(result.user);
-        return result;
+        return signInWithEmailAndPassword(auth, email, password);
     };
 
     const logout = () => {
@@ -51,13 +70,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Sync on initial auth state
-                await syncUserToDatabase(user);
-            }
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
             setLoading(false);
+            if (user) {
+                syncUserToDatabase(user);
+            }
         });
 
         return unsubscribe;
