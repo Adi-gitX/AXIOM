@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { educationApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import GlassCard from '../components/ui/GlassCard';
 
 const Education = () => {
+    const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [topic, setTopic] = useState(null);
     const [video, setVideo] = useState(null);
@@ -13,6 +15,18 @@ const Education = () => {
     const [watchedVideos, setWatchedVideos] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [retryNonce, setRetryNonce] = useState(0);
+    const hasSnapshotRef = useRef(false);
+    const isTransientApiError = (err) => (
+        err?.status === 401
+        || err?.status === 429
+        || err?.status === 503
+        || err?.code === 'BACKEND_UNAVAILABLE'
+    );
+
+    useEffect(() => {
+        hasSnapshotRef.current = topics.length > 0 || Object.keys(videosByTopic).length > 0;
+    }, [topics, videosByTopic]);
 
     const getTopic = (id) => topics.find((t) => t.id === id);
     const videos = topic ? (videosByTopic[topic] || []) : [];
@@ -38,7 +52,9 @@ const Education = () => {
                     try {
                         progress = await educationApi.getProgress(currentUser.email);
                     } catch (progressErr) {
-                        console.error('Failed to load education progress:', progressErr);
+                        if (!isTransientApiError(progressErr)) {
+                            console.error('Failed to load education progress:', progressErr);
+                        }
                         setError('Failed to load watch progress');
                     }
                 }
@@ -57,17 +73,25 @@ const Education = () => {
                 });
                 setWatchedVideos(progressMap);
             } catch (err) {
-                console.error('Failed to load education data:', err);
-                setError('Failed to load education content');
-                setTopics([]);
-                setVideosByTopic({});
+                if (!isTransientApiError(err)) {
+                    console.error('Failed to load education data:', err);
+                }
+                setError(
+                    hasSnapshotRef.current
+                        ? 'Education refresh is limited right now. Showing last synced catalog.'
+                        : 'Failed to load education content'
+                );
+                if (!hasSnapshotRef.current) {
+                    setTopics([]);
+                    setVideosByTopic({});
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         loadData();
-    }, [currentUser?.email]);
+    }, [currentUser?.email, retryNonce]);
 
     // Track video progress when video is opened
     const handleVideoOpen = async (v) => {
@@ -132,7 +156,32 @@ const Education = () => {
                         <>
                             <h1 className="text-5xl font-light text-foreground font-display tracking-tight">Education</h1>
                             <p className="text-muted-foreground text-lg font-light mt-2">Choose what to learn</p>
+                            <div className="flex flex-wrap gap-2 mt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/app/dsa')}
+                                    className="rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                >
+                                    Go to DSA Tracker
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/app/interview')}
+                                    className="rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                >
+                                    Go to Interview Prep
+                                </button>
+                            </div>
                             {error && <p className="text-sm text-rose-400 mt-3">{error}</p>}
+                            {error && (
+                                <button
+                                    type="button"
+                                    onClick={() => setRetryNonce((value) => value + 1)}
+                                    className="mt-3 rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                >
+                                    Retry
+                                </button>
+                            )}
                         </>
                     )}
                 </motion.header>
@@ -167,6 +216,9 @@ const Education = () => {
                                         </div>
                                         <h3 className="font-medium text-foreground">{t.name}</h3>
                                         <p className="text-xs text-muted-foreground mt-1">{videoCount} {videoCount === 1 ? 'video' : 'videos'}</p>
+                                        <p className="text-[11px] text-muted-foreground mt-1">
+                                            {progress === 100 ? 'Completed' : progress > 0 ? 'In Progress' : 'Not Started'}
+                                        </p>
 
                                         {/* Progress bar */}
                                         {progress > 0 && (
