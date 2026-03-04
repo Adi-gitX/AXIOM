@@ -40,18 +40,20 @@ const SheetTabs = ({ sheets = [], activeSheetId, solvedSet, onChange }) => {
                             key={sheet.id}
                             type="button"
                             onClick={() => onChange(sheet.id)}
-                            className={`min-w-[220px] text-left rounded-2xl border px-4 py-3 transition-all ${isActive
-                                ? 'bg-foreground text-background border-foreground shadow-lg'
+                            className={`min-w-[220px] text-left rounded-2xl border px-4 py-3 transition-colors ${isActive
+                                ? 'bg-foreground text-background border-foreground shadow-[0_4px_14px_rgba(255,255,255,0.08)]'
                                 : 'bg-background/40 text-foreground border-border hover:border-foreground/40 hover:bg-background/70'
                                 }`}
                         >
-                            <p className="font-display text-sm font-semibold tracking-wide">{sheet.name}</p>
+                            <p className={`font-display text-sm font-semibold tracking-wide ${isActive ? 'text-background' : 'text-foreground'}`}>
+                                {sheet.name}
+                            </p>
                             <p className={`text-xs mt-1 ${isActive ? 'text-background/80' : 'text-muted-foreground'}`}>
                                 {sheet.solved}/{sheet.total} solved
                             </p>
                             <div className={`mt-2 h-1.5 rounded-full overflow-hidden ${isActive ? 'bg-background/20' : 'bg-foreground/10'}`}>
                                 <div
-                                    className={`h-full rounded-full ${isActive ? 'bg-background' : 'bg-foreground'}`}
+                                    className={`h-full rounded-full transition-all duration-300 ease-out ${isActive ? 'bg-background' : 'bg-foreground'}`}
                                     style={{ width: `${sheet.progress}%` }}
                                 />
                             </div>
