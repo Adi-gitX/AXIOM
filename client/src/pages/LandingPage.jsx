@@ -312,7 +312,7 @@ const LandingPage = () => {
                     </div>
 
                     {/* BENTO GRID (Active & Tilted) */}
-                    <div id="features" className="glass-panel py-40 px-6 relative border-y border-border">
+                    <div id="features" className="bg-background py-40 px-6 relative border-y border-border">
                         <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-background/50 to-transparent pointer-events-none" />
 
                         <div className="max-w-7xl mx-auto relative z-10">
@@ -367,7 +367,7 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 2: DSA Tracker */}
-                                <TiltCard delay={0.1} className="p-12 glass-card">
+                                <TiltCard delay={0.1} className="p-12 bg-background border border-border">
                                     <div className="h-full flex flex-col justify-between relative z-10">
                                         <div className="w-16 h-16 rounded-3xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
                                             <Cpu className="w-8 h-8 text-purple-600 dark:text-purple-400" />
@@ -392,7 +392,7 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 3: Interview Prep */}
-                                <TiltCard delay={0.2} className="p-12 glass-card">
+                                <TiltCard delay={0.2} className="p-12 bg-background border border-border">
                                     <div className="h-full flex flex-col justify-between relative z-10">
                                         <div className="w-16 h-16 rounded-3xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
                                             <ShieldCheck className="w-8 h-8 text-green-600 dark:text-green-400" />
@@ -455,7 +455,7 @@ const LandingPage = () => {
                                 </TiltCard>
 
                                 {/* Card 5: Jobs & Community */}
-                                <TiltCard delay={0.4} className="md:col-span-3 p-12 glass-card">
+                                <TiltCard delay={0.4} className="md:col-span-3 p-12 bg-background border border-border">
                                     <div className="flex flex-col md:flex-row h-full items-start md:items-center justify-between gap-12 relative z-10">
                                         <div className="max-w-md">
                                             <div className="flex gap-4 mb-8">
