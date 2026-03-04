@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Camera,
@@ -26,7 +26,7 @@ import {
 import { updateProfile } from 'firebase/auth';
 import { cn } from '../lib/utils';
 import { uploadToCloudinary } from '../lib/cloudinary';
-import { getApiUrl, userApi } from '../lib/api';
+import { ossApi, userApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserStore } from '../stores/useUserStore';
 
@@ -52,26 +52,25 @@ const Toast = ({ message, type = 'success', onClose }) => {
     );
 };
 
+const parseJsonArray = (value, fallback = []) => {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === 'string') {
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed : fallback;
+        } catch {
+            return fallback;
+        }
+    }
+    return fallback;
+};
+
 const Profile = () => {
     const { currentUser } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [toast, setToast] = useState(null);
     const fileInputRef = useRef(null);
-
-    const parseJsonArray = (value, fallback = []) => {
-        if (Array.isArray(value)) return value;
-        if (value && typeof value === 'string') {
-            try {
-                const parsed = JSON.parse(value);
-                return Array.isArray(parsed) ? parsed : fallback;
-            } catch {
-                return fallback;
-            }
-        }
-        return fallback;
-    };
-
-    const defaultUser = {
+    const defaultUser = useMemo(() => ({
         name: currentUser?.displayName || 'Aditya Kammati',
         role: 'Senior Full Stack Engineer',
         location: 'San Francisco, CA',
@@ -79,17 +78,20 @@ const Profile = () => {
         avatar: currentUser?.photoURL || 'https://github.com/shadcn.png',
         banner: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop',
         resumeName: '',
-        resumeUrl: ''
-    };
+        resumeUrl: '',
+        username: currentUser?.email?.split('@')[0] || 'developer',
+        githubUsername: '',
+        portfolioVisibility: true,
+    }), [currentUser?.displayName, currentUser?.photoURL, currentUser?.email]);
 
-    const defaultSocials = [
+    const defaultSocials = useMemo(() => ([
         { id: '1', platform: 'GitHub', url: 'https://github.com/Adi-gitX', iconName: 'Github' },
         { id: '2', platform: 'LinkedIn', url: 'https://linkedin.com/in/kammatiaditya', iconName: 'Linkedin' }
-    ];
+    ]), []);
 
-    const defaultSkills = ['React', 'Node.js', 'TypeScript', 'Tailwind', 'Python', 'AWS'];
+    const defaultSkills = useMemo(() => (['React', 'Node.js', 'TypeScript', 'Tailwind', 'Python', 'AWS']), []);
 
-    const defaultExperience = [
+    const defaultExperience = useMemo(() => ([
         {
             id: 1,
             role: 'Senior Engineer',
@@ -104,7 +106,7 @@ const Profile = () => {
             period: '2021 - 2023',
             description: 'Built the MVP from scratch and scaled it to 100k users. Handled both React frontend and Node backend.'
         }
-    ];
+    ]), []);
 
     const { user: storeUser, setUser: setStoreUser } = useUserStore();
     const [user, setUser] = useState(defaultUser);
@@ -112,6 +114,8 @@ const Profile = () => {
     const [skills, setSkills] = useState(defaultSkills);
     const [experience, setExperience] = useState(defaultExperience);
     const [isLoading, setIsLoading] = useState(true);
+    const [ats, setAts] = useState({ score: 0, suggestions: [] });
+    const [ossSummary, setOssSummary] = useState(null);
 
     useEffect(() => {
         if (!currentUser?.email) {
@@ -121,19 +125,24 @@ const Profile = () => {
 
         const loadData = async () => {
             let data = storeUser;
-
             if (!data) {
-                try {
-                    const API_URL = getApiUrl();
-                    const response = await fetch(`${API_URL}/api/users/${encodeURIComponent(currentUser.email)}`);
-                    if (response.ok) {
-                        data = await response.json();
-                        setStoreUser(data);
-                    }
-                } catch (error) {
+                data = await userApi.getProfile(currentUser.email).catch((error) => {
                     console.error('Failed to fetch profile:', error);
+                    return null;
+                });
+                if (data) {
+                    setStoreUser(data);
                 }
             }
+            const [atsData, ossData] = await Promise.all([
+                userApi.getAtsScore(currentUser.email).catch(() => ({ score: 0, suggestions: [] })),
+                ossApi.getContributions(currentUser.email).catch(() => null),
+            ]);
+            setAts({
+                score: Number.parseInt(atsData?.score, 10) || 0,
+                suggestions: Array.isArray(atsData?.suggestions) ? atsData.suggestions : [],
+            });
+            setOssSummary(ossData);
 
             // Always merge with defaultUser to ensure Auth fallback
             setUser({
@@ -144,7 +153,10 @@ const Profile = () => {
                 avatar: data?.avatar || defaultUser.avatar,
                 banner: data?.banner || defaultUser.banner,
                 resumeName: data?.resume_name || defaultUser.resumeName,
-                resumeUrl: data?.resume_url || defaultUser.resumeUrl
+                resumeUrl: data?.resume_url || defaultUser.resumeUrl,
+                username: data?.username || defaultUser.username,
+                githubUsername: data?.github_username || defaultUser.githubUsername,
+                portfolioVisibility: data?.portfolio_visibility !== false,
             });
 
             if (data) {
@@ -156,11 +168,14 @@ const Profile = () => {
         };
 
         loadData();
-    }, [currentUser, storeUser, setStoreUser]);
+    }, [currentUser, storeUser, setStoreUser, defaultUser, defaultExperience, defaultSkills, defaultSocials]);
 
     const [showSocialModal, setShowSocialModal] = useState(false);
     const [newSocial, setNewSocial] = useState({ platform: 'GitHub', url: '' });
     const [newSkill, setNewSkill] = useState('');
+    const publicProfileUrl = user.username
+        ? `${window.location.origin}/u/${user.username}`
+        : '';
 
     const iconMap = {
         Github: Github,
@@ -182,6 +197,38 @@ const Profile = () => {
         setToast({ message, type });
     };
 
+    const handleCopyPublicProfile = async () => {
+        if (!publicProfileUrl) {
+            showNotification('Public profile URL unavailable', 'error');
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(publicProfileUrl);
+            showNotification('Public profile URL copied');
+        } catch {
+            showNotification('Unable to copy public profile URL', 'error');
+        }
+    };
+
+    const handleResumePrint = () => {
+        if (!user.resumeUrl) {
+            showNotification('Upload resume to print/export', 'error');
+            return;
+        }
+
+        const printWindow = window.open(user.resumeUrl, '_blank');
+        if (!printWindow) {
+            showNotification('Popup blocked. Enable popups to print resume.', 'error');
+            return;
+        }
+
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+        }, 300);
+    };
+
     const handleSave = async () => {
         if (!currentUser) {
             showNotification('Please log in to save changes', 'error');
@@ -201,7 +248,10 @@ const Profile = () => {
                 skills,
                 socials,
                 resume_url: user.resumeUrl,
-                resume_name: user.resumeName
+                resume_name: user.resumeName,
+                username: user.username,
+                github_username: user.githubUsername,
+                portfolio_visibility: user.portfolioVisibility,
             };
 
             let savedUser;
@@ -447,7 +497,11 @@ const Profile = () => {
                                             Edit Profile
                                         </button>
                                     )}
-                                    <button className="p-2.5 rounded-full border border-border hover:bg-muted/50 transition-all">
+                                    <button
+                                        onClick={handleCopyPublicProfile}
+                                        className="p-2.5 rounded-full border border-border hover:bg-muted/50 transition-all"
+                                        title="Copy public profile URL"
+                                    >
                                         <Settings className="w-5 h-5 text-muted-foreground" />
                                     </button>
                                 </div>
@@ -660,15 +714,14 @@ const Profile = () => {
                                     </div>
 
                                     {user.resumeUrl && (
-                                        <a
-                                            href={user.resumeUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <button
+                                            type="button"
+                                            onClick={handleResumePrint}
                                             className="p-2 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-                                            title="Download"
+                                            title="Print / Export PDF"
                                         >
                                             <Share2 className="w-5 h-5" />
-                                        </a>
+                                        </button>
                                     )}
 
                                     {isEditing && (
@@ -712,8 +765,8 @@ const Profile = () => {
                                     <Globe className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-foreground">Remote</p>
-                                    <p className="text-muted-foreground text-xs">Preferred work mode</p>
+                                    <p className="font-bold text-foreground">Public Profile</p>
+                                    <p className="text-muted-foreground text-xs truncate max-w-[180px]">{publicProfileUrl || 'Unavailable'}</p>
                                 </div>
                             </div>
                             <div className="h-px bg-white/5" />
@@ -722,8 +775,12 @@ const Profile = () => {
                                     <Calendar className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-foreground">Immediate</p>
-                                    <p className="text-muted-foreground text-xs">Start date availability</p>
+                                    <p className="font-bold text-foreground">ATS Score {ats.score}/100</p>
+                                    <p className="text-muted-foreground text-xs">
+                                        {ossSummary?.connected
+                                            ? `OSS merged PRs: ${ossSummary?.prsMerged || 0}`
+                                            : 'Connect GitHub in OSS to improve score'}
+                                    </p>
                                 </div>
                             </div>
                         </div>
