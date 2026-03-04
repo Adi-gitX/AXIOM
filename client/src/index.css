@@ -5,12 +5,12 @@
 @layer base {
   :root {
     /* Base - Light Mode */
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222 47% 11%;
 
     /* Glass Cards & Surfaces - Light */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
@@ -62,14 +62,14 @@
 
   .dark {
     /* Base - Deep Dark */
-    --background: 0 0% 4%;
-    /* #0a0a0a */
+    --background: 0 0% 0%;
+    /* #000000 */
     --foreground: 0 0% 98%;
     /* #fafafa */
 
     /* Glass Cards & Surfaces */
-    --card: 0 0% 4%;
-    /* Changed to match dark bg base, relies on opacity elsewhere */
+    --card: 0 0% 5%;
+    /* Elevated from pure black */
     --card-foreground: 0 0% 98%;
 
     --popover: 0 0% 4%;
@@ -90,9 +90,9 @@
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    /* Darker border for dark mode */
-    --input: 0 0% 20%;
+    --border: 0 0% 12%;
+    /* Subtle thin border */
+    --input: 0 0% 12%;
     --ring: 0 0% 83%;
 
     /* Glass Tokens - Dark */
@@ -175,112 +175,73 @@
   font-style: normal;
 }
 
-@layer utilities {
-  .glass-panel {
-    @apply backdrop-blur-3xl border transition-all duration-300;
-    background-color: var(--glass-bg);
-    border-color: var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
+.glass-card-hover {
+  @apply hover:-translate-y-1;
+}
 
-  .glass-card {
-    @apply backdrop-blur-2xl border transition-all duration-300;
-    background-color: var(--glass-bg);
-    border-color: var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
+.text-glow {
+  text-shadow: 0 0 20px var(--glow-color);
+}
 
-  .glass-card-hover {
-    @apply hover:-translate-y-1;
-  }
+.premium-card {
+  isolation: isolate;
+}
 
-  .glass-card-hover:hover {
-    background-color: var(--glass-hover-bg);
-    border-color: var(--glass-hover-border);
-    box-shadow: var(--glass-shadow);
-  }
+.premium-card-border {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 250ms ease;
+  background:
+    linear-gradient(130deg,
+      transparent 10%,
+      rgba(255, 255, 255, 0.32) 35%,
+      transparent 60%);
+  z-index: 0;
+}
 
-  .glass-button {
-    @apply backdrop-blur-md transition-colors duration-200 border;
-    background-color: var(--glass-bg);
-    border-color: var(--glass-border);
-  }
+.premium-card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 250ms ease;
+  background:
+    radial-gradient(420px circle at 12% 0%,
+      rgba(255, 255, 255, 0.12),
+      transparent 45%);
+  z-index: 0;
+}
 
-  .glass-button:hover {
-    background-color: var(--glass-hover-bg);
-    border-color: var(--glass-hover-border);
-  }
+.premium-card:hover .premium-card-border,
+.premium-card:hover .premium-card-glow {
+  opacity: 1;
+}
 
-  .text-glow {
-    text-shadow: 0 0 20px var(--glow-color);
-  }
+.premium-progress-track {
+  position: relative;
+  overflow: hidden;
+}
 
-  .premium-card {
-    isolation: isolate;
-  }
+.premium-progress-fill {
+  position: relative;
+  overflow: hidden;
+}
 
-  .premium-card-border {
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 250ms ease;
-    background:
-      linear-gradient(
-        130deg,
-        transparent 10%,
-        rgba(255, 255, 255, 0.32) 35%,
-        transparent 60%
-      );
-    z-index: 0;
-  }
-
-  .premium-card-glow {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 250ms ease;
-    background:
-      radial-gradient(
-        420px circle at 12% 0%,
-        rgba(255, 255, 255, 0.12),
-        transparent 45%
-      );
-    z-index: 0;
-  }
-
-  .premium-card:hover .premium-card-border,
-  .premium-card:hover .premium-card-glow {
-    opacity: 1;
-  }
-
-  .premium-progress-track {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .premium-progress-fill {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .premium-progress-fill::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      100deg,
+.premium-progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg,
       transparent 15%,
       rgba(255, 255, 255, 0.35) 50%,
-      transparent 85%
-    );
-    transform: translateX(-140%);
-    animation: premium-shimmer 3s linear infinite;
-    opacity: 0.55;
-  }
+      transparent 85%);
+  transform: translateX(-140%);
+  animation: premium-shimmer 3s linear infinite;
+  opacity: 0.55;
 }
 
 @keyframes premium-shimmer {
