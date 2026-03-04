@@ -111,7 +111,7 @@ const GsocAccelerator = () => {
         <div className="min-h-screen p-8 lg:p-12">
             <div className="max-w-6xl mx-auto space-y-6">
                 <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-                    <h1 className="text-5xl font-light text-foreground font-display tracking-tight">GSOC Accelerator</h1>
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">GSOC Accelerator</h1>
                     <p className="text-muted-foreground text-lg font-light">
                         Timeline, reminders, target organizations, and a practical readiness score for GSOC 2026.
                     </p>
@@ -142,11 +142,11 @@ const GsocAccelerator = () => {
                         {loading ? (
                             <p className="text-sm text-muted-foreground">Loading timeline...</p>
                         ) : (
-                            <div className="space-y-2">
+                            <div className="divide-y divide-border/50">
                                 {timeline.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="rounded-xl border border-border bg-background/40 px-3 py-2"
+                                        className="py-4 hover:pl-2 transition-all"
                                     >
                                         <div className="flex items-center justify-between gap-3">
                                             <p className="text-sm font-medium text-foreground">{item.title}</p>
@@ -239,16 +239,16 @@ const GsocAccelerator = () => {
                                         : 'All reminders dismissed.'}
                                 </p>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="divide-y divide-border/50">
                                     {visibleReminders.map((item) => (
-                                        <div key={item.id} className="rounded-xl border border-border bg-background/40 px-3 py-2">
+                                        <div key={item.id} className="py-3 group hover:pl-2 transition-all">
                                             <div className="flex items-center justify-between gap-2">
                                                 <p className="text-sm font-medium text-foreground">{item.title}</p>
                                                 {item.dismissed ? (
                                                     <button
                                                         type="button"
                                                         onClick={() => restoreReminder(item.id)}
-                                                        className="text-[11px] font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                                                        className="text-[11px] font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     >
                                                         <Bell className="w-3 h-3" /> Restore
                                                     </button>
@@ -256,13 +256,13 @@ const GsocAccelerator = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => dismissReminder(item.id)}
-                                                        className="text-[11px] font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                                                        className="text-[11px] font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     >
                                                         <BellOff className="w-3 h-3" /> Dismiss
                                                     </button>
                                                 )}
                                             </div>
-                                            <p className="text-[11px] text-muted-foreground mt-1">
+                                            <p className="text-[11px] text-muted-foreground mt-0.5">
                                                 {item.date} • {item.status}
                                             </p>
                                         </div>
