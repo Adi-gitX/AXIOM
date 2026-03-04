@@ -5,28 +5,36 @@ import {
     getActivityHeatmap,
     logStudyTime,
     getDashboardStats,
-    getDsaCatalog
+    getDsaCatalog,
+    getDailyFocus,
+    getProblemMetaForUser,
+    upsertProblemMetaForUser,
+    completeProblemReview,
+    getReviewToday,
 } from '../controllers/progressController.js';
 import { validate, schemas } from '../middleware/validation.js';
+import { requireVerifiedUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get user progress data
+// Catalog and aggregate data
 router.get('/catalog', getDsaCatalog);
-
-// Get user progress data
-router.get('/:email', getUserProgress);
-
-// Toggle problem solved/unsolved
-router.post('/problem', validate(schemas.problemToggle), toggleProblem);
-
-// Get activity heatmap
+router.use(requireVerifiedUser);
 router.get('/heatmap/:email', getActivityHeatmap);
+router.get('/dashboard/:email', getDashboardStats);
+router.get('/focus/:email', getDailyFocus);
 
-// Log study time
+// DSA journal + spaced repetition
+router.get('/problem-meta/:email', getProblemMetaForUser);
+router.post('/problem-meta', validate(schemas.problemMetaUpsert), upsertProblemMetaForUser);
+router.get('/review/:email', getReviewToday);
+router.post('/review/complete', validate(schemas.problemReviewComplete), completeProblemReview);
+
+// Progress mutation endpoints
+router.post('/problem', validate(schemas.problemToggle), toggleProblem);
 router.post('/study-time', logStudyTime);
 
-// Get dashboard stats
-router.get('/dashboard/:email', getDashboardStats);
+// User progress snapshot (keep last to avoid route conflicts)
+router.get('/:email', getUserProgress);
 
 export default router;
