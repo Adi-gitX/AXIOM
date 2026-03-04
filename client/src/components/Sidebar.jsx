@@ -38,9 +38,9 @@ const Sidebar = () => {
       <div className="h-full flex flex-col rounded-[2rem] bg-background border border-border shadow-2xl overflow-hidden transition-all duration-500">
         <div className="h-20 flex items-center px-5">
           <NavLink to="/" className="flex items-center gap-2 group w-full">
-            <img src={logoBlack} alt="Axiom" className="h-9 w-9 object-contain block dark:hidden shrink-0 group-hover:scale-105 transition-transform duration-200" />
-            <img src={logoWhite} alt="Axiom" className="h-9 w-9 object-contain hidden dark:block shrink-0 group-hover:scale-105 transition-transform duration-200" />
-            <span className="font-bold text-lg text-foreground font-display tracking-tight">AXIOM</span>
+            <img src={logoBlack} alt="Axiom" className="h-16 w-16 object-contain block dark:hidden shrink-0 group-hover:scale-105 transition-transform duration-200" />
+            <img src={logoWhite} alt="Axiom" className="h-16 w-16 object-contain hidden dark:block shrink-0 group-hover:scale-105 transition-transform duration-200" />
+            <span className="font-bold text-lg text-foreground font-display tracking-tight"></span>
           </NavLink>
         </div>
 
