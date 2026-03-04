@@ -12,7 +12,7 @@ const Sidebar = () => {
     if (currentUser?.email) {
       fetchProfile(currentUser.email);
     }
-  }, [currentUser, fetchProfile]);
+  }, [currentUser?.email, fetchProfile]);
 
   const displayName = profileData?.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
   const displayAvatar = profileData?.avatar || currentUser?.photoURL || "https://github.com/shadcn.png";
@@ -21,11 +21,15 @@ const Sidebar = () => {
     { path: '/app', label: 'Dashboard', end: true },
     { path: '/app/education', label: 'Education' },
     { path: '/app/dsa', label: 'DSA Tracker' },
+    { path: '/app/oss', label: 'OSS Engine' },
+    { path: '/app/gsoc', label: 'GSOC Accelerator' },
     { path: '/app/interview', label: 'Interview Prep' },
     { path: '/app/connect', label: 'Dev Connect' },
     { path: '/app/jobs', label: 'Jobs' },
     { path: '/app/posts', label: 'Posts' },
   ];
+
+  const planLabel = profileData?.is_pro ? 'Pro Plan' : 'Free Forever';
 
   return (
     <div className="h-screen sticky top-0 flex flex-col w-72 shrink-0 z-40 p-4 transition-all duration-300">
@@ -76,7 +80,7 @@ const Sidebar = () => {
                 <p className="text-sm font-bold text-foreground group-hover:text-glow transition-colors truncate">
                   {displayName}
                 </p>
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Pro Plan</p>
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{planLabel}</p>
               </div>
             </NavLink>
             <div className="scale-90 origin-right flex flex-col items-center gap-2">
