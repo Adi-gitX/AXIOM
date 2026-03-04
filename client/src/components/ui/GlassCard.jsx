@@ -9,8 +9,8 @@ const GlassCard = ({ children, className, hoverEffect = true, premium = false, .
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className={twMerge(
-                'glass-card relative overflow-hidden rounded-3xl p-6 group',
-                hoverEffect && 'glass-card-hover group cursor-pointer',
+                'relative overflow-hidden rounded-2xl p-6 group bg-card border border-border shadow-sm',
+                hoverEffect && 'hover:border-foreground/30 cursor-pointer transition-colors duration-300',
                 premium && 'premium-card',
                 className
             )}
