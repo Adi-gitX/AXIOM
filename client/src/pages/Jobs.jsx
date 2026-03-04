@@ -127,10 +127,10 @@ const Jobs = () => {
                 <motion.header
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="mb-12"
+                    className="mb-12 space-y-3"
                 >
-                    <h1 className="text-5xl font-light text-foreground font-display tracking-tight">Jobs</h1>
-                    <p className="text-muted-foreground text-lg font-light mt-2">Find your next opportunity</p>
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Jobs</h1>
+                    <p className="text-muted-foreground text-lg mt-1">Find your next opportunity</p>
                     {error && (
                         <div className="mt-3 flex flex-wrap items-center gap-3">
                             <p className="text-sm text-rose-400">{error}</p>
