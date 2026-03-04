@@ -214,6 +214,79 @@
   .text-glow {
     text-shadow: 0 0 20px var(--glow-color);
   }
+
+  .premium-card {
+    isolation: isolate;
+  }
+
+  .premium-card-border {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 250ms ease;
+    background:
+      linear-gradient(
+        130deg,
+        transparent 10%,
+        rgba(255, 255, 255, 0.32) 35%,
+        transparent 60%
+      );
+    z-index: 0;
+  }
+
+  .premium-card-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 250ms ease;
+    background:
+      radial-gradient(
+        420px circle at 12% 0%,
+        rgba(255, 255, 255, 0.12),
+        transparent 45%
+      );
+    z-index: 0;
+  }
+
+  .premium-card:hover .premium-card-border,
+  .premium-card:hover .premium-card-glow {
+    opacity: 1;
+  }
+
+  .premium-progress-track {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .premium-progress-fill {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .premium-progress-fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 15%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 85%
+    );
+    transform: translateX(-140%);
+    animation: premium-shimmer 3s linear infinite;
+    opacity: 0.55;
+  }
+}
+
+@keyframes premium-shimmer {
+  100% {
+    transform: translateX(140%);
+  }
 }
 
 #root {
