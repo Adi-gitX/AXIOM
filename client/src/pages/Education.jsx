@@ -144,30 +144,30 @@ const Education = () => {
                 <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-12">
                     {topic ? (
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setTopic(null)} className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-foreground hover:bg-accent transition-colors">
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+                            <button onClick={() => setTopic(null)} className="w-10 h-10 rounded-full border border-border bg-background/40 hover:border-foreground/40 flex items-center justify-center text-foreground transition-colors group">
+                                <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
                             </button>
                             <div>
-                                <h1 className="text-3xl font-light text-foreground font-display tracking-tight">{getTopic(topic)?.name}</h1>
+                                <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">{getTopic(topic)?.name}</h1>
                                 <p className="text-muted-foreground mt-1">{videos.length} videos • {getTopicProgress(topic)}% complete</p>
                             </div>
                         </div>
                     ) : (
-                        <>
-                            <h1 className="text-5xl font-light text-foreground font-display tracking-tight">Education</h1>
-                            <p className="text-muted-foreground text-lg font-light mt-2">Choose what to learn</p>
+                        <div className="space-y-3">
+                            <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Education</h1>
+                            <p className="text-muted-foreground text-lg mt-1">Choose what to learn</p>
                             <div className="flex flex-wrap gap-2 mt-4">
                                 <button
                                     type="button"
                                     onClick={() => navigate('/app/dsa')}
-                                    className="rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                    className="rounded-xl border border-border bg-background/40 px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors"
                                 >
                                     Go to DSA Tracker
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => navigate('/app/interview')}
-                                    className="rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                    className="rounded-xl border border-border bg-background/40 px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors"
                                 >
                                     Go to Interview Prep
                                 </button>
@@ -177,12 +177,12 @@ const Education = () => {
                                 <button
                                     type="button"
                                     onClick={() => setRetryNonce((value) => value + 1)}
-                                    className="mt-3 rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                    className="mt-3 rounded-xl border border-border bg-background/40 px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors"
                                 >
                                     Retry
                                 </button>
                             )}
-                        </>
+                        </div>
                     )}
                 </motion.header>
 
@@ -309,17 +309,17 @@ const Education = () => {
                     >
                         <button
                             onClick={() => setVideo(null)}
-                            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-accent transition-colors border border-border"
+                            className="absolute top-6 right-6 w-10 h-10 rounded-full border border-border bg-background/60 hover:border-foreground/40 flex items-center justify-center text-foreground transition-colors group z-10"
                         >
-                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                            <svg className="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
                         </button>
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="w-full max-w-5xl glass-panel p-1 rounded-2xl overflow-hidden"
+                            className="w-full max-w-5xl border border-border bg-background rounded-2xl overflow-hidden shadow-xl"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="aspect-video bg-black rounded-xl overflow-hidden">
+                            <div className="aspect-video bg-black rounded-xl overflow-hidden m-2 border border-border/50">
                                 <iframe
                                     width="100%"
                                     height="100%"
@@ -337,9 +337,9 @@ const Education = () => {
                                 </div>
                                 <button
                                     onClick={markComplete}
-                                    className={`px-4 py-2 rounded-xl font-medium transition-all ${watchedVideos[video.id]?.completed
-                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                        : 'bg-foreground text-background'
+                                    className={`px-5 py-2.5 rounded-xl font-medium transition-colors ${watchedVideos[video.id]?.completed
+                                        ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
+                                        : 'bg-foreground text-background hover:bg-foreground/90'
                                         }`}
                                 >
                                     {watchedVideos[video.id]?.completed ? '✓ Completed' : 'Mark Complete'}
