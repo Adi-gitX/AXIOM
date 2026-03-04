@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowUpRight, Sparkles } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
+import PremiumBadge from '../ui/PremiumBadge';
 import { orderSheetsByPreferredFlow } from '../../lib/dsaCatalog';
 
 const DsaSheetCards = ({ sheets = [], sheetStatsById = {} }) => {
@@ -18,6 +20,7 @@ const DsaSheetCards = ({ sheets = [], sheetStatsById = {} }) => {
                     <GlassCard
                         key={sheet.id}
                         className="p-5 cursor-pointer border-border/80 hover:border-foreground/30"
+                        premium
                         onClick={() => navigate(`/app/dsa/${sheet.id}`)}
                     >
                         <div className="flex items-start justify-between gap-3">
@@ -25,27 +28,34 @@ const DsaSheetCards = ({ sheets = [], sheetStatsById = {} }) => {
                                 <p className="text-lg font-semibold text-foreground">{sheet.name}</p>
                                 <p className="text-xs text-muted-foreground mt-1">{sheet.totalTopics} topics curated</p>
                             </div>
-                            <span className="text-xs px-2 py-1 rounded-full border border-border text-muted-foreground font-mono">
-                                {stats.progress}%
-                            </span>
+                            <div className="flex flex-col items-end gap-1.5">
+                                <PremiumBadge tone="subtle" className="font-mono">
+                                    {stats.progress}%
+                                </PremiumBadge>
+                                <PremiumBadge tone="accent">
+                                    <Sparkles className="h-3 w-3" />
+                                    Active
+                                </PremiumBadge>
+                            </div>
                         </div>
 
                         <p className="text-2xl font-light text-foreground mt-4">{stats.solved}/{stats.total}</p>
                         <p className="text-xs text-muted-foreground">Problems solved</p>
 
-                        <div className="h-2 w-full rounded-full bg-foreground/10 overflow-hidden mt-3">
-                            <div className="h-full rounded-full bg-foreground" style={{ width: `${stats.progress}%` }} />
+                        <div className="premium-progress-track h-2 w-full rounded-full bg-foreground/10 mt-3">
+                            <div className="premium-progress-fill h-full rounded-full bg-foreground" style={{ width: `${stats.progress}%` }} />
                         </div>
 
                         <button
                             type="button"
-                            className="mt-4 text-sm font-medium text-foreground hover:underline underline-offset-4"
+                            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline underline-offset-4"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 navigate(`/app/dsa/${sheet.id}`);
                             }}
                         >
                             Open Sheet
+                            <ArrowUpRight className="h-3.5 w-3.5" />
                         </button>
                     </GlassCard>
                 );
