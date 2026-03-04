@@ -196,7 +196,7 @@ const DSASheetPage = () => {
                     >
                         ← Back to DSA Home
                     </button>
-                    <h1 className="text-4xl lg:text-5xl font-light text-foreground font-display tracking-tight">
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">
                         {sheet?.name || 'Loading Sheet...'}
                     </h1>
                     {sheetStats && (
@@ -244,7 +244,7 @@ const DSASheetPage = () => {
                     </GlassCard>
                 )}
 
-                <GlassCard className="p-5 space-y-4" hoverEffect={false}>
+                <div className="space-y-4 border-y border-border/50 py-4 mb-6">
                     <SheetTabs
                         sheets={sheets}
                         activeSheetId={sheet?.id}
@@ -258,10 +258,10 @@ const DSASheetPage = () => {
                         onReset={handleFilterReset}
                     />
 
-                    <p className="text-xs text-muted-foreground font-mono">
+                    <p className="text-xs text-muted-foreground font-mono px-1">
                         Showing {filteredTopics.length} topics • {visibleProblemCount} visible problems
                     </p>
-                </GlassCard>
+                </div>
 
                 <GlassCard className="p-5" hoverEffect={false}>
                     <div className="flex items-center justify-between gap-3 mb-3">
@@ -272,7 +272,7 @@ const DSASheetPage = () => {
                     {reviewItems.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No due reviews in this sheet. Keep solving and scheduling reviews.</p>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                             {reviewItems.slice(0, 6).map((item) => (
                                 <button
                                     key={item.problemId}
@@ -281,10 +281,10 @@ const DSASheetPage = () => {
                                         setExpandedTopicId(item.topicId);
                                         setFocusedProblemId(item.problemId);
                                     }}
-                                    className="text-left rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+                                    className="text-left py-2 border-b border-border/50 hover:pl-2 transition-all group"
                                 >
-                                    <p className="text-sm font-medium text-foreground line-clamp-1">{item.title}</p>
-                                    <p className="text-[11px] text-muted-foreground mt-1">
+                                    <p className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-glow transition-all">{item.title}</p>
+                                    <p className="text-[11px] text-muted-foreground mt-0.5">
                                         Due {item.reviewDueDate || 'today'} • {item.topicName}
                                     </p>
                                 </button>
