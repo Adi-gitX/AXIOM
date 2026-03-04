@@ -6,17 +6,20 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     name TEXT,
+    username TEXT UNIQUE,
     role TEXT,
     location TEXT,
     bio TEXT,
     avatar TEXT,
     banner TEXT,
+    github_username TEXT,
     experience TEXT DEFAULT '[]',
     skills TEXT DEFAULT '[]',
     socials TEXT DEFAULT '[]',
     resume_url TEXT,
     resume_name TEXT,
     is_pro INTEGER DEFAULT 0,
+    portfolio_visibility INTEGER DEFAULT 1,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
@@ -56,8 +59,20 @@ CREATE TABLE IF NOT EXISTS chat_channels (
     name TEXT NOT NULL,
     description TEXT,
     is_default INTEGER DEFAULT 0,
+    is_private INTEGER DEFAULT 0,
     created_by TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Private room members
+CREATE TABLE IF NOT EXISTS chat_room_members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    channel_id TEXT NOT NULL,
+    user_email TEXT NOT NULL,
+    role TEXT DEFAULT 'member',
+    invited_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    accepted_at TEXT,
+    UNIQUE(channel_id, user_email)
 );
 
 -- Chat Messages
@@ -164,6 +179,86 @@ CREATE TABLE IF NOT EXISTS solved_problems (
     solved_at TEXT DEFAULT CURRENT_TIMESTAMP,
     notes TEXT,
     UNIQUE(user_email, problem_id)
+);
+
+-- DSA Problem Journal (notes, time, spaced repetition)
+CREATE TABLE IF NOT EXISTS dsa_problem_journal (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    problem_id TEXT NOT NULL,
+    notes TEXT,
+    time_spent_minutes INTEGER DEFAULT 0,
+    attempts INTEGER DEFAULT 0,
+    last_attempted_at TEXT,
+    review_interval_days INTEGER DEFAULT 1,
+    review_due_date TEXT,
+    last_reviewed_at TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_email, problem_id)
+);
+
+-- GitHub account links for OSS engine
+CREATE TABLE IF NOT EXISTS github_connections (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT UNIQUE NOT NULL,
+    github_user_id TEXT,
+    username TEXT,
+    avatar_url TEXT,
+    access_token_enc TEXT,
+    scope TEXT,
+    stars_total INTEGER DEFAULT 0,
+    connected_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    last_sync_at TEXT,
+    sync_error TEXT
+);
+
+-- Imported pull requests
+CREATE TABLE IF NOT EXISTS github_pull_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    pr_id INTEGER NOT NULL,
+    repo_full_name TEXT,
+    title TEXT,
+    state TEXT,
+    merged_at TEXT,
+    created_at TEXT,
+    html_url TEXT,
+    UNIQUE(user_email, pr_id)
+);
+
+-- Daily contribution aggregates
+CREATE TABLE IF NOT EXISTS github_contribution_daily (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    activity_date TEXT NOT NULL,
+    prs_opened INTEGER DEFAULT 0,
+    prs_merged INTEGER DEFAULT 0,
+    stars_gained INTEGER DEFAULT 0,
+    UNIQUE(user_email, activity_date)
+);
+
+-- Cached good-first-issues for matching/fallback
+CREATE TABLE IF NOT EXISTS good_first_issue_cache (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    repo_full_name TEXT NOT NULL,
+    issue_number INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    html_url TEXT NOT NULL,
+    labels_json TEXT DEFAULT '[]',
+    language TEXT,
+    is_open INTEGER DEFAULT 1,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(repo_full_name, issue_number)
+);
+
+-- GSOC reminder dismiss state
+CREATE TABLE IF NOT EXISTS gsoc_reminder_state (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    milestone_id TEXT NOT NULL,
+    dismissed_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_email, milestone_id)
 );
 
 -- User Progress
