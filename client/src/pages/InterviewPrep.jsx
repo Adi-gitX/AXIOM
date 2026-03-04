@@ -91,10 +91,10 @@ const InterviewPrep = () => {
                 <motion.header
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="mb-12"
+                    className="mb-12 space-y-3"
                 >
-                    <h1 className="text-5xl font-light text-foreground text-glow font-display">Interview Prep</h1>
-                    <p className="text-muted-foreground mt-2">Resources to ace your interviews</p>
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Interview Prep</h1>
+                    <p className="text-muted-foreground text-lg mt-1">Resources to ace your interviews</p>
                     {error && (
                         <div className="mt-3 flex flex-wrap items-center gap-3">
                             <p className="text-sm text-rose-400">{error}</p>
@@ -134,7 +134,7 @@ const InterviewPrep = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.03 }}
-                                className="glass-card p-6 rounded-2xl hover:bg-accent/50 transition-all border border-border hover:border-border/80"
+                                className="p-6 rounded-2xl hover:bg-accent/50 transition-all border border-border bg-background"
                             >
                                 <div className="flex items-start justify-between gap-2">
                                     <span className="text-xs text-muted-foreground font-mono">{r.category}</span>
@@ -164,7 +164,7 @@ const InterviewPrep = () => {
                     </div>
                 )}
 
-                <div className="glass-panel p-8 rounded-3xl border border-border">
+                <div className="bg-background p-8 rounded-3xl border border-border">
                     <h2 className="text-xs font-bold text-foreground uppercase tracking-widest mb-6 opacity-50">Quick Tips</h2>
                     <div className="space-y-4">
                         {(tips.length ? tips : ['No tips available']).map((tip, i) => (
