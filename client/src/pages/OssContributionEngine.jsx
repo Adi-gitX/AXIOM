@@ -224,10 +224,10 @@ const OssContributionEngine = () => {
     return (
         <div className="min-h-screen p-8 lg:p-12">
             <div className="max-w-6xl mx-auto space-y-6">
-                <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-                    <h1 className="text-5xl font-light text-foreground font-display tracking-tight">OSS Contribution Engine</h1>
-                    <p className="text-muted-foreground text-lg font-light">
-                        Link GitHub, import PR history, and get issue recommendations tailored to your skills.
+                <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">OSS Contribution Engine</h1>
+                    <p className="text-muted-foreground text-lg font-light mt-1">
+                        Link GitHub, import PR history, and get issue recommendations.
                     </p>
                 </motion.header>
 
@@ -339,17 +339,20 @@ const OssContributionEngine = () => {
                         ) : (summary?.recentPrs || []).length === 0 ? (
                             <p className="text-sm text-muted-foreground">No PRs imported yet. Run a sync after connecting GitHub.</p>
                         ) : (
-                            <div className="space-y-2">
+                            <div className="divide-y divide-border/50">
                                 {(summary?.recentPrs || []).map((pr) => (
                                     <a
                                         key={`${pr.pr_id}-${pr.repo_full_name}`}
                                         href={pr.html_url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="block rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+                                        className="block py-3 group hover:pl-2 transition-all"
                                     >
-                                        <p className="text-sm font-medium text-foreground line-clamp-1">{pr.title}</p>
-                                        <p className="text-[11px] text-muted-foreground mt-1">
+                                        <div className="flex items-center justify-between gap-2 min-w-0">
+                                            <p className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-glow transition-all">{pr.title}</p>
+                                            <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                                        </div>
+                                        <p className="text-[11px] text-muted-foreground mt-0.5">
                                             {pr.repo_full_name} • {pr.merged_at ? 'Merged' : 'Open'}
                                         </p>
                                     </a>
