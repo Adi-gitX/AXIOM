@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, Loader2 } from 'lucide-react';
+import logoBlack from '../../assets/axiom-logo-black.png';
+import logoWhite from '../../assets/axiom-logo-white.png';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -36,6 +38,11 @@ const Login = () => {
 
             <div className="w-full max-w-md p-8 rounded-2xl bg-background border border-border shadow-2xl relative z-10">
                 <div className="text-center mb-8">
+                    <div className="flex items-center justify-center gap-2 mb-6">
+                        <img src={logoBlack} alt="Axiom" className="h-10 w-10 object-contain block dark:hidden" />
+                        <img src={logoWhite} alt="Axiom" className="h-10 w-10 object-contain hidden dark:block" />
+                        <span className="text-2xl font-bold font-display text-foreground tracking-tight">AXIOM</span>
+                    </div>
                     <h1 className="text-3xl font-bold font-display text-foreground mb-2">Welcome Back</h1>
                     <p className="text-muted-foreground">Sign in to continue your journey</p>
                 </div>

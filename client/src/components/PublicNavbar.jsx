@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import logoWhite from '../assets/axiom-logo-white.png';
 
 const PublicNavbar = () => {
     const navigate = useNavigate();
@@ -15,10 +16,11 @@ const PublicNavbar = () => {
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-2xl font-bold tracking-tight text-white font-display cursor-pointer"
+                    className="flex items-center gap-2 cursor-pointer"
                     onClick={() => navigate('/')}
                 >
-                    AXIOM
+                    <img src={logoWhite} alt="Axiom" className="h-9 w-9 object-contain" />
+                    <span className="text-xl font-bold tracking-tight text-white font-display">AXIOM</span>
                 </motion.div>
 
                 <motion.nav

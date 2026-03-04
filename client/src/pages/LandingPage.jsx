@@ -32,6 +32,7 @@ import landscapeBg from '../assets/-landscape.webp';
 import darkerLandscape from '../assets/darkerlandscape.webp';
 import footerBg from '../assets/footer.webp';
 import nightFooter from '../assets/footer.webp';
+import logoWhite from '../assets/axiom-logo-white.png';
 
 // --- COMPONENTS ---
 
@@ -176,9 +177,10 @@ const LandingPage = () => {
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="text-3xl font-bold tracking-tight text-foreground font-display"
+                                className="flex items-center gap-2.5"
                             >
-                                AXIOM
+                                <img src={logoWhite} alt="Axiom" className="h-16 w-16 object-contain" />
+                                <span className="text-3xl font-bold tracking-tight text-foreground font-display"></span>
                             </motion.div>
                             <motion.nav
                                 initial={{ opacity: 0, y: -20 }}

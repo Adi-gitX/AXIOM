@@ -3,6 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { AnimatedThemeToggler } from './AnimatedThemeToggler';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserStore } from '../stores/useUserStore';
+import logoBlack from '../assets/axiom-logo-black.png';
+import logoWhite from '../assets/axiom-logo-white.png';
 
 const Sidebar = () => {
   const { currentUser } = useAuth();
@@ -34,12 +36,11 @@ const Sidebar = () => {
   return (
     <div className="h-screen sticky top-0 flex flex-col w-72 shrink-0 z-40 p-4 transition-all duration-300">
       <div className="h-full flex flex-col rounded-[2rem] bg-background border border-border shadow-2xl overflow-hidden transition-all duration-500">
-        <div className="h-24 flex items-center px-6">
-          <NavLink to="/" className="flex items-center gap-4 group w-full py-2">
-            <div className="w-10 h-10 rounded-2xl bg-foreground/5 border border-foreground/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <span className="text-foreground text-sm font-bold font-display">A</span>
-            </div>
-            <span className="font-bold text-xl text-foreground font-display tracking-tight group-hover:text-glow transition-all">AXIOM</span>
+        <div className="h-20 flex items-center px-5">
+          <NavLink to="/" className="flex items-center gap-2 group w-full">
+            <img src={logoBlack} alt="Axiom" className="h-9 w-9 object-contain block dark:hidden shrink-0 group-hover:scale-105 transition-transform duration-200" />
+            <img src={logoWhite} alt="Axiom" className="h-9 w-9 object-contain hidden dark:block shrink-0 group-hover:scale-105 transition-transform duration-200" />
+            <span className="font-bold text-lg text-foreground font-display tracking-tight">AXIOM</span>
           </NavLink>
         </div>
 
