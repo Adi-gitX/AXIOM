@@ -28,10 +28,10 @@ import { WaitlistForm } from '../components/WaitlistForm';
 import { AnimatedThemeToggler } from '../components/AnimatedThemeToggler';
 
 // Assets
-import landscapeBg from '../assets/-landscape.png';
-import darkerLandscape from '../assets/darkerlandscape.png';
-import footerBg from '../assets/footer.png';
-import nightFooter from '../assets/footer.png';
+import landscapeBg from '../assets/-landscape.webp';
+import darkerLandscape from '../assets/darkerlandscape.webp';
+import footerBg from '../assets/footer.webp';
+import nightFooter from '../assets/footer.webp';
 
 // --- COMPONENTS ---
 
@@ -189,6 +189,8 @@ const LandingPage = () => {
                                 {[
                                     { label: 'Product', action: () => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) },
                                     { label: 'Documentation', action: () => navigate('/docs') },
+                                    { label: 'OSS', action: () => navigate('/app/oss') },
+                                    { label: 'GSOC', action: () => navigate('/app/gsoc') },
                                     { label: 'Jobs', action: () => navigate('/app/jobs') },
                                     { label: 'Pricing', action: () => navigate('/pricing') }
                                 ].map(item => (
@@ -502,7 +504,7 @@ const LandingPage = () => {
                                     Build your future,<br /><span className="text-foreground/50">line by line.</span>
                                 </h2>
                                 <p className="text-xl text-muted-foreground mb-12 leading-relaxed font-light max-w-lg">
-                                    AXIOM provides the tools, runtime, and environment you need to prove your skills to the world's best companies.
+                                    AXIOM provides the tools, runtime, and environment you need to prove your skills to the world&apos;s best companies.
                                 </p>
                                 <div className="space-y-5">
                                     {['450+ DSA Patterns & Tracking', 'Video Course Library', 'AI-powered Interview Prep'].map((item, i) => (
@@ -598,6 +600,8 @@ const LandingPage = () => {
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="/app/education" className="hover:text-white hover:underline transition-all">Education Hub</a></li>
                                     <li><a href="/app/dsa" className="hover:text-white hover:underline transition-all">DSA Tracker</a></li>
+                                    <li><a href="/app/oss" className="hover:text-white hover:underline transition-all">OSS Engine</a></li>
+                                    <li><a href="/app/gsoc" className="hover:text-white hover:underline transition-all">GSOC Accelerator</a></li>
                                     <li><a href="/app/interview" className="hover:text-white hover:underline transition-all">Interview Prep</a></li>
                                     <li><a href="/app/connect" className="hover:text-white hover:underline transition-all">Developer Connect</a></li>
                                     <li><a href="/app/jobs" className="hover:text-white hover:underline transition-all">Jobs Board</a></li>
@@ -610,6 +614,7 @@ const LandingPage = () => {
                                 <ul className="space-y-4 text-white/80 text-sm font-medium drop-shadow-md">
                                     <li><a href="/docs" className="hover:text-white hover:underline transition-all">Documentation</a></li>
                                     <li><a href="/app/posts" className="hover:text-white hover:underline transition-all">Community Posts</a></li>
+                                    <li><a href="/app/profile" className="hover:text-white hover:underline transition-all">Public Portfolio</a></li>
                                     <li><a href="/pricing" className="hover:text-white hover:underline transition-all">Pricing</a></li>
                                     <li><a href="/docs" className="hover:text-white hover:underline transition-all">System Design Guide</a></li>
                                 </ul>
