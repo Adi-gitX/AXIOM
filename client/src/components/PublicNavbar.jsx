@@ -30,6 +30,8 @@ const PublicNavbar = () => {
                     {[
                         { label: 'Home', path: '/' },
                         { label: 'Documentation', path: '/docs' },
+                        { label: 'OSS', path: '/app/oss' },
+                        { label: 'GSOC', path: '/app/gsoc' },
                         { label: 'Pricing', path: '/pricing' }
                     ].map(item => (
                         <button
