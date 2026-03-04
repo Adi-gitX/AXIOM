@@ -314,7 +314,7 @@ const DeveloperConnect = () => {
         <div className="min-h-screen bg-transparent flex">
 
             {/* Sidebar */}
-            <div className="w-60 border-r border-border p-6 shrink-0 hidden lg:block bg-card/50 backdrop-blur-xl">
+            <div className="w-60 border-r border-border p-6 shrink-0 hidden lg:block bg-background/40">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xs font-bold text-foreground uppercase tracking-widest opacity-50">Channels</h2>
                     <button
@@ -336,7 +336,7 @@ const DeveloperConnect = () => {
                             key={channel.id}
                             onClick={() => setActiveChannel(channel.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all border ${activeChannel === channel.id
-                                ? 'glass-card border-border text-foreground shadow-glow'
+                                ? 'bg-background/80 border-border text-foreground shadow-sm'
                                 : 'border-transparent text-muted-foreground hover:bg-muted hover:text-foreground'
                                 }`}
                         >
@@ -396,8 +396,8 @@ const DeveloperConnect = () => {
             <div className="flex-1 flex flex-col min-h-screen">
 
                 {/* Header */}
-                <header className="px-8 py-6 border-b border-border bg-card/30 backdrop-blur-md">
-                    <h1 className="text-2xl font-light text-foreground font-display tracking-tight">
+                <header className="px-8 py-6 border-b border-border bg-background/40">
+                    <h1 className="text-2xl font-semibold text-foreground font-display tracking-tight">
                         #{activeChannelData.name}
                     </h1>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -521,9 +521,9 @@ const DeveloperConnect = () => {
                 </div>
 
                 {/* Input */}
-                <div className="px-8 py-6 border-t border-border bg-card/20 backdrop-blur-xl">
+                <div className="px-8 py-6 border-t border-border bg-background/40">
                     <div className="max-w-4xl mx-auto">
-                        <div className="flex items-center gap-3 glass-panel px-2 py-2 rounded-2xl border-border">
+                        <div className="flex items-center gap-3 bg-background border border-border px-2 py-2 rounded-2xl shadow-sm">
                             <input
                                 type="text"
                                 value={messageInput}
@@ -535,7 +535,7 @@ const DeveloperConnect = () => {
                             <button
                                 onClick={handleSend}
                                 disabled={!messageInput.trim() || !activeChannel || !currentUser?.email}
-                                className="p-2.5 rounded-xl bg-foreground text-background hover:opacity-90 disabled:opacity-30 disabled:bg-muted disabled:text-muted-foreground transition-all shadow-glow"
+                                className="p-2.5 rounded-xl bg-foreground text-background hover:opacity-90 disabled:opacity-30 disabled:bg-muted disabled:text-muted-foreground transition-all shadow-sm"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M5 12h14M12 5l7 7-7 7" />
