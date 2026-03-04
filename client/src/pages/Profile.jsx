@@ -413,7 +413,7 @@ const Profile = () => {
     return (
         <div className="flex-1 min-h-screen bg-transparent text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar pb-32">
             <div className="max-w-5xl mx-auto space-y-8">
-                <div className="relative group rounded-[2.5rem] overflow-hidden bg-background/50 backdrop-blur-3xl border border-white/20 dark:border-white/5 shadow-2xl transition-all duration-500 hover:shadow-primary/5">
+                <div className="relative group rounded-2xl overflow-hidden bg-background border border-border transition-all duration-300">
                     <div className="h-64 md:h-80 w-full overflow-hidden relative">
                         <img src={user.banner} alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
@@ -435,7 +435,7 @@ const Profile = () => {
                     </div>
                     <div className="px-8 pb-8 -mt-20 relative flex flex-col md:flex-row items-end md:items-start gap-6">
                         <div className="relative">
-                            <div className="w-40 h-40 rounded-[2rem] border-4 border-background overflow-hidden relative group/avatar shadow-2xl bg-muted">
+                            <div className="w-40 h-40 rounded-2xl border-4 border-background overflow-hidden relative group/avatar shadow-lg bg-muted">
                                 <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                                 <input
                                     type="file"
@@ -463,17 +463,17 @@ const Profile = () => {
                                             <input
                                                 value={user.name}
                                                 onChange={(e) => setUser({ ...user, name: e.target.value })}
-                                                className="text-4xl font-bold font-display bg-transparent border-b border-white/20 focus:border-primary focus:outline-none w-full md:w-auto"
+                                                className="text-4xl font-bold font-display bg-transparent border-b border-border focus:border-foreground focus:outline-none w-full md:w-auto"
                                             />
                                             <input
                                                 value={user.role}
                                                 onChange={(e) => setUser({ ...user, role: e.target.value })}
-                                                className="text-lg text-muted-foreground font-medium bg-transparent border-b border-white/20 focus:border-primary focus:outline-none w-full md:w-auto block"
+                                                className="text-lg text-muted-foreground font-medium bg-transparent border-b border-border focus:border-foreground focus:outline-none w-full md:w-auto block"
                                             />
                                             <input
                                                 value={user.location}
                                                 onChange={(e) => setUser({ ...user, location: e.target.value })}
-                                                className="text-sm text-muted-foreground bg-transparent border-b border-white/20 focus:border-primary focus:outline-none w-full md:w-auto block"
+                                                className="text-sm text-muted-foreground bg-transparent border-b border-border focus:border-foreground focus:outline-none w-full md:w-auto block"
                                             />
                                         </div>
                                     ) : (
@@ -489,17 +489,17 @@ const Profile = () => {
                                 </div>
                                 <div className="flex gap-3">
                                     {isEditing ? (
-                                        <button onClick={handleSave} className="px-6 py-2.5 rounded-full bg-green-500 text-white font-bold text-sm hover:bg-green-600 transition-all shadow-lg active:scale-95 flex items-center gap-2">
+                                        <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-foreground text-background font-medium text-sm hover:opacity-90 transition-all flex items-center gap-2">
                                             <Check className="w-4 h-4" /> Save
                                         </button>
                                     ) : (
-                                        <button onClick={() => setIsEditing(true)} className="px-6 py-2.5 rounded-full bg-foreground text-background font-bold text-sm hover:opacity-90 transition-all shadow-lg active:scale-95">
+                                        <button onClick={() => setIsEditing(true)} className="px-5 py-2 rounded-xl bg-foreground text-background font-medium text-sm hover:opacity-90 transition-all">
                                             Edit Profile
                                         </button>
                                     )}
                                     <button
                                         onClick={handleCopyPublicProfile}
-                                        className="p-2.5 rounded-full border border-border hover:bg-muted/50 transition-all"
+                                        className="p-2 rounded-xl border border-border hover:bg-foreground/5 transition-all"
                                         title="Copy public profile URL"
                                     >
                                         <Settings className="w-5 h-5 text-muted-foreground" />
@@ -512,7 +512,7 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-8">
-                        <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
+                        <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
                             <h2 className="text-xl font-bold font-display mb-4 flex items-center gap-2">
                                 About
                                 {isEditing && <span className="text-xs font-sans font-normal text-muted-foreground bg-muted px-2 py-1 rounded-full">Editing</span>}
@@ -528,7 +528,7 @@ const Profile = () => {
                             )}
                         </section>
 
-                        <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
+                        <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-bold font-display">Experience</h2>
                                 {isEditing && (
@@ -551,12 +551,12 @@ const Profile = () => {
                                             <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-background border-2 border-primary" />
 
                                             {isEditing ? (
-                                                <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-white/5">
+                                                <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border">
                                                     <div className="flex justify-between items-start">
                                                         <input
                                                             value={exp.role}
                                                             onChange={(e) => handleExperienceChange(exp.id, 'role', e.target.value)}
-                                                            className="font-bold bg-transparent border-b border-white/10 w-full focus:outline-none focus:border-primary"
+                                                            className="font-bold bg-transparent border-b border-border w-full focus:outline-none focus:border-foreground"
                                                             placeholder="Role"
                                                         />
                                                         <button onClick={() => removeExperience(exp.id)} className="text-red-400 hover:text-red-500 p-1"><Trash2 className="w-4 h-4" /></button>
@@ -565,20 +565,20 @@ const Profile = () => {
                                                         <input
                                                             value={exp.company}
                                                             onChange={(e) => handleExperienceChange(exp.id, 'company', e.target.value)}
-                                                            className="text-sm font-medium bg-transparent border-b border-white/10 flex-1 focus:outline-none focus:border-primary"
+                                                            className="text-sm font-medium bg-transparent border-b border-border flex-1 focus:outline-none focus:border-foreground"
                                                             placeholder="Company"
                                                         />
                                                         <input
                                                             value={exp.period}
                                                             onChange={(e) => handleExperienceChange(exp.id, 'period', e.target.value)}
-                                                            className="text-sm text-muted-foreground bg-transparent border-b border-white/10 w-32 focus:outline-none focus:border-primary"
+                                                            className="text-sm text-muted-foreground bg-transparent border-b border-border w-32 focus:outline-none focus:border-foreground"
                                                             placeholder="Period"
                                                         />
                                                     </div>
                                                     <textarea
                                                         value={exp.description}
                                                         onChange={(e) => handleExperienceChange(exp.id, 'description', e.target.value)}
-                                                        className="w-full text-sm bg-transparent border border-white/10 rounded-lg p-2 focus:outline-none focus:border-primary resize-none"
+                                                        className="w-full text-sm bg-transparent border border-border rounded-lg p-2 focus:outline-none focus:border-foreground resize-none"
                                                         rows={2}
                                                         placeholder="Description"
                                                     />
@@ -600,7 +600,7 @@ const Profile = () => {
                             </div>
                         </section>
 
-                        <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
+                        <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
                             <h2 className="text-xl font-bold font-display mb-6">Tech Stack</h2>
                             <div className="flex flex-wrap gap-3">
                                 <AnimatePresence>
@@ -611,7 +611,7 @@ const Profile = () => {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
-                                            className="group relative pl-4 pr-4 py-3 rounded-2xl bg-background/40 border border-white/10 flex items-center gap-3 hover:bg-background/60 transition-all cursor-default select-none shadow-sm"
+                                            className="group relative pl-4 pr-4 py-3 rounded-2xl bg-background border border-border flex items-center gap-3 hover:bg-foreground/5 transition-all cursor-default select-none shadow-sm"
                                         >
                                             <span className="font-semibold text-foreground/80 text-sm">{tech}</span>
                                             <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-green-400 to-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
@@ -629,7 +629,7 @@ const Profile = () => {
                                 </AnimatePresence>
 
                                 {isEditing && (
-                                    <div className="flex items-center gap-2 pl-3 pr-2 py-2 rounded-2xl bg-muted/20 border border-dashed border-muted-foreground/30 focus-within:border-primary/50 focus-within:bg-muted/40 transition-colors">
+                                    <div className="flex items-center gap-2 pl-3 pr-2 py-2 rounded-2xl bg-background border border-dashed border-border focus-within:border-foreground/40 focus-within:bg-foreground/5 transition-colors">
                                         <Plus className="w-4 h-4 text-muted-foreground" />
                                         <input
                                             type="text"
@@ -646,7 +646,7 @@ const Profile = () => {
                     </div>
 
                     <div className="space-y-6">
-                        <div className="p-6 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
+                        <div className="p-6 rounded-2xl bg-background border border-border shadow-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold font-display">Connect</h3>
                                 <button onClick={() => setShowSocialModal(true)} className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground">
@@ -703,10 +703,10 @@ const Profile = () => {
                         </div>
 
                         {(user.resumeUrl || isEditing) && (
-                            <section className="p-8 rounded-[2rem] bg-background/50 backdrop-blur-xl border border-white/20 dark:border-white/5 shadow-sm">
+                            <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
                                 <h2 className="text-xl font-bold font-display mb-6">Resume</h2>
 
-                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-muted/30 border border-white/10">
+                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-background border border-border">
                                     <FileText className="w-10 h-10 text-primary" />
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold truncate">{user.resumeName || 'No resume uploaded'}</p>
@@ -745,7 +745,7 @@ const Profile = () => {
                                 </div>
 
                                 {user.resumeUrl && (
-                                    <div className="mt-6 w-full h-[500px] rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+                                    <div className="mt-6 w-full h-[500px] rounded-2xl overflow-hidden border border-border bg-background">
                                         <iframe
                                             src={user.resumeUrl.replace('http://', 'https://')}
                                             className="w-full h-full"
@@ -759,7 +759,7 @@ const Profile = () => {
                             </section>
                         )}
 
-                        <div className="p-6 rounded-[2rem] bg-background/30 backdrop-blur-md border border-white/10 shadow-sm space-y-4">
+                        <div className="p-6 rounded-2xl bg-background border border-border shadow-sm space-y-4">
                             <div className="flex items-center gap-3 text-sm">
                                 <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
                                     <Globe className="w-4 h-4" />
