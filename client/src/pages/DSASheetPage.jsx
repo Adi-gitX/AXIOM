@@ -12,6 +12,7 @@ const DEFAULT_FILTERS = {
     query: '',
     status: 'all',
     difficulty: 'all',
+    company: '',
     sort: 'sheet-order',
 };
 
@@ -26,6 +27,7 @@ const parseFilters = (searchParams) => {
         difficulty: ['Easy', 'Medium', 'Hard', 'Unknown'].includes(difficulty)
             ? difficulty
             : DEFAULT_FILTERS.difficulty,
+        company: searchParams.get('c') || '',
         sort: ['sheet-order', 'topic-a-z', 'most-complete'].includes(sort)
             ? sort
             : DEFAULT_FILTERS.sort,
@@ -37,6 +39,7 @@ const buildSearchParams = (filters) => {
     if (filters.query.trim()) params.set('q', filters.query.trim());
     if (filters.status !== 'all') params.set('status', filters.status);
     if (filters.difficulty !== 'all') params.set('difficulty', filters.difficulty);
+    if (filters.company.trim()) params.set('c', filters.company.trim());
     if (filters.sort !== 'sheet-order') params.set('sort', filters.sort);
     return params;
 };
@@ -50,34 +53,42 @@ const DSASheetPage = () => {
     const {
         sheets,
         solvedSet,
+        pendingProblemSet,
         loading,
         error,
+        warning,
         getSheet,
         toggleProblem,
+        dsaLastError,
+        clearDsaError,
         sheetStatsById,
+        problemMetaById,
+        reviewQueue,
+        saveProblemMeta,
+        completeReview,
+        refreshProblemMeta,
+        refreshReviewQueue,
         refresh,
     } = useDsaData();
 
     const [expandedTopicId, setExpandedTopicId] = useState(null);
+    const [focusedProblemId, setFocusedProblemId] = useState('');
 
     const isSupportedRoute = isSupportedSheetId(sheetId);
     const sheet = useMemo(() => getSheet(sheetId), [getSheet, sheetId]);
     const filters = useMemo(() => parseFilters(searchParams), [searchParams]);
 
-    if (!isSupportedRoute) {
-        return <Navigate to="/app/dsa" replace />;
-    }
-
     useEffect(() => {
-        if (!loading && !sheet) {
+        if (isSupportedRoute && !loading && !sheet) {
             navigate('/app/dsa', { replace: true });
         }
-    }, [loading, sheet, navigate]);
+    }, [isSupportedRoute, loading, sheet, navigate]);
 
     const filteredTopics = useMemo(() => {
         if (!sheet) return [];
 
         const query = filters.query.trim().toLowerCase();
+        const companyQuery = filters.company.trim().toLowerCase();
 
         const topicsWithFilteredProblems = (sheet.topics || []).map((topic) => {
             const topicName = String(topic.name || '').toLowerCase();
@@ -95,6 +106,12 @@ const DSASheetPage = () => {
                 if (filters.status === 'solved' && !solvedSet.has(problem.id)) return false;
                 if (filters.status === 'unsolved' && solvedSet.has(problem.id)) return false;
                 if (filters.difficulty !== 'all' && problem.difficulty !== filters.difficulty) return false;
+
+                if (companyQuery) {
+                    const tags = Array.isArray(problem.company_tags) ? problem.company_tags : [];
+                    const hasCompany = tags.some((tag) => String(tag).toLowerCase().includes(companyQuery));
+                    if (!hasCompany) return false;
+                }
 
                 return true;
             });
@@ -126,6 +143,11 @@ const DSASheetPage = () => {
         return sorted;
     }, [sheet, solvedSet, filters]);
 
+    const reviewItems = useMemo(
+        () => (reviewQueue || []).filter((item) => item.sheetId === sheetId),
+        [reviewQueue, sheetId]
+    );
+
     const visibleProblemCount = useMemo(
         () => filteredTopics.reduce((sum, topic) => sum + topic.problems.length, 0),
         [filteredTopics]
@@ -146,6 +168,18 @@ const DSASheetPage = () => {
             search: location.search,
         });
     };
+
+    const handleSaveProblemMeta = async (problemId, payload) => {
+        await saveProblemMeta({ problemId, ...payload });
+    };
+
+    const handleReviewComplete = async (problemId, rating) => {
+        await completeReview(problemId, rating);
+    };
+
+    if (!isSupportedRoute) {
+        return <Navigate to="/app/dsa" replace />;
+    }
 
     if (!loading && !sheet) return null;
 
@@ -185,6 +219,31 @@ const DSASheetPage = () => {
                     </GlassCard>
                 )}
 
+                {warning && !loading && (
+                    <GlassCard className="p-4" hoverEffect={false}>
+                        <p className="text-sm text-amber-500">{warning}</p>
+                    </GlassCard>
+                )}
+
+                {dsaLastError && (
+                    <GlassCard className="p-4" hoverEffect={false}>
+                        <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm text-rose-500">
+                                {dsaLastError.code === 'AUTH_MISSING_TOKEN'
+                                    ? 'Session not ready. Please retry this toggle in a moment.'
+                                    : dsaLastError.message}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={clearDsaError}
+                                className="text-xs text-muted-foreground hover:text-foreground"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </GlassCard>
+                )}
+
                 <GlassCard className="p-5 space-y-4" hoverEffect={false}>
                     <SheetTabs
                         sheets={sheets}
@@ -202,6 +261,36 @@ const DSASheetPage = () => {
                     <p className="text-xs text-muted-foreground font-mono">
                         Showing {filteredTopics.length} topics • {visibleProblemCount} visible problems
                     </p>
+                </GlassCard>
+
+                <GlassCard className="p-5" hoverEffect={false}>
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                        <p className="text-sm font-semibold text-foreground">Review Today</p>
+                        <span className="text-xs text-muted-foreground font-mono">{reviewItems.length} due</span>
+                    </div>
+
+                    {reviewItems.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No due reviews in this sheet. Keep solving and scheduling reviews.</p>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {reviewItems.slice(0, 6).map((item) => (
+                                <button
+                                    key={item.problemId}
+                                    type="button"
+                                    onClick={() => {
+                                        setExpandedTopicId(item.topicId);
+                                        setFocusedProblemId(item.problemId);
+                                    }}
+                                    className="text-left rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+                                >
+                                    <p className="text-sm font-medium text-foreground line-clamp-1">{item.title}</p>
+                                    <p className="text-[11px] text-muted-foreground mt-1">
+                                        Due {item.reviewDueDate || 'today'} • {item.topicName}
+                                    </p>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </GlassCard>
 
                 {loading ? (
@@ -227,9 +316,14 @@ const DSASheetPage = () => {
                                 key={topic.id}
                                 topic={topic}
                                 solvedSet={solvedSet}
+                                pendingProblemSet={pendingProblemSet}
                                 isExpanded={expandedTopicId === topic.id}
-                                onToggleExpand={() => setExpandedTopicId((prev) => prev === topic.id ? null : topic.id)}
+                                focusedProblemId={focusedProblemId}
+                                problemMetaById={problemMetaById}
+                                onToggleExpand={() => setExpandedTopicId((prev) => (prev === topic.id ? null : topic.id))}
                                 onToggleProblem={toggleProblem}
+                                onSaveProblemMeta={handleSaveProblemMeta}
+                                onCompleteReview={handleReviewComplete}
                             />
                         ))}
                     </div>
