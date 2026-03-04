@@ -8,7 +8,7 @@ const Layout = () => {
     const isChatPage = location.pathname.startsWith('/app/connect');
 
     return (
-        <div className="flex w-full min-h-screen bg-transparent text-foreground overflow-hidden">
+        <div className="flex w-full max-w-[1600px] mx-auto min-h-screen bg-transparent text-foreground overflow-hidden">
             <Sidebar />
             <main className="flex-1 relative h-screen">
                 <AnimatePresence mode="wait">

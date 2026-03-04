@@ -115,7 +115,7 @@ const DsaTopicAccordion = ({
             <button
                 type="button"
                 onClick={onToggleExpand}
-                className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-foreground/5 transition-colors"
+                className="w-full px-5 py-4 flex flex-col md:flex-row md:items-center justify-between text-left hover:bg-foreground/5 transition-colors"
             >
                 <div>
                     <p className="font-semibold text-foreground">{topic.name}</p>
@@ -261,7 +261,7 @@ const DsaTopicAccordion = ({
                                                                 onChange={(event) => updateDraft(problem.id, { notes: event.target.value })}
                                                                 rows={3}
                                                                 placeholder="Write revision notes, edge cases, mistakes..."
-                                                                className="w-full rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                                                className="w-full rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
                                                             />
                                                         </div>
                                                         <div className="space-y-2">
@@ -272,7 +272,7 @@ const DsaTopicAccordion = ({
                                                                     min="0"
                                                                     value={getDraft(problem.id).timeSpentMinutes}
                                                                     onChange={(event) => updateDraft(problem.id, { timeSpentMinutes: event.target.value })}
-                                                                    className="w-full rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                                                    className="w-full rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
                                                                 />
                                                             </div>
                                                             <div>
@@ -283,7 +283,7 @@ const DsaTopicAccordion = ({
                                                                     max="120"
                                                                     value={getDraft(problem.id).reviewIntervalDays}
                                                                     onChange={(event) => updateDraft(problem.id, { reviewIntervalDays: event.target.value })}
-                                                                    className="w-full rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                                                    className="w-full rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
                                                                 />
                                                             </div>
                                                         </div>
@@ -307,7 +307,7 @@ const DsaTopicAccordion = ({
                                                                         type="button"
                                                                         onClick={() => handleReview(problem.id, rating)}
                                                                         disabled={reviewingProblemId === problem.id}
-                                                                        className="rounded-lg border border-border px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:border-foreground/40"
+                                                                        className="rounded-lg border border-border px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
                                                                     >
                                                                         {rating}
                                                                     </button>

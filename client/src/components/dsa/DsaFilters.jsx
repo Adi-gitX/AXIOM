@@ -9,14 +9,14 @@ const DsaFilters = ({ filters, onChange, onReset }) => {
                     value={filters.query}
                     onChange={(e) => onChange({ query: e.target.value })}
                     placeholder="Search topics or problems"
-                    className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                    className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
                 />
             </div>
 
             <select
                 value={filters.status}
                 onChange={(e) => onChange({ status: e.target.value })}
-                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
             >
                 <option value="all">All status</option>
                 <option value="solved">Solved</option>
@@ -26,7 +26,7 @@ const DsaFilters = ({ filters, onChange, onReset }) => {
             <select
                 value={filters.difficulty}
                 onChange={(e) => onChange({ difficulty: e.target.value })}
-                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
             >
                 <option value="all">All difficulty</option>
                 <option value="Easy">Easy</option>
@@ -40,13 +40,13 @@ const DsaFilters = ({ filters, onChange, onReset }) => {
                 value={filters.company}
                 onChange={(e) => onChange({ company: e.target.value })}
                 placeholder="Company tag (e.g. Amazon)"
-                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
             />
 
             <select
                 value={filters.sort}
                 onChange={(e) => onChange({ sort: e.target.value })}
-                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                className="rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20 focus:border-foreground/40 transition-colors"
             >
                 <option value="sheet-order">Sheet order</option>
                 <option value="topic-a-z">Topic A-Z</option>
