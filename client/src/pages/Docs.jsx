@@ -69,7 +69,7 @@ const Docs = () => {
 
                     <main className="md:ml-72 w-full py-8 space-y-20 pb-28">
                         <section id="overview" className="space-y-4">
-                            <h1 className="text-5xl font-bold tracking-tight text-foreground font-display">AXIOM Product Docs</h1>
+                            <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight text-foreground font-display">AXIOM Product Docs</h1>
                             <p className="text-lg text-muted-foreground max-w-3xl">
                                 AXIOM is a student-focused engineering growth platform. The current product combines DSA execution,
                                 OSS contribution tracking, GSOC planning, learning modules, and a public portfolio surface.
