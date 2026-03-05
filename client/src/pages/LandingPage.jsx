@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import SEOHead from '../components/SEOHead';
 import { motion, useScroll, useTransform, useInView, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ReactLenis } from '@studio-freight/react-lenis';
@@ -135,6 +136,40 @@ const LandingPage = () => {
     const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+    // Splash screen state
+    const [splashPhase, setSplashPhase] = useState('showing'); // 'showing' | 'moving' | 'done'
+    const logoTargetRef = useRef(null);
+    const [targetPos, setTargetPos] = useState({ top: 40, left: 30 });
+
+    useEffect(() => {
+        // Measure the navbar logo placeholder position
+        const measure = () => {
+            if (logoTargetRef.current) {
+                const rect = logoTargetRef.current.getBoundingClientRect();
+                setTargetPos({ top: rect.top, left: rect.left });
+            }
+        };
+        measure();
+        window.addEventListener('resize', measure);
+
+        // Phase 1: Show logo centered for 1.2s, then start moving
+        const moveTimer = setTimeout(() => {
+            measure(); // re-measure right before moving
+            setSplashPhase('moving');
+        }, 1200);
+
+        // Phase 2: After move animation completes (0.8s), mark done
+        const doneTimer = setTimeout(() => {
+            setSplashPhase('done');
+        }, 2200);
+
+        return () => {
+            clearTimeout(moveTimer);
+            clearTimeout(doneTimer);
+            window.removeEventListener('resize', measure);
+        };
+    }, []);
+
     // Theme Detection for Image Switching
     const [isDark, setIsDark] = useState(false);
     useEffect(() => {
@@ -151,6 +186,75 @@ const LandingPage = () => {
     return (
         <ReactLenis root options={{ lerp: 0.05, duration: 1.2, smoothTouch: true, wheelMultiplier: 0.8 }}>
             <div className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans overflow-x-hidden">
+                <SEOHead
+                    title={null}
+                    description="Free, open-source developer career command center. Track DSA practice with 1,096 problems, sync GitHub OSS contributions, prepare for GSOC, ace interviews, find jobs, and build your public portfolio."
+                    path="/"
+                />
+
+                {/* SPLASH: Black background overlay */}
+                <AnimatePresence>
+                    {splashPhase !== 'done' && (
+                        <motion.div
+                            key="splash-bg"
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: splashPhase === 'moving' ? 0 : 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.6, ease: 'easeInOut' }}
+                            className="fixed inset-0 z-[9999] bg-black pointer-events-none"
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* SPLASH: Animated logo that travels from center to navbar */}
+                {splashPhase !== 'done' && (
+                    <motion.img
+                        key="splash-logo"
+                        src={logoWhite}
+                        alt="Axiom"
+                        initial={{
+                            top: '50vh',
+                            left: '50vw',
+                            x: '-50%',
+                            y: '-50%',
+                            width: 80,
+                            height: 80,
+                            opacity: 0,
+                            scale: 0.7,
+                        }}
+                        animate={splashPhase === 'moving' ? {
+                            top: targetPos.top,
+                            left: targetPos.left,
+                            x: 0,
+                            y: 0,
+                            width: 48,
+                            height: 48,
+                            opacity: 1,
+                            scale: 1,
+                        } : {
+                            top: '50vh',
+                            left: '50vw',
+                            x: '-50%',
+                            y: '-50%',
+                            width: 80,
+                            height: 80,
+                            opacity: 1,
+                            scale: 1,
+                        }}
+                        transition={splashPhase === 'moving' ? {
+                            duration: 0.8,
+                            ease: [0.76, 0, 0.24, 1],
+                        } : {
+                            duration: 0.5,
+                            ease: 'easeOut',
+                        }}
+                        style={{
+                            position: 'fixed',
+                            zIndex: 10000,
+                            objectFit: 'contain',
+                        }}
+                    />
+                )}
 
                 {/* MAIN CONTENT WRAPPER (Z-10 to cover footer) */}
                 <div className="relative z-10 bg-background shadow-2xl mb-[80vh]">
@@ -174,18 +278,22 @@ const LandingPage = () => {
 
                         {/* Navigation */}
                         <header className="relative z-20 px-6 md:px-12 py-8 flex justify-between items-center">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center gap-2.5"
-                            >
-                                <img src={logoWhite} alt="Axiom" className="h-16 w-16 object-contain" />
-                                <span className="text-3xl font-bold tracking-tight text-foreground font-display"></span>
-                            </motion.div>
+                            <div className="flex items-center gap-2.5" ref={logoTargetRef}>
+                                {splashPhase === 'done' && (
+                                    <motion.img
+                                        src={logoWhite}
+                                        alt="Axiom"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="h-12 w-12 object-contain"
+                                    />
+                                )}
+                            </div>
                             <motion.nav
                                 initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
+                                animate={splashPhase === 'done' ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+                                transition={{ delay: 0.2 }}
                                 className="hidden md:flex gap-1 text-sm font-medium text-muted-foreground bg-background/50 backdrop-blur-xl py-2 px-3 rounded-full border border-border/20 shadow-sm"
                             >
                                 {[

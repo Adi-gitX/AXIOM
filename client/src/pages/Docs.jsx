@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import SEOHead from '../components/SEOHead';
 import { ReactLenis } from '@studio-freight/react-lenis';
 import PublicNavbar from '../components/PublicNavbar';
 
@@ -45,6 +46,11 @@ const Docs = () => {
     return (
         <ReactLenis root options={{ lerp: 0.05 }}>
             <div className="min-h-screen">
+                <SEOHead
+                    title="Documentation"
+                    description="AXIOM product documentation — Dashboard, DSA Tracker, OSS Engine, GSOC Accelerator, and API reference for the developer career command center."
+                    path="/docs"
+                />
                 <PublicNavbar />
 
                 <div className="max-w-7xl mx-auto pt-32 px-6 flex flex-col md:flex-row gap-12" ref={scrollRef}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import SEOHead from '../components/SEOHead';
 import { ReactLenis } from '@studio-freight/react-lenis';
 import { motion } from 'framer-motion';
 import { Check, Sparkles, BarChart3 } from 'lucide-react';
@@ -25,6 +26,11 @@ const Pricing = () => {
     return (
         <ReactLenis root options={{ lerp: 0.05 }}>
             <div className="min-h-screen font-sans pb-24">
+                <SEOHead
+                    title="Pricing"
+                    description="AXIOM pricing — Free Forever plan with full DSA tracking, OSS engine, GSOC accelerator, education hub, and more. Pro plan for AI-powered features and advanced analytics."
+                    path="/pricing"
+                />
                 <PublicNavbar />
 
                 <div className="pt-36 px-6 text-center max-w-4xl mx-auto mb-16">
