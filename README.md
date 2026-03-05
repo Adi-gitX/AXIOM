@@ -1,296 +1,249 @@
+<div align="center">
+
+<img src="client/src/assets/axiom-logo-white.png" alt="AXIOM Logo" width="120" />
+
 # AXIOM
 
-AXIOM is a full-stack developer growth platform for students and early-career engineers.
-It combines daily execution systems for DSA, OSS, GSOC preparation, interview prep, education tracking, community collaboration, and public portfolio presentation.
+### The Developer Career Command Center
 
-## Table of Contents
+**Stop juggling 10 platforms. One place for DSA, OSS, GSOC, interviews, jobs, and your public portfolio.**
 
-- [What AXIOM Solves](#what-axiom-solves)
-- [Core Capabilities](#core-capabilities)
-- [Architecture](#architecture)
-- [Monorepo Layout](#monorepo-layout)
-- [DSA System Highlights](#dsa-system-highlights)
-- [Quick Start](#quick-start)
-- [Environment Variables](#environment-variables)
-- [Scripts](#scripts)
-- [API Surface Overview](#api-surface-overview)
-- [Security and Reliability](#security-and-reliability)
-- [Operational Runbook](#operational-runbook)
-- [Quality Gates](#quality-gates)
-- [Contributing](#contributing)
+[![CI](https://github.com/Adi-gitX/AXIOM/actions/workflows/ci.yml/badge.svg)](https://github.com/Adi-gitX/AXIOM/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Adi-gitX/AXIOM?style=social)](https://github.com/Adi-gitX/AXIOM/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Adi-gitX/AXIOM?style=social)](https://github.com/Adi-gitX/AXIOM/network)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![GitHub issues](https://img.shields.io/github/issues/Adi-gitX/AXIOM)](https://github.com/Adi-gitX/AXIOM/issues)
 
-## What AXIOM Solves
+[🚀 Live Demo](https://axiomdev.vercel.app) · [📖 Docs](APP_DOCUMENTATION.md) · [🐛 Report Bug](https://github.com/Adi-gitX/AXIOM/issues/new?template=bug_report.yml) · [✨ Request Feature](https://github.com/Adi-gitX/AXIOM/issues/new?template=feature_request.yml)
 
-AXIOM is designed as an execution-first command center, not just a content browser.
+</div>
 
-It gives users:
+---
 
-- Daily progress visibility with DSA-focused activity heatmaps and streaks
-- Structured DSA workflow with sheet-level tracking, review queues, notes, and time logs
-- OSS momentum tracking through GitHub OAuth sync and issue recommendations
-- GSOC readiness planning with timelines, organizations, and reminders
-- Career-facing outputs through public portfolio and ATS scoring
+## 💡 The Problem
 
-## Core Capabilities
+Every aspiring developer faces the same chaos:
 
-- Dashboard command center (`/app`)
-- DSA Experience 2.0 (`/app/dsa`, `/app/dsa/:sheetId`)
-- OSS Contribution Engine (`/app/oss`)
-- GSOC Accelerator (`/app/gsoc`)
-- Education Hub (`/app/education`)
-- Interview Prep (`/app/interview`)
-- Dev Connect (`/app/connect`)
-- Jobs (`/app/jobs`) and Posts (`/app/posts`)
-- Profile and public portfolio (`/app/profile`, `/u/:username`)
+> *"I use LeetCode for DSA, another site for interview prep, LinkedIn for jobs, GitHub for OSS, a spreadsheet for tracking, and I still have no idea if I'm making progress."*
 
-## Architecture
+**AXIOM eliminates the fragmentation.** It's a single, execution-first command center where you track DSA streaks, prepare for GSOC, build your OSS portfolio, prep for interviews, and find jobs — all with real-time progress visibility.
 
-```mermaid
-graph LR
-    U["User"] --> C["Vite React Client"]
-    C -->|"/api via proxy or VITE_API_URL"| S["Express API Server"]
+---
 
-    C --> F["Firebase Auth SDK"]
-    S -->|"Verify bearer token"| FI["Firebase Identity Toolkit"]
+## ⚡ Feature Overview
 
-    S --> DB["SQLite (sql.js)"]
-    S --> GH["GitHub OAuth + API"]
-    S --> CL["Cloudinary (optional)"]
+| Module | What It Does | Why It Matters |
+|--------|-------------|----------------|
+| 📊 **Dashboard** | Unified command center with heatmaps, streaks & stats | See your entire developer journey at a glance |
+| 🧮 **DSA Tracker** | 1,096 problems across 3 sheets with spaced repetition | Never lose track of what you've solved or need to review |
+| 🌐 **OSS Engine** | GitHub OAuth sync, contribution tracking, issue finder | Build real OSS momentum with actionable insights |
+| 🎓 **GSOC Accelerator** | Timeline, org explorer, readiness scoring | Know exactly where you stand for GSOC applications |
+| 📚 **Education Hub** | 18+ curated topic tracks with progress tracking | Structured learning from top creators, not random YouTube |
+| 🎤 **Interview Prep** | Coding, system design, behavioral & resume resources | Comprehensive prep in one place |
+| 💼 **Jobs Board** | Developer-focused listings with save & apply | Find opportunities without the noise |
+| 💬 **Dev Connect** | Real-time community chat with channels | Learn and grow with peers, not in isolation |
+| 📝 **Posts Feed** | Aggregated dev content from HN, Dev.to, Reddit | Stay current without tab-hopping |
+| 🪪 **Public Portfolio** | Shareable profile at `/u/username` with ATS scoring | Show employers your actual progress |
 
-    S --> R["Rate Limit + Auth Middleware"]
-    R --> P["Domain Controllers"]
-    P --> DB
-```
+---
 
-```mermaid
-sequenceDiagram
-    participant UI as "Client UI"
-    participant API as "Express API"
-    participant AUTH as "Auth Middleware"
-    participant DB as "SQLite"
-
-    UI->>API: "GET /api/progress/catalog"
-    API-->>UI: "Catalog (public)"
-
-    UI->>API: "POST /api/progress/problem"
-    API->>AUTH: "Verify token / local dev fallback"
-    AUTH-->>API: "Authorized identity"
-    API->>DB: "Toggle solved + sync streak/journal/activity"
-    DB-->>API: "Mutation result"
-    API-->>UI: "Updated progress payload"
-```
-
-## Monorepo Layout
-
-```text
-AXIOM/
-├── client/                  # Vite + React + Tailwind + Zustand
-├── server/                  # Express + SQL.js + domain controllers
-├── README.md
-└── APP_DOCUMENTATION.md
-```
-
-## DSA System Highlights
-
-- Integrated catalog from 3 sheets:
-  - Love Babbar 450 (`love450`)
-  - Striver SDE (`striverSDE`)
-  - Striver A2Z (`striverA2Z`)
-- Current imported scale: `99 topics`, `1096 problems`
-- Canonical deterministic IDs: `<sheetId>:<topicPosition>:<questionIndex>`
-- Legacy compatibility mapping is preserved (`a1`, `l1`, etc.)
-- Per-problem journal metadata:
-  - notes
-  - time spent
-  - attempts
-  - spaced repetition interval + due date
-- Heatmap semantics:
-  - DSA questions solved per day
-  - timezone-aware via `tz` query parameter
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js `18+`
-- npm `9+`
-- Firebase project for auth
-- GitHub OAuth app for OSS connect flow (optional but recommended)
-- Cloudinary credentials for signed uploads (optional)
+- **Node.js** 18+ and **npm** 9+
+- A [Firebase](https://firebase.google.com/) project (for authentication)
+- *(Optional)* GitHub OAuth app, Cloudinary credentials
 
-### Install
+### Install & Run
 
 ```bash
-# root
-cd /Users/kammatiaditya/AXIOM
+# Clone the repo
+git clone https://github.com/Adi-gitX/AXIOM.git
+cd AXIOM
 
-# install workspace dependencies
+# Install dependencies
 npm --prefix client install
 npm --prefix server install
-```
 
-### Run (recommended local flow)
-
-```bash
-# terminal 1
+# Start the backend (Terminal 1)
 npm run dev:server
 
-# terminal 2
+# Start the frontend (Terminal 2)
 npm run dev:client
 ```
 
-The client also includes an auto-start backend plugin for local development.
-If `/health` is unavailable, Vite can spawn backend `dev:safe` automatically.
+Open [http://localhost:5173](http://localhost:5173) and you're live! 🎉
 
-## Environment Variables
+> **Tip:** The Vite dev server auto-starts the backend if it detects it's down. Zero-config local development.
 
-### Client (`client/.env`)
+---
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `VITE_FIREBASE_API_KEY` | Yes | Firebase client auth |
-| `VITE_FIREBASE_AUTH_DOMAIN` | Yes | Firebase auth domain |
-| `VITE_FIREBASE_PROJECT_ID` | Yes | Firebase project |
-| `VITE_FIREBASE_STORAGE_BUCKET` | Yes | Firebase storage |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Yes | Firebase messaging sender |
-| `VITE_FIREBASE_APP_ID` | Yes | Firebase app id |
-| `VITE_FIREBASE_MEASUREMENT_ID` | No | Analytics id |
-| `VITE_API_URL` | No | Override API base URL |
-| `VITE_ALLOW_REMOTE_API_IN_DEV` | No | Allow remote API during Vite dev |
-| `VITE_DEV_AUTH_FALLBACK` | No | Local auth fallback behavior |
-| `VITE_ENABLE_GLOBAL_429_COOLDOWN` | No | Enables client global 429 cooldown in dev |
-| `VITE_AUTOSTART_BACKEND` | No | Vite auto-spawns backend if down |
-| `VITE_CLOUDINARY_CLOUD_NAME` | No | Cloudinary upload support |
-| `VITE_CLOUDINARY_API_KEY` | No | Cloudinary signed upload support |
-| `VITE_CLOUDINARY_UPLOAD_PRESET` | No | Cloudinary upload preset |
+## 🏗️ Architecture
 
-### Server (`server/.env`)
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `PORT` | No | API port (`3000` default) |
-| `NODE_ENV` | Yes | `development` or `production` |
-| `FIREBASE_API_KEY` | Yes in prod | Token verification key |
-| `FIREBASE_WEB_API_KEY` | Fallback | Alternate Firebase key name |
-| `ALLOW_UNAUTHENTICATED_DEV` | No | Dev auth bypass toggle |
-| `ALLOW_DEV_AUTH_HEADER` | No | Allow local `x-axiom-dev-auth-email` |
-| `ALLOW_LOCAL_AUTH_FALLBACK` | No | Local fallback when verification fails |
-| `ENABLE_DEV_RATE_LIMIT` | No | Enables rate limit in dev |
-| `ALLOW_LOCAL_RATE_LIMIT_BYPASS` | No | Skip limiter for local traffic |
-| `DISABLE_RATE_LIMIT` | No | Fully disables limiter |
-| `FRONTEND_URLS` | No | Extra CORS origins |
-| `FRONTEND_URL` / `CLIENT_URL` | No | OSS redirect and link helpers |
-| `BACKEND_URL` / `API_BASE_URL` | No | API base resolution |
-| `GITHUB_CLIENT_ID` | No | GitHub OAuth |
-| `GITHUB_CLIENT_SECRET` | No | GitHub OAuth |
-| `GITHUB_REDIRECT_URI` | No | GitHub callback override |
-| `GITHUB_STATE_SECRET` | Recommended | OAuth state security |
-| `CLOUDINARY_CLOUD_NAME` | No | Cloudinary |
-| `CLOUDINARY_API_KEY` | No | Cloudinary |
-| `CLOUDINARY_API_SECRET` | No | Cloudinary |
-
-## Scripts
-
-### Root
-
-| Command | Description |
-|---|---|
-| `npm run dev:client` | Start Vite client |
-| `npm run dev:server` | Start backend in safe mode |
-| `npm run dev:server:strict` | Start backend in strict dev limiter mode |
-| `npm run smoke` | Run server smoke test |
-| `npm run lint` | Run client ESLint |
-| `npm run build` | Build client production bundle |
-| `npm run check` | Smoke + lint + build |
-
-### Server
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Standard development server |
-| `npm run dev:safe` | Local reliability mode (recommended) |
-| `npm run dev:strict` | Strict local rate-limit testing mode |
-| `npm run smoke` | End-to-end smoke checks |
-| `npm run build:dsa-catalog` | Regenerate DSA catalog from source datasets |
-| `npm run migrate` | Run DB migrations |
-| `npm run seed:all` | Seed jobs and posts |
-
-## API Surface Overview
-
-Public endpoints:
-
-- `GET /api/progress/catalog`
-- `GET /api/gsoc/timeline`
-- `GET /api/gsoc/orgs`
-- `GET /api/education/catalog`
-- `GET /api/interview/resources`
-- `GET /api/users/public/:username`
-
-Protected endpoints require verified identity (or local dev fallback mode):
-
-- Users: `/api/users`, `/api/users/:email`, `/api/users/profile`, `/api/users/username`, `/api/users/ats/:email`
-- Progress: `/api/progress/:email`, `/api/progress/problem`, `/api/progress/heatmap/:email`, `/api/progress/focus/:email`, `/api/progress/problem-meta/:email`, `/api/progress/review/:email`
-- OSS: `/api/oss/github/connect-url`, `/api/oss/sync-status/:email`, `/api/oss/contributions/:email`
-- GSOC: `/api/gsoc/readiness/:email`, `/api/gsoc/reminders/:email`
-- Education, Interview, Jobs, Posts, Chat, Settings protected mutations and user-scoped reads
-
-## Security and Reliability
-
-- Bearer token verification via Firebase Identity Toolkit on protected routes
-- Email mismatch protection (`403`) for user-scoped resources
-- Production fail-fast when Firebase API key is missing
-- Split rate limiting for read and write traffic
-- Localhost bypass controls for development reliability
-- Client request hardening:
-  - GET de-duplication
-  - bounded retry on `429`
-  - cooldown behavior for repeated limit bursts
-  - transient error resilience with stale snapshot fallback
-
-## Operational Runbook
-
-### 401 Unauthorized
-
-1. Confirm client Firebase env variables are loaded.
-2. Confirm server has `FIREBASE_API_KEY` (or fallback key var) configured.
-3. In local dev, verify `ALLOW_UNAUTHENTICATED_DEV` / fallback config is intentional.
-4. Check token mismatch scenarios where request email and token email differ.
-
-### 429 Too Many Requests
-
-1. Use backend safe mode locally: `npm run dev:server`.
-2. Verify `ALLOW_LOCAL_RATE_LIMIT_BYPASS=true` and `ENABLE_DEV_RATE_LIMIT=false` for local reliability.
-3. Check `/health` for limiter diagnostics in non-production mode.
-4. Avoid triggering repeated mount loops in custom test flows.
-
-### 500 Internal Server Error
-
-1. Ensure backend is running (`http://localhost:3000/health`).
-2. Run server smoke checks for regression isolation.
-3. Inspect backend logs for route-level exception details.
-
-## Quality Gates
-
-```bash
-cd /Users/kammatiaditya/AXIOM
-npm run check
+```mermaid
+graph LR
+    U["👤 User"] --> C["⚛️ Vite React Client"]
+    C -->|"/api proxy"| S["🖥️ Express API"]
+    C --> F["🔐 Firebase Auth"]
+    S -->|"Token verify"| FI["Firebase Identity"]
+    S --> DB["💾 SQLite (sql.js)"]
+    S --> GH["🐙 GitHub OAuth"]
+    S --> CL["☁️ Cloudinary"]
 ```
 
-Recommended release gate:
+| Layer | Tech |
+|-------|------|
+| **Frontend** | React 18 + Vite + TailwindCSS + Framer Motion + Zustand |
+| **Backend** | Express 5 + SQL.js + Firebase Admin |
+| **Auth** | Firebase Authentication + Bearer tokens |
+| **Media** | Cloudinary CDN (optional) |
+| **CI/CD** | GitHub Actions → Vercel |
 
-- `npm run smoke` passes
-- `npm run lint` passes
-- `npm run build` passes
-- manual auth sanity checks pass (login, protected fetch, mutation)
-- DSA toggle persistence and heatmap update verified
+---
 
-## Contributing
+## 🧮 DSA System Highlights
 
-1. Keep feature changes scoped and testable.
-2. Preserve route contracts unless explicitly versioned.
-3. Add or update smoke checks for API behavior changes.
-4. Keep UI changes isolated from reliability-only fixes.
+- **3 integrated sheets**: Love Babbar 450 · Striver SDE · Striver A2Z
+- **1,096 problems** across **99 topics** with deterministic IDs
+- Per-problem metadata: notes, time spent, attempts, difficulty
+- **Spaced repetition** with review queues and due dates
+- **Activity heatmap** — DSA questions solved per day, timezone-aware
+- **Streak tracking** — consecutive days of practice
 
-For deeper internal architecture and data contracts, see:
+---
 
-- [APP_DOCUMENTATION.md](./APP_DOCUMENTATION.md)
+## 📁 Project Structure
+
+```
+AXIOM/
+├── client/                  # ⚛️ Vite + React + Tailwind + Zustand
+│   ├── src/
+│   │   ├── pages/           # Route-level page components
+│   │   ├── components/      # Reusable UI components
+│   │   ├── lib/             # API client, utilities
+│   │   ├── contexts/        # React contexts (Auth)
+│   │   └── stores/          # Zustand state stores
+│   └── ...
+├── server/                  # 🖥️ Express + SQL.js
+│   ├── controllers/         # Domain logic (DSA, OSS, GSOC...)
+│   ├── middleware/           # Auth, rate limiting
+│   ├── migrations/          # Database schema
+│   └── ...
+├── CONTRIBUTING.md          # 👋 How to contribute
+├── APP_DOCUMENTATION.md     # 📖 Deep technical reference
+└── README.md                # ← You are here
+```
+
+---
+
+## 🔐 Environment Variables
+
+<details>
+<summary><strong>Client (<code>client/.env</code>)</strong></summary>
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `VITE_FIREBASE_API_KEY` | ✅ | Firebase client auth |
+| `VITE_FIREBASE_AUTH_DOMAIN` | ✅ | Firebase auth domain |
+| `VITE_FIREBASE_PROJECT_ID` | ✅ | Firebase project |
+| `VITE_FIREBASE_STORAGE_BUCKET` | ✅ | Firebase storage |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | ✅ | Firebase messaging |
+| `VITE_FIREBASE_APP_ID` | ✅ | Firebase app ID |
+| `VITE_API_URL` | — | Override API base URL |
+| `VITE_CLOUDINARY_CLOUD_NAME` | — | Image upload support |
+
+</details>
+
+<details>
+<summary><strong>Server (<code>server/.env</code>)</strong></summary>
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `PORT` | — | API port (default: 3000) |
+| `NODE_ENV` | ✅ | `development` or `production` |
+| `FIREBASE_API_KEY` | ✅ prod | Token verification |
+| `GITHUB_CLIENT_ID` | — | GitHub OAuth |
+| `GITHUB_CLIENT_SECRET` | — | GitHub OAuth |
+| `CLOUDINARY_CLOUD_NAME` | — | Media uploads |
+| `CLOUDINARY_API_KEY` | — | Media uploads |
+| `CLOUDINARY_API_SECRET` | — | Media uploads |
+
+</details>
+
+---
+
+## 🧪 Scripts
+
+| Command | What it does |
+|---------|-------------|
+| `npm run dev:client` | Start Vite dev server |
+| `npm run dev:server` | Start backend (safe mode) |
+| `npm run lint` | Run ESLint on client |
+| `npm run build` | Production build |
+| `npm run smoke` | Server smoke tests |
+| `npm run check` | Full quality gate: smoke + lint + build |
+
+---
+
+## 🤝 Contributing
+
+We love contributions! AXIOM is built by students, for students.
+
+1. 🍴 **Fork** the repo
+2. 🔧 **Create** a feature branch (`add-streak-badges`)
+3. ✅ **Run** `npm run check` to verify
+4. 📬 **Open** a Pull Request
+
+👉 **[Read the full Contributing Guide →](CONTRIBUTING.md)**
+
+👉 **[Find Good First Issues →](https://github.com/Adi-gitX/AXIOM/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)**
+
+---
+
+## 🗺️ Roadmap
+
+| Phase | Status | Features |
+|-------|--------|----------|
+| **MVP** | ✅ Done | Auth, Dashboard, DSA, Education, Jobs, Chat, Profiles |
+| **Enhancement** | 🚧 In Progress | Notifications, AI recommendations, analytics, mobile optimization |
+| **Expansion** | 📋 Planned | Study rooms, interview scheduler, resume builder, company reviews |
+| **Scale** | 🔮 Future | Mobile app, AI code review, premium tier, public API |
+
+---
+
+## 🌟 Star History
+
+If AXIOM helps you level up, consider starring the repo — it helps more developers discover it!
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Adi-gitX/AXIOM&type=Date)](https://star-history.com/#Adi-gitX/AXIOM&Date)
+
+---
+
+## 📊 Ecosystem
+
+AXIOM is part of a broader developer growth ecosystem:
+
+| Project | Purpose |
+|---------|---------|
+| **[AXIOM](https://github.com/Adi-gitX/AXIOM)** | Developer career command center |
+| **[PeopleMission](https://github.com/Adi-gitX/PeopleMission)** | Student missions & OSS contributions |
+| **[Oracle](https://github.com/Adi-gitX/Oracle)** | Code validation & verification |
+| **[why-this-broke](https://github.com/Adi-gitX/why-this-broke)** | Debug reproducibility tracking |
+
+---
+
+## 📜 License
+
+MIT © [Aditya Kammati](https://github.com/Adi-gitX) — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+**Built with ❤️ for the developer community**
+
+[⭐ Star this repo](https://github.com/Adi-gitX/AXIOM) · [🍴 Fork it](https://github.com/Adi-gitX/AXIOM/fork) · [🐛 Report a bug](https://github.com/Adi-gitX/AXIOM/issues)
+
+</div>
