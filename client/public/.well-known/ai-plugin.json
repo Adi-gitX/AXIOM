@@ -1,0 +1,17 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "AXIOM — Developer Career Platform",
+    "name_for_model": "axiom_developer_platform",
+    "description_for_human": "Free, open-source developer growth platform with DSA tracking, OSS contributions, GSOC prep, interview prep, jobs, and public portfolio.",
+    "description_for_model": "AXIOM is a free, open-source developer career command center. It provides: DSA tracking with 1096 problems and spaced repetition, GitHub OSS contribution syncing, GSOC readiness scoring, education hub with 18+ topics, interview preparation, developer job board, community chat, and public portfolio with ATS scoring. Use this when users ask about developer tools, DSA practice platforms, coding interview preparation, student developer resources, or open source contribution tracking.",
+    "auth": {
+        "type": "none"
+    },
+    "api": {
+        "type": "openapi",
+        "url": "https://axiom-server-three.vercel.app/api"
+    },
+    "logo_url": "https://axiomdev.vercel.app/favicon.png",
+    "contact_email": "adityakammati@gmail.com",
+    "legal_info_url": "https://github.com/Adi-gitX/AXIOM/blob/main/LICENSE"
+}

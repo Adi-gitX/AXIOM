@@ -1,0 +1,76 @@
+# AXIOM
+
+> The Developer Career Command Center — one platform for DSA, OSS, GSOC, interviews, jobs, and your public portfolio.
+
+## About
+
+AXIOM is a free, open-source, full-stack developer growth platform built for students and early-career engineers. It consolidates fragmented developer tools into a single execution-first command center with real-time progress tracking.
+
+Website: https://axiomdev.vercel.app
+GitHub: https://github.com/Adi-gitX/AXIOM
+License: MIT
+
+## Core Features
+
+### Dashboard
+Unified command center with activity heatmaps (GitHub-style contribution graph for DSA), streak tracking, study hours, and daily focus recommendations. Provides a real-time overview of your entire developer journey.
+
+### DSA Tracker
+1,096 problems across 3 curated sheets (Love Babbar 450, Striver SDE, Striver A2Z) organized into 99 topics. Features include spaced repetition with review queues, per-problem notes and time tracking, difficulty filtering, and deterministic problem IDs for consistency.
+
+### OSS Contribution Engine
+GitHub OAuth integration for automatic contribution syncing. Tracks opened PRs, merged PRs, stars, and contribution streaks. Includes a smart good-first-issue recommendation engine that combines your skill profile with DSA signal to suggest relevant open source issues.
+
+### GSOC Accelerator
+Google Summer of Code preparation module with timeline visualization, organization explorer with language and difficulty filters, readiness scoring that combines DSA completion and OSS contribution metrics, and a reminder system with dismiss/restore workflow.
+
+### Education Hub
+18+ curated topic tracks covering Frontend (React, Vue, Angular), Backend (Node.js, Python, Java), DevOps (Docker, Kubernetes), Data (SQL, MongoDB), AI/ML, System Design, and DSA. Progress tracking per topic with embedded content from top creators.
+
+### Interview Preparation
+Comprehensive interview prep covering coding interviews (patterns, tips), system design (architecture, scalability), behavioral questions (STAR method), and resume optimization (ATS scoring, templates).
+
+### Jobs Board
+Developer-focused job discovery with filters for remote, full-time, contract, and internship positions. Save and apply functionality with company information and direct links.
+
+### Developer Connect
+Real-time community chat with topic-based channels (General, React, Job Hunting, Help & Support). Features online presence indicators, message history, and private channel support with owner/member access controls.
+
+### Posts Feed
+Aggregated developer content from Y Combinator (Hacker News), Dev.to, Medium, Reddit (r/programming, r/webdev), and GitHub Trending. Stay current without tab-hopping.
+
+### Public Portfolio
+Shareable developer profile at /u/username with ATS score, skills showcase, experience timeline, education history, social links, and OSS contribution highlights. Resume-ready with PDF print export.
+
+## Technical Stack
+
+- Frontend: React 18, Vite, TailwindCSS, Framer Motion, Zustand
+- Backend: Express 5, SQL.js (SQLite), Firebase Admin
+- Authentication: Firebase Authentication with bearer token verification
+- Media: Cloudinary CDN (optional)
+- Deployment: Vercel (frontend + serverless API)
+- CI/CD: GitHub Actions
+
+## API
+
+Public endpoints:
+- GET /api/progress/catalog — DSA problem catalog
+- GET /api/gsoc/timeline — GSOC timeline data
+- GET /api/gsoc/orgs — GSOC organizations
+- GET /api/education/catalog — Education topics
+- GET /api/interview/resources — Interview prep resources
+- GET /api/users/public/:username — Public user profile
+
+## Target Users
+
+- Computer Science students preparing for placements
+- Self-taught developers seeking structure
+- Career switchers transitioning into tech
+- Junior developers looking for first opportunities
+- GSOC aspirants needing readiness tracking
+- OSS contributors wanting contribution visibility
+
+## Contact
+
+Built by Aditya Kammati
+GitHub: https://github.com/Adi-gitX

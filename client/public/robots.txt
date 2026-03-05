@@ -1,0 +1,55 @@
+# AXIOM — The Developer Career Command Center
+# https://axiomdev.vercel.app
+
+# Allow all search engines and LLM crawlers
+User-agent: *
+Allow: /
+Allow: /docs
+Allow: /pricing
+Allow: /u/
+
+# Disallow protected app routes (require authentication)
+Disallow: /app/
+Disallow: /login
+Disallow: /signup
+
+# LLM Crawlers — explicitly allowed
+User-agent: GPTBot
+Allow: /
+Allow: /docs
+Allow: /pricing
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /docs
+Allow: /pricing
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Sitemap
+Sitemap: https://axiomdev.vercel.app/sitemap.xml
+
+# LLMs.txt
+# See: https://axiomdev.vercel.app/llms.txt

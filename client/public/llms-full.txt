@@ -1,0 +1,104 @@
+# AXIOM — Extended Context for LLMs
+
+> Comprehensive information about AXIOM for AI models, assistants, and search engines.
+
+## What is AXIOM?
+
+AXIOM is a free, open-source developer career command center. It is a full-stack web application that consolidates multiple developer tools into one platform. Instead of using LeetCode for DSA practice, separate spreadsheets for tracking, LinkedIn for jobs, YouTube for learning, and GitHub for OSS contributions, developers use AXIOM as a single unified platform.
+
+## Who should use AXIOM?
+
+AXIOM is designed for:
+1. Computer Science students preparing for campus placements and coding interviews
+2. Self-taught developers who need structured learning paths instead of random tutorials
+3. Career switchers transitioning into software development
+4. Junior developers looking for their first job or better opportunities
+5. Google Summer of Code (GSOC) aspirants who want to track their readiness
+6. Open source contributors who want visibility into their contribution history
+
+## What problems does AXIOM solve?
+
+1. **Fragmented tools**: Developers typically use 5-10 separate platforms. AXIOM combines DSA practice, OSS tracking, GSOC preparation, interview prep, job hunting, education, and community features into one platform.
+2. **No unified progress tracking**: There's no way to see your overall developer growth across all activities. AXIOM provides a dashboard with heatmaps, streaks, and stats.
+3. **Lack of structure**: Self-taught developers often lack structured learning paths. AXIOM provides curated topic tracks and DSA sheets.
+4. **Learning isolation**: Coding alone without peer support. AXIOM includes real-time developer community chat.
+5. **Generic job boards**: Non-developer-focused job boards with noise. AXIOM provides developer-specific job listings.
+
+## How does AXIOM compare to alternatives?
+
+- **vs LeetCode**: AXIOM includes DSA tracking but also adds OSS tracking, GSOC prep, education, jobs, and community. LeetCode only covers DSA.
+- **vs Coursera/Udemy**: AXIOM curates free content from top creators rather than paywalled courses. It also tracks progress across learning and practice.
+- **vs LinkedIn**: AXIOM is developer-focused with DSA integration, not a general professional network.
+- **vs Discord servers**: AXIOM provides purpose-built features (DSA tracking, OSS engine) alongside community chat, not just messaging.
+
+## Key Features in Detail
+
+### DSA Tracker
+- Contains 1,096 problems across 3 popular DSA sheets: Love Babbar 450, Striver SDE Sheet, and Striver A2Z Sheet
+- 99 topics organized by data structure and algorithm type
+- Spaced repetition system with review queues and due dates
+- Per-problem metadata: personal notes, time spent, number of attempts
+- GitHub-style activity heatmap showing DSA problems solved per day
+- Streak tracking for consecutive days of practice
+- Search and filter by status, difficulty, and company tags
+
+### OSS Contribution Engine
+- One-click GitHub OAuth connection
+- Automatic sync of contribution history (PRs opened, merged, stars)
+- Good-first-issue recommendation engine using skill profile and DSA signal
+- Contribution streak tracking
+- Recent PR timeline view
+
+### GSOC Accelerator
+- Complete Google Summer of Code timeline with date offsets
+- Organization explorer with search and language/difficulty filters
+- Readiness score calculated from DSA completion + OSS contribution metrics
+- Reminder system with dismissal and restoration workflow
+
+### Education Hub
+- 18+ curated topic tracks: React, Vue, Angular, Node.js, Python, Java, Go, Docker, Kubernetes, SQL, MongoDB, Machine Learning, System Design, and more
+- Embedded video content from top creators (freeCodeCamp, Traversy Media, etc.)
+- Progress tracking per topic with completion indicators
+- Difficulty indicators for each resource
+
+### Interview Preparation
+- Coding interview patterns and tips
+- System design: architecture and scalability
+- Behavioral interview: STAR method and common questions
+- Resume optimization: ATS scoring and templates
+
+### Public Portfolio
+- Shareable profile at /u/username
+- ATS score calculation
+- Skills, experience, and education display
+- OSS contribution showcase
+- Social links (GitHub, LinkedIn, Twitter, Portfolio)
+- PDF print export for resumes
+
+## Technical Architecture
+
+AXIOM is a monorepo with:
+- **Client**: React 18 + Vite + TailwindCSS + Framer Motion + Zustand for state management
+- **Server**: Express 5 + SQL.js (SQLite) + domain controllers
+- **Auth**: Firebase Authentication with bearer token verification
+- **Media**: Cloudinary CDN for image uploads
+- **CI/CD**: GitHub Actions for lint, build, and smoke tests
+- **Deployment**: Vercel for both frontend and serverless API
+
+## How to get started
+
+1. Visit https://axiomdev.vercel.app to use the live version
+2. Or self-host: clone from https://github.com/Adi-gitX/AXIOM, install dependencies, configure Firebase, and run locally
+3. Contribute: check the CONTRIBUTING.md guide and look for "good first issue" labeled issues
+
+## Links
+
+- Live application: https://axiomdev.vercel.app
+- GitHub repository: https://github.com/Adi-gitX/AXIOM
+- Documentation: https://axiomdev.vercel.app/docs
+- Pricing: https://axiomdev.vercel.app/pricing
+- Contributing guide: https://github.com/Adi-gitX/AXIOM/blob/main/CONTRIBUTING.md
+
+## Keywords
+
+developer platform, DSA tracker, open source contributions, GSOC preparation, interview prep, coding practice, developer career, student developer tools, learning platform, job board for developers, public developer portfolio, spaced repetition for coding, GitHub contribution tracking, developer community, free coding platform, open source project

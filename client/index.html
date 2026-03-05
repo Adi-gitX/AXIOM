@@ -1,13 +1,220 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dev Universe</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>AXIOM — The Developer Career Command Center</title>
+  <meta name="title" content="AXIOM — The Developer Career Command Center" />
+  <meta name="description"
+    content="Free, open-source platform for developer growth. Track DSA practice with 1,096 problems, sync GitHub OSS contributions, prepare for GSOC, ace interviews, find jobs, and build your public portfolio — all in one place." />
+  <meta name="keywords"
+    content="DSA tracker, developer platform, open source, GSOC preparation, interview prep, coding practice, student developer, developer career, portfolio builder, LeetCode alternative, spaced repetition, developer community, job board" />
+  <meta name="author" content="Aditya Kammati" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <link rel="canonical" href="https://axiomdev.vercel.app/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://axiomdev.vercel.app/" />
+  <meta property="og:title" content="AXIOM — The Developer Career Command Center" />
+  <meta property="og:description"
+    content="Stop juggling 10 platforms. One place for DSA tracking (1,096 problems), OSS contributions, GSOC prep, interview prep, jobs, and your public developer portfolio. Free & open source." />
+  <meta property="og:image" content="https://axiomdev.vercel.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="AXIOM — Developer Career Command Center with DSA tracking, OSS engine, and more" />
+  <meta property="og:site_name" content="AXIOM" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://axiomdev.vercel.app/" />
+  <meta name="twitter:title" content="AXIOM — The Developer Career Command Center" />
+  <meta name="twitter:description"
+    content="Free, open-source platform: DSA tracking (1,096 problems), OSS contributions, GSOC prep, interview prep, jobs & portfolio. Built for students & early-career devs." />
+  <meta name="twitter:image" content="https://axiomdev.vercel.app/og-image.png" />
+  <meta name="twitter:image:alt" content="AXIOM — Developer Career Command Center" />
+  <meta name="twitter:creator" content="@AdiGitX" />
+
+  <!-- Additional SEO -->
+  <meta name="application-name" content="AXIOM" />
+  <meta name="apple-mobile-web-app-title" content="AXIOM" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="color-scheme" content="dark light" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://axiom-server-three.vercel.app" />
+
+  <!-- LLM Discovery -->
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Context" />
+
+  <!-- JSON-LD Structured Data: WebApplication -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AXIOM",
+      "alternateName": "AXIOM Developer Platform",
+      "url": "https://axiomdev.vercel.app",
+      "description": "Free, open-source developer career command center. Track DSA practice, sync GitHub OSS contributions, prepare for GSOC, ace interviews, find jobs, and build your public portfolio.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Aditya Kammati",
+        "url": "https://github.com/Adi-gitX"
+      },
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "featureList": [
+        "DSA Tracker with 1096 problems across 3 sheets",
+        "GitHub-style activity heatmap and streak tracking",
+        "Spaced repetition review system",
+        "OSS Contribution Engine with GitHub OAuth sync",
+        "Good-first-issue recommendation engine",
+        "GSOC Accelerator with readiness scoring",
+        "Education Hub with 18+ curated topic tracks",
+        "Interview Preparation resources",
+        "Developer-focused job board",
+        "Real-time developer community chat",
+        "Public portfolio with ATS scoring"
+      ],
+      "screenshot": "https://axiomdev.vercel.app/og-image.png",
+      "softwareVersion": "1.0.0",
+      "programmingLanguage": ["JavaScript", "React", "Node.js"],
+      "keywords": "DSA tracker, developer platform, GSOC, open source, interview prep, portfolio, student developer"
+    }
+    </script>
+
+  <!-- JSON-LD Structured Data: SoftwareSourceCode -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareSourceCode",
+      "name": "AXIOM",
+      "codeRepository": "https://github.com/Adi-gitX/AXIOM",
+      "codeSampleType": "full solution",
+      "programmingLanguage": [
+        {
+          "@type": "ComputerLanguage",
+          "name": "JavaScript"
+        },
+        {
+          "@type": "ComputerLanguage",
+          "name": "React"
+        }
+      ],
+      "runtimePlatform": "Node.js",
+      "license": "https://opensource.org/licenses/MIT",
+      "author": {
+        "@type": "Person",
+        "name": "Aditya Kammati",
+        "url": "https://github.com/Adi-gitX"
+      },
+      "description": "Open-source developer career command center with DSA tracking, OSS contribution engine, GSOC accelerator, and more."
+    }
+    </script>
+
+  <!-- JSON-LD Structured Data: FAQPage (for search rich snippets) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is AXIOM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AXIOM is a free, open-source developer career command center that combines DSA tracking (1,096 problems), OSS contribution management, GSOC preparation, interview prep, job discovery, and a public portfolio into one unified platform for students and early-career developers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is AXIOM free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, AXIOM is completely free and open-source under the MIT license. All core features including DSA tracking, OSS engine, GSOC accelerator, education hub, interview prep, and job board are available at no cost."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the DSA tracker work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AXIOM's DSA tracker includes 1,096 problems across three popular sheets: Love Babbar 450, Striver SDE, and Striver A2Z. It features spaced repetition for review scheduling, per-problem notes and time tracking, a GitHub-style activity heatmap, and streak tracking for consistent practice."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is AXIOM different from LeetCode?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "While LeetCode focuses only on DSA practice, AXIOM is a complete developer growth platform that combines DSA tracking with OSS contribution management, GSOC preparation, interview prep, education resources, job hunting, community chat, and a public portfolio — all in one place with unified progress tracking."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I contribute to AXIOM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely! AXIOM is open source and welcomes contributions. Check the Contributing Guide on GitHub for setup instructions, and look for 'good first issue' labeled issues to get started. All contributors are recognized in the project README."
+          }
+        }
+      ]
+    }
+    </script>
+
+  <!-- JSON-LD: BreadcrumbList -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://axiomdev.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Documentation",
+          "item": "https://axiomdev.vercel.app/docs"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Pricing",
+          "item": "https://axiomdev.vercel.app/pricing"
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

@@ -1,0 +1,12 @@
+/* TEAM */
+Developer: Aditya Kammati
+GitHub: https://github.com/Adi-gitX
+Location: India
+
+/* SITE */
+Name: AXIOM
+URL: https://axiomdev.vercel.app
+Description: The Developer Career Command Center
+Standards: HTML5, CSS3, JavaScript ES2022
+Components: React 18, Vite, TailwindCSS, Express 5, SQLite
+Software: VS Code, GitHub Actions, Vercel
