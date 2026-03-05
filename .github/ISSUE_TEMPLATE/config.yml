@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/Adi-gitX/AXIOM/discussions
+    about: Ask questions, share ideas, and discuss AXIOM with the community
+  - name: 📖 Documentation
+    url: https://github.com/Adi-gitX/AXIOM/blob/main/APP_DOCUMENTATION.md
+    about: Read the technical documentation before reporting issues
