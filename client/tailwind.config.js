@@ -58,8 +58,10 @@ export default {
                 sm: "calc(var(--radius) - 4px)",
             },
             fontFamily: {
-                sans: ['Inter', 'sans-serif'],
-                display: ['"Terminal Grotesque"', 'monospace'],
+                sans: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
+                display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
+                serif: ['"Newsreader"', 'Georgia', 'serif'],
+                mono: ['"JetBrains Mono"', 'monospace'],
             },
             keyframes: {
                 "accordion-down": {
