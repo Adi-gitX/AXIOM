@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { educationApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import GlassCard from '../components/ui/GlassCard';
+import { PageHeader } from '../components/ui/AppPrimitives';
 
 const Education = () => {
-    const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [topic, setTopic] = useState(null);
     const [video, setVideo] = useState(null);
@@ -137,54 +136,41 @@ const Education = () => {
     };
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
             <div className="max-w-5xl mx-auto">
 
                 {/* Header */}
-                <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-12">
-                    {topic ? (
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => setTopic(null)} className="w-10 h-10 rounded-full border border-border bg-background/40 hover:border-foreground/40 flex items-center justify-center text-foreground transition-colors group">
-                                <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
-                            </button>
-                            <div>
-                                <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">{getTopic(topic)?.name}</h1>
-                                <p className="text-muted-foreground mt-1">{videos.length} videos • {getTopicProgress(topic)}% complete</p>
-                            </div>
+                {topic ? (
+                    <header className="mb-12 flex items-center gap-4">
+                        <button onClick={() => setTopic(null)} className="w-10 h-10 rounded-full border border-border bg-card hover:border-foreground/30 flex items-center justify-center text-foreground transition-colors group shrink-0">
+                            <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+                        </button>
+                        <div>
+                            <h1 className="font-display font-semibold text-[28px] md:text-[32px] leading-[1.1] tracking-[-0.022em] text-foreground">{getTopic(topic)?.name}</h1>
+                            <p className="mt-2 text-[13.5px] text-muted-foreground tabular">{videos.length} videos · {getTopicProgress(topic)}% complete</p>
                         </div>
-                    ) : (
-                        <div className="space-y-3">
-                            <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Education</h1>
-                            <p className="text-muted-foreground text-lg mt-1">Choose what to learn</p>
-                            <div className="flex flex-wrap gap-2 mt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/app/dsa')}
-                                    className="rounded-xl border border-border bg-background/40 px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors"
-                                >
-                                    Go to DSA Tracker
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/app/interview')}
-                                    className="rounded-xl border border-border bg-background/40 px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors"
-                                >
-                                    Go to Interview Prep
-                                </button>
-                            </div>
-                            {error && <p className="text-sm text-rose-400 mt-3">{error}</p>}
-                            {error && (
-                                <button
-                                    type="button"
-                                    onClick={() => setRetryNonce((value) => value + 1)}
-                                    className="mt-3 rounded-xl border border-border bg-background/40 px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors"
-                                >
-                                    Retry
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </motion.header>
+                    </header>
+                ) : (
+                    <PageHeader
+                        eyebrow="Career"
+                        title="Education"
+                        tail="— curated, not infinite."
+                        meta={`${topics.length} topic tracks · video-driven learning`}
+                    />
+                )}
+
+                {!topic && error && (
+                    <div className="mb-6 flex flex-wrap items-center gap-3">
+                        <p className="text-sm text-[#9C2A1F]">{error}</p>
+                        <button
+                            type="button"
+                            onClick={() => setRetryNonce((value) => value + 1)}
+                            className="rounded-full bg-card border border-border px-3 h-8 text-xs font-semibold text-foreground hover:border-foreground/15 transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
 
                 {/* Topics Grid */}
                 {!topic && (
@@ -209,7 +195,7 @@ const Education = () => {
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-xs text-muted-foreground font-mono">{String(i + 1).padStart(2, '0')}</span>
                                             {progress > 0 && (
-                                                <span className={`text-xs font-bold ${progress === 100 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                                <span className={`text-xs font-semibold ${progress === 100 ? 'text-[#0E334F]' : 'text-[#7A4A1F]'}`}>
                                                     {progress}%
                                                 </span>
                                             )}
@@ -224,7 +210,7 @@ const Education = () => {
                                         {progress > 0 && (
                                             <div className="mt-3 h-1 w-full rounded-full bg-foreground/10 overflow-hidden">
                                                 <div
-                                                    className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                                                    className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-[#0E334F]' : 'bg-[#FBEFE0]'}`}
                                                     style={{ width: `${progress}%` }}
                                                 />
                                             </div>
@@ -271,7 +257,7 @@ const Education = () => {
                                         </span>
                                         {isWatched && (
                                             <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                                                <svg className="w-8 h-8 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg className="w-8 h-8 text-[#0E334F]" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                 </svg>
                                             </div>
@@ -283,7 +269,7 @@ const Education = () => {
                                                 {v.title}
                                             </h3>
                                             {isStarted && (
-                                                <span className="text-xs text-amber-400 font-medium">In Progress</span>
+                                                <span className="text-xs text-[#7A4A1F] font-medium">In Progress</span>
                                             )}
                                         </div>
                                         <p className="text-sm text-muted-foreground mt-2">{v.channel}</p>
@@ -338,7 +324,7 @@ const Education = () => {
                                 <button
                                     onClick={markComplete}
                                     className={`px-5 py-2.5 rounded-xl font-medium transition-colors ${watchedVideos[video.id]?.completed
-                                        ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
+                                        ? 'bg-[#E8F2E5] text-[#0E334F] border border-[#0E334F]/15'
                                         : 'bg-foreground text-background hover:bg-foreground/90'
                                         }`}
                                 >
