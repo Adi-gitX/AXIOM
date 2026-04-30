@@ -4,16 +4,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '../ui/GlassCard';
 
 const difficultyClasses = {
-    Easy: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
-    Medium: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
-    Hard: 'bg-rose-500/15 text-rose-500 border-rose-500/30',
+    Easy: 'bg-[#E8F2E5] text-[#0E334F] border-[#0E334F]/15',
+    Medium: 'bg-[#FBEFE0] text-[#7A4A1F] border-[#7A4A1F]/15',
+    Hard: 'bg-[#F2E5EC] text-[#9C2A1F] border-[#9C2A1F]/20',
     Unknown: 'bg-foreground/10 text-muted-foreground border-border',
 };
 
 const sourceClasses = {
-    leetcode: 'bg-yellow-500/15 text-yellow-500 border-yellow-500/30',
-    geeksforgeeks: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
-    interviewbit: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
+    leetcode: 'bg-[#FBEFE0] text-[#7A4A1F] border-[#7A4A1F]/20',
+    geeksforgeeks: 'bg-[#E8F2E5] text-[#0E334F] border-[#0E334F]/15',
+    interviewbit: 'bg-[#E5E8F2] text-[#0E334F] border-[#0E334F]/15',
     other: 'bg-foreground/10 text-muted-foreground border-border',
 };
 
@@ -161,7 +161,7 @@ const DsaTopicAccordion = ({
                                                 onClick={() => onToggleProblem(problem.id, topic.id)}
                                                 disabled={isPendingToggle}
                                                 className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isSolved
-                                                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                                                    ? 'bg-[#0E334F] border-[#0E334F] text-white'
                                                     : 'border-muted-foreground/40 hover:border-foreground'
                                                     }`}
                                                 aria-label={isSolved ? 'Mark as unsolved' : 'Mark as solved'}
@@ -192,7 +192,7 @@ const DsaTopicAccordion = ({
                                                     {tags.slice(0, 3).map((tag) => (
                                                         <span
                                                             key={`${problem.id}-${tag}`}
-                                                            className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full border border-sky-500/30 text-sky-500 bg-sky-500/10"
+                                                            className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full border border-[#0E334F]/15 text-[#0E334F] bg-[#E5E8F2]"
                                                         >
                                                             {tag}
                                                         </span>
