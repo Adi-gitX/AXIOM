@@ -3,11 +3,28 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadEnv } from './loadEnv.js';
+import { isPostgresEnabled, initPostgres, pgQuery } from './dbPostgres.js';
 
 loadEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Driver selection — prefers Postgres when DATABASE_URL is set AND reachable.
+// Falls back to sql.js if Postgres init fails (e.g. preview cluster firewall).
+let usingPostgres = false;
+const driverReady = (async () => {
+    if (isPostgresEnabled()) {
+        usingPostgres = await initPostgres();
+        if (usingPostgres) {
+            console.log('[db] driver: postgres');
+        } else {
+            console.log('[db] driver: sql.js (Postgres unreachable from this network)');
+        }
+    } else {
+        console.log('[db] driver: sql.js (set DATABASE_URL to enable Postgres)');
+    }
+})();
 
 // Database path
 const dataDir = path.join(__dirname, '..', 'data');
@@ -391,6 +408,19 @@ process.on('SIGTERM', () => { saveDb(); process.exit(); });
 
 // Query wrapper to match PostgreSQL-style interface
 export const query = async (text, params = []) => {
+    // Wait for driver selection to finish before first query.
+    await driverReady;
+
+    // Postgres branch — clean pass-through. Codebase already uses $1, $2... placeholders.
+    if (usingPostgres) {
+        try {
+            return await pgQuery(text, params);
+        } catch (err) {
+            console.error('[db:postgres] query error:', err.message, '\n  SQL:', text.slice(0, 160));
+            throw err;
+        }
+    }
+
     try {
         const database = await initDb();
 
@@ -458,7 +488,7 @@ export const query = async (text, params = []) => {
     }
 };
 
-// Initialize on module load
+// Initialize sql.js eagerly; it's a no-op if Postgres claims the driver later.
 initDb().catch(err => console.error('Failed to init database:', err.message));
 
 export default { query };
