@@ -203,6 +203,30 @@ export const getUserProfile = async (req, res) => {
         const { rows } = await query('SELECT * FROM users WHERE email = $1', [email]);
 
         if (rows.length === 0) {
+            // Auto-create a minimal user record on first fetch so dev-bypass
+            // and brand-new signups never see a 404 noise loop on the dashboard.
+            const fallbackName =
+                String(email || '').split('@')[0] || 'New developer';
+            try {
+                await query(
+                    `INSERT INTO users (email, name, avatar, role, bio, location)
+                     VALUES ($1, $2, $3, $4, $5, $6)`,
+                    [
+                        email,
+                        fallbackName,
+                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
+                        'Software Engineer',
+                        '',
+                        '',
+                    ],
+                );
+                const created = await query('SELECT * FROM users WHERE email = $1', [email]);
+                if (created.rows.length > 0) {
+                    return res.json(normalizeUser(created.rows[0]));
+                }
+            } catch (insertErr) {
+                console.warn('[users] auto-create failed:', insertErr.message);
+            }
             return res.status(404).json({ message: 'User not found' });
         }
 
