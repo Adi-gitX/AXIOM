@@ -87,25 +87,6 @@ export default defineConfig({
     },
     build: {
         rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    if (!id.includes('node_modules')) return
-                    if (id.includes('firebase')) return 'vendor-firebase'
-                    if (id.includes('react-router-dom')) return 'vendor-router'
-                    if (
-                        id.includes('framer-motion')
-                        || id.includes('/motion/')
-                        || id.includes('react-lenis')
-                        || id.includes('@studio-freight')
-                        || id.includes('/ogl/')
-                    ) {
-                        return 'vendor-motion'
-                    }
-                    if (id.includes('lucide-react')) return 'vendor-icons'
-                    if (id.includes('react-dom') || id.includes('/react/')) return 'vendor-react'
-                    return 'vendor-misc'
-                },
-            },
         },
     },
     server: {
