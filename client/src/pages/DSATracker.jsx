@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import GlassCard from '../components/ui/GlassCard';
+import { useNavigate } from 'react-router-dom';
 import DsaSheetCards from '../components/dsa/DsaSheetCards';
-import PremiumBadge from '../components/ui/PremiumBadge';
+import UpcomingSheets from '../components/dsa/UpcomingSheets';
+import { PageHeader, Section, Surface, KpiTile } from '../components/ui/AppPrimitives';
 import useDsaData from '../hooks/useDsaData';
 import { progressApi } from '../lib/api';
 import { HeatmapCalendar } from "@/components/heatmap-calendar";
@@ -116,115 +116,140 @@ const DSATracker = () => {
     const data = useMemo(() => makeData(heatmapData.rows), [heatmapData.rows]);
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
-            <div className="max-w-6xl mx-auto space-y-8">
-                <motion.header
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="space-y-2"
-                >
-                    <div className="flex flex-wrap items-center gap-2">
-                        <PremiumBadge tone="subtle">DSA Command Center</PremiumBadge>
-                        <PremiumBadge tone="accent">Premium Focus</PremiumBadge>
-                    </div>
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">DSA Tracker</h1>
-                    <p className="text-muted-foreground text-lg font-light">
-                        Track global progress, monitor yearly consistency, and jump into each sheet with focus.
-                    </p>
-                </motion.header>
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
+            <div className="max-w-6xl mx-auto">
+                <PageHeader
+                    eyebrow="Engineering"
+                    title="DSA Tracker"
+                    tail="— ship one a day."
+                    meta="Track problems across curated sheets · 1,096 problems available"
+                />
 
                 {error && !loading && (
-                    <GlassCard className="p-6" hoverEffect={false}>
-                        <p className="text-sm text-rose-500 mb-3">{error}</p>
+                    <Surface className="p-5 mb-6">
+                        <p className="text-sm text-[#9C2A1F] mb-3">{error}</p>
                         <button
                             type="button"
                             onClick={() => {
                                 refresh();
                                 setHeatmapNonce((value) => value + 1);
                             }}
-                            className="rounded-xl px-4 py-2 bg-foreground text-background text-sm font-semibold"
+                            className="rounded-full px-4 h-8 bg-foreground text-background text-[12px] font-semibold hover:opacity-90 transition-opacity"
                         >
-                            Retry loading DSA data
+                            Retry
                         </button>
-                    </GlassCard>
+                    </Surface>
                 )}
 
                 {warning && !loading && (
-                    <GlassCard className="p-4" hoverEffect={false}>
+                    <Surface className="p-4 mb-6">
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                            <p className="text-sm text-amber-500">{warning}</p>
+                            <p className="text-sm text-[#7A4A1F]">{warning}</p>
                             <button
                                 type="button"
                                 onClick={() => {
                                     refresh();
                                     setHeatmapNonce((value) => value + 1);
                                 }}
-                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                className="rounded-full bg-card border px-3 h-8 text-xs font-semibold text-foreground hover:border-foreground/15 transition-colors"
+                                style={{ borderColor: 'hsl(var(--hair))' }}
                             >
                                 Retry
                             </button>
                         </div>
-                    </GlassCard>
+                    </Surface>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <GlassCard className="p-5" hoverEffect={false}>
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Global Solved</p>
-                        <p className="text-3xl font-light mt-2">{loading ? '...' : `${totalSolved}/${totalProblems}`}</p>
-                    </GlassCard>
-
-                    <GlassCard className="p-5" hoverEffect={false} premium>
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Completion</p>
-                        <p className="text-3xl font-light mt-2">{loading ? '...' : `${overallProgress}%`}</p>
-                        <div className="premium-progress-track h-2 w-full rounded-full bg-foreground/10 mt-2">
-                            <div className="premium-progress-fill h-full rounded-full bg-foreground" style={{ width: `${overallProgress}%` }} />
-                        </div>
-                    </GlassCard>
-
-                    <GlassCard className="p-5" hoverEffect={false}>
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Current Streak</p>
-                        <p className="text-3xl font-light mt-2">{loading ? '...' : streak}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Longest: {loading ? '...' : longestStreak} days</p>
-                    </GlassCard>
-
-                    <GlassCard className="p-5" hoverEffect={false}>
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Study Time</p>
-                        <p className="text-3xl font-light mt-2">{loading ? '...' : studyHours}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Hours logged</p>
-                    </GlassCard>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
+                    <KpiTile label="Solved" value={loading ? '—' : `${totalSolved}`} hint={`of ${totalProblems}`} />
+                    <KpiTile label="Completion" value={loading ? '—' : `${overallProgress}%`} hint="overall mastery" />
+                    <KpiTile label="Streak" value={loading ? '—' : `${streak}`} hint={`longest ${loading ? '—' : longestStreak}d`} />
+                    <KpiTile label="Studied" value={loading ? '—' : `${studyHours}h`} hint="logged total" />
                 </div>
 
-                <div className="space-y-2">
+                <Section label="Activity">
                     {heatmapError && !heatmapLoading && (
-                        <p className="text-sm text-amber-500">{heatmapError}</p>
+                        <p className="text-sm text-[#7A4A1F] mb-3">{heatmapError}</p>
                     )}
-                    <HeatmapCalendar
-                        title="Contribution Activity (Last 365 days)"
-                        data={data}
-                        weekStartsOn={1}
-                        interactionMode="hover"
-                        valueLabel={{ singular: 'question solved', plural: 'questions solved' }}
-                        legend={{ placement: 'bottom' }}
-                        axisLabels={{
-                            showMonths: true,
-                            showWeekdays: true,
-                            weekdayIndices: [1, 3, 5],
-                            monthFormat: "short",
-                            minWeekSpacing: 3,
-                        }}
-                        loading={heatmapLoading || loading}
-                        timezone={heatmapData.timezone}
-                        from={heatmapData.from}
-                        to={heatmapData.to}
-                    />
-                </div>
+                    <Surface className="p-6">
+                        <HeatmapCalendar
+                            title=""
+                            data={data}
+                            weekStartsOn={1}
+                            interactionMode="hover"
+                            valueLabel={{ singular: 'question solved', plural: 'questions solved' }}
+                            legend={{ placement: 'bottom' }}
+                            axisLabels={{
+                                showMonths: true,
+                                showWeekdays: true,
+                                weekdayIndices: [1, 3, 5],
+                                monthFormat: "short",
+                                minWeekSpacing: 3,
+                            }}
+                            loading={heatmapLoading || loading}
+                            timezone={heatmapData.timezone}
+                            from={heatmapData.from}
+                            to={heatmapData.to}
+                        />
+                    </Surface>
+                </Section>
 
-                <div className="space-y-3">
-                    <h2 className="text-sm uppercase tracking-wider text-muted-foreground font-semibold">Sheets</h2>
+                <Section label="Sheets">
                     <DsaSheetCards sheets={sheets} sheetStatsById={sheetStatsById} />
-                </div>
+                </Section>
+
+                <CompaniesTeaser />
+
+                <Section>
+                    <UpcomingSheets />
+                </Section>
             </div>
         </div>
+    );
+};
+
+const CompaniesTeaser = () => {
+    const navigate = useNavigate();
+    const [companies, setCompanies] = React.useState([]);
+    React.useEffect(() => {
+        fetch(((import.meta.env.VITE_API_URL || '') + '/api/dsa/companies'))
+            .then((r) => r.json())
+            .then((d) => setCompanies((d.companies || []).slice(0, 8)))
+            .catch(() => {});
+    }, []);
+    if (companies.length === 0) return null;
+    return (
+        <Section
+            eyebrow="New"
+            label="Prep by company"
+            action={
+                <button
+                    onClick={() => navigate('/app/dsa/companies')}
+                    data-testid="dsa-companies-cta"
+                    className="inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-foreground hover:text-[#0E334F] transition-colors"
+                >
+                    All companies →
+                </button>
+            }
+        >
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                {companies.map((c) => (
+                    <button
+                        key={c.slug}
+                        onClick={() => navigate(`/app/dsa/companies/${c.slug}`)}
+                        data-testid={`dsa-company-tile-${c.slug}`}
+                        className="bg-card border rounded-2xl p-3.5 text-left hover-lift"
+                        style={{ borderColor: 'hsl(var(--hair))' }}
+                    >
+                        <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center font-display font-semibold text-[14px] text-foreground mb-2.5">
+                            {c.initial}
+                        </div>
+                        <p className="text-[12.5px] font-semibold text-foreground truncate">{c.name}</p>
+                        <p className="text-[10.5px] text-muted-foreground tabular mt-0.5">{c.count} problems</p>
+                    </button>
+                ))}
+            </div>
+        </Section>
     );
 };
 
