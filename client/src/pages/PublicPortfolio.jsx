@@ -19,7 +19,14 @@ const PublicPortfolio = () => {
                 const response = await userApi.getPublicProfile(username);
                 setData(response);
             } catch (err) {
-                console.error('Failed to load public portfolio:', err);
+                // 404 on a public profile is an expected case (deep-link to a
+                // username that doesn't exist or has portfolio_visibility=0).
+                // Surface as info, not error, so the console stays clean.
+                if (err?.status === 404 || /404/.test(err?.message || '')) {
+                    console.info('[portfolio] not found:', username);
+                } else {
+                    console.error('Failed to load public portfolio:', err);
+                }
                 setError('Profile not found or private.');
                 setData(null);
             } finally {
@@ -65,7 +72,7 @@ const PublicPortfolio = () => {
                                     <div className="flex flex-col md:flex-row md:items-start gap-5">
                                         <img src={profile.avatar} alt={profile.name} className="w-24 h-24 rounded-2xl object-cover border border-border" />
                                         <div className="flex-1">
-                                            <h1 className="text-4xl font-light text-foreground font-display tracking-tight">{profile.name}</h1>
+                                            <h1 className="font-display font-semibold text-[30px] md:text-[38px] leading-[1.04] tracking-[-0.028em] text-foreground">{profile.name}</h1>
                                             <p className="text-muted-foreground mt-1 inline-flex items-center gap-2"><Briefcase className="w-4 h-4" /> {profile.role || 'Developer'}</p>
                                             {profile.location && (
                                                 <p className="text-muted-foreground mt-1 inline-flex items-center gap-2"><MapPin className="w-4 h-4" /> {profile.location}</p>
@@ -75,15 +82,15 @@ const PublicPortfolio = () => {
                                     </div>
 
                                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <div className="rounded-xl border border-border bg-background/40 p-3">
+                                        <div className="rounded-xl border border-border bg-card p-3">
                                             <p className="text-xs text-muted-foreground uppercase tracking-wider">PRs Opened</p>
                                             <p className="text-2xl font-light mt-1">{showcase?.prsOpened ?? 0}</p>
                                         </div>
-                                        <div className="rounded-xl border border-border bg-background/40 p-3">
+                                        <div className="rounded-xl border border-border bg-card p-3">
                                             <p className="text-xs text-muted-foreground uppercase tracking-wider">Merged PRs</p>
                                             <p className="text-2xl font-light mt-1">{showcase?.prsMerged ?? 0}</p>
                                         </div>
-                                        <div className="rounded-xl border border-border bg-background/40 p-3">
+                                        <div className="rounded-xl border border-border bg-card p-3">
                                             <p className="text-xs text-muted-foreground uppercase tracking-wider">Skills</p>
                                             <p className="text-2xl font-light mt-1">{(profile.skills || []).length}</p>
                                         </div>
@@ -104,7 +111,7 @@ const PublicPortfolio = () => {
                                                     href={pr.html_url}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="block rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+                                                    className="block rounded-xl border border-border bg-card px-3 py-2 hover:border-foreground/30 transition-colors"
                                                 >
                                                     <p className="text-sm font-medium text-foreground">{pr.title}</p>
                                                     <p className="text-[11px] text-muted-foreground mt-1">{pr.repo_full_name}</p>
@@ -123,7 +130,7 @@ const PublicPortfolio = () => {
                                                 href={social?.url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="block rounded-xl border border-border bg-background/40 px-3 py-2 hover:border-foreground/30 transition-colors"
+                                                className="block rounded-xl border border-border bg-card px-3 py-2 hover:border-foreground/30 transition-colors"
                                             >
                                                 <p className="text-sm text-foreground">{social?.platform || 'Link'}</p>
                                                 <p className="text-[11px] text-muted-foreground truncate">{social?.url}</p>
