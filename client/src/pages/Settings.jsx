@@ -3,33 +3,25 @@ import {
     User,
     Bell,
     Shield,
-    Palette,
     LogOut,
-    Monitor,
-    Moon,
-    Sun,
-    Laptop,
     Check
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { settingsApi, userApi } from '../lib/api';
-import { useTheme } from '../components/theme-provider';
 
 const normalizeBool = (value) => value === true || value === 1 || value === '1';
 
 const Settings = () => {
     const [activeTab, setActiveTab] = useState('account');
     const { currentUser, logout } = useAuth();
-    const { setTheme: applyTheme } = useTheme();
     const navigate = useNavigate();
     const currentEmail = currentUser?.email || '';
     const currentDisplayName = currentUser?.displayName || '';
 
     // Settings state
     const [settings, setSettings] = useState({
-        theme: 'system',
         email_notifications: true,
         push_notifications: true,
         weekly_digest: true,
@@ -63,14 +55,12 @@ const Settings = () => {
             if (settingsData) {
                 const normalized = {
                     ...settingsData,
-                    theme: settingsData.theme || 'system',
                     email_notifications: normalizeBool(settingsData.email_notifications),
                     push_notifications: normalizeBool(settingsData.push_notifications),
                     weekly_digest: normalizeBool(settingsData.weekly_digest),
                     product_updates: normalizeBool(settingsData.product_updates),
                 };
                 setSettings((prev) => ({ ...prev, ...normalized }));
-                applyTheme(normalized.theme);
             }
 
             if (userData) {
@@ -95,7 +85,7 @@ const Settings = () => {
         } finally {
             setLoading(false);
         }
-    }, [applyTheme, currentDisplayName, currentEmail]);
+    }, [currentDisplayName, currentEmail]);
 
     // Load settings from API
     useEffect(() => {
@@ -154,26 +144,8 @@ const Settings = () => {
         }
     };
 
-    // Set theme
-    const handleThemeChange = async (theme) => {
-        if (!currentEmail) return;
-
-        const previousTheme = settings.theme;
-        setSettings(prev => ({ ...prev, theme }));
-        applyTheme(theme);
-
-        try {
-            await settingsApi.updateTheme(currentEmail, theme);
-        } catch (err) {
-            console.error('Failed to update theme:', err);
-            setSettings(prev => ({ ...prev, theme: previousTheme }));
-            applyTheme(previousTheme || 'system');
-        }
-    };
-
     const tabs = [
         { id: 'account', label: 'Account', icon: User },
-        { id: 'appearance', label: 'Appearance', icon: Palette },
         { id: 'notifications', label: 'Notifications', icon: Bell },
         { id: 'security', label: 'Security', icon: Shield },
     ];
@@ -186,17 +158,31 @@ const Settings = () => {
     ];
 
     return (
-        <div className="flex-1 min-h-screen bg-background text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar">
-            <div className="max-w-5xl mx-auto">
-                <h1 className="text-4xl font-bold font-display tracking-tight mb-8">Settings</h1>
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16 overflow-y-auto custom-scrollbar">
+            <div className="max-w-[1180px] mx-auto">
+                <header className="mb-12">
+                    <div className="mb-3.5">
+                        <span className="inline-flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/75">
+                            <span className="inline-block w-3.5 h-px bg-foreground/30" />
+                            Workspace
+                        </span>
+                    </div>
+                    <h1 className="font-display font-semibold text-[30px] md:text-[38px] leading-[1.04] tracking-[-0.028em] text-foreground">
+                        Settings
+                        <span className="italic-accent text-foreground/85"> — preferences.</span>
+                    </h1>
+                    <p className="mt-3 text-[13.5px] text-muted-foreground max-w-[560px] leading-relaxed">
+                        Account, notifications, and security.
+                    </p>
+                </header>
 
                 {loadError && (
-                    <div className="mb-4 rounded-2xl border border-border bg-background/40 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-sm text-amber-500">{loadError}</p>
+                    <div className="mb-6 rounded-2xl border border-[#7A4A1F]/15 bg-[#FBEFE0] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-sm text-[#7A4A1F]">{loadError}</p>
                         <button
                             type="button"
                             onClick={loadSettings}
-                            className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                            className="rounded-full bg-card border px-3 h-8 text-xs font-semibold text-foreground hover:border-foreground/15 transition-colors"
                         >
                             Retry
                         </button>
@@ -206,35 +192,35 @@ const Settings = () => {
                 <div className="flex flex-col md:flex-row gap-8">
 
                     {/* Sidebar Tabs */}
-                    <div className="w-full md:w-64 shrink-0 space-y-2">
+                    <div className="w-full md:w-60 shrink-0 space-y-1">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-medium text-sm border ${activeTab === tab.id
-                                    ? 'bg-foreground text-background border-foreground shadow-lg'
-                                    : 'bg-transparent text-muted-foreground border-transparent hover:bg-muted/50 hover:text-foreground'
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors ${activeTab === tab.id
+                                    ? 'bg-foreground text-background'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                                     }`}
                             >
-                                <tab.icon className="w-4 h-4" />
+                                <tab.icon className="w-[15px] h-[15px]" strokeWidth={1.7} />
                                 {tab.label}
                             </button>
                         ))}
 
-                        <div className="pt-4 mt-4 border-t border-border">
+                        <div className="pt-3 mt-3 border-t border-border">
                             <button
                                 onClick={handleLogout}
-                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-500/10 transition-all font-medium text-sm"
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium text-[#9C2A1F] hover:bg-[#F2E5EC] transition-colors"
                             >
-                                <LogOut className="w-4 h-4" />
+                                <LogOut className="w-[15px] h-[15px]" strokeWidth={1.7} />
                                 Log Out
                             </button>
                         </div>
                     </div>
 
                     {/* Main Content Area */}
-                    <div className="flex-1">
-                        <div className="bg-background border border-border rounded-2xl p-8 shadow-sm min-h-[500px]">
+                    <div className="flex-1 min-w-0">
+                        <div className="bg-card border border-border rounded-2xl p-6 lg:p-8 min-h-[500px]">
 
                             {loading ? (
                                 <div className="flex items-center justify-center h-64">
@@ -245,7 +231,7 @@ const Settings = () => {
                                     {activeTab === 'account' && (
                                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                             <div>
-                                                <h2 className="text-xl font-bold font-display mb-1">Personal Information</h2>
+                                                <h2 className="text-xl font-display font-semibold mb-1">Personal Information</h2>
                                                 <p className="text-sm text-muted-foreground">Manage your personal details.</p>
                                             </div>
 
@@ -256,7 +242,7 @@ const Settings = () => {
                                                         type="text"
                                                         value={profile.name}
                                                         onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
-                                                        className="w-full bg-muted/30 border border-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 outline-none"
+                                                        className="w-full bg-secondary border border-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-foreground/15 outline-none"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
@@ -265,7 +251,7 @@ const Settings = () => {
                                                         type="email"
                                                         value={profile.email}
                                                         disabled
-                                                        className="w-full bg-muted/30 border border-border rounded-xl px-4 py-3 opacity-50 cursor-not-allowed"
+                                                        className="w-full bg-secondary border border-border rounded-xl px-4 py-3 opacity-50 cursor-not-allowed"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
@@ -274,21 +260,21 @@ const Settings = () => {
                                                         type="text"
                                                         value={profile.username}
                                                         onChange={(e) => setProfile(prev => ({ ...prev, username: e.target.value }))}
-                                                        className="w-full bg-muted/30 border border-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 outline-none"
+                                                        className="w-full bg-secondary border border-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-foreground/15 outline-none"
                                                     />
                                                 </div>
                                             </div>
 
                                             <div className="pt-8 border-t border-border flex justify-end gap-3">
                                                 {saveSuccess && (
-                                                    <span className="flex items-center gap-2 text-emerald-500 text-sm">
+                                                    <span className="flex items-center gap-2 text-[#0E334F] text-sm">
                                                         <Check className="w-4 h-4" /> Saved!
                                                     </span>
                                                 )}
                                                 <button
                                                     onClick={saveProfile}
                                                     disabled={saving}
-                                                    className="px-6 py-3 bg-foreground text-background rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
+                                                    className="px-6 py-3 bg-foreground text-background rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
                                                 >
                                                     {saving ? 'Saving...' : 'Save Changes'}
                                                 </button>
@@ -296,52 +282,10 @@ const Settings = () => {
                                         </div>
                                     )}
 
-                                    {activeTab === 'appearance' && (
-                                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                            <div>
-                                                <h2 className="text-xl font-bold font-display mb-1">Theme Preferences</h2>
-                                                <p className="text-sm text-muted-foreground">Customize how AXIOM looks on your device.</p>
-                                            </div>
-
-                                            <div className="p-6 rounded-2xl bg-muted/20 border border-border flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center">
-                                                        <Monitor className="w-6 h-6" />
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="font-bold">Interface Theme</h3>
-                                                        <p className="text-sm text-muted-foreground">Select your preferred color scheme</p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex bg-muted/50 p-1 rounded-full border border-border">
-                                                    <button
-                                                        onClick={() => handleThemeChange('light')}
-                                                        className={`p-2 rounded-full transition-all ${settings.theme === 'light' ? 'bg-background shadow-sm' : 'hover:bg-background/50'}`}
-                                                    >
-                                                        <Sun className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleThemeChange('dark')}
-                                                        className={`p-2 rounded-full transition-all ${settings.theme === 'dark' ? 'bg-background shadow-sm' : 'hover:bg-background/50'}`}
-                                                    >
-                                                        <Moon className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleThemeChange('system')}
-                                                        className={`p-2 rounded-full transition-all ${settings.theme === 'system' ? 'bg-background shadow-sm' : 'hover:bg-background/50'}`}
-                                                    >
-                                                        <Laptop className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
                                     {activeTab === 'notifications' && (
                                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                             <div>
-                                                <h2 className="text-xl font-bold font-display mb-1">Notifications</h2>
+                                                <h2 className="text-xl font-display font-semibold mb-1">Notifications</h2>
                                                 <p className="text-sm text-muted-foreground">Choose what you want to be notified about.</p>
                                             </div>
 
@@ -350,11 +294,11 @@ const Settings = () => {
                                                     <div
                                                         key={item.key}
                                                         onClick={() => toggleNotification(item.key)}
-                                                        className="flex items-center justify-between p-4 hover:bg-muted/30 rounded-xl transition-colors cursor-pointer"
+                                                        className="flex items-center justify-between p-4 hover:bg-secondary rounded-xl transition-colors cursor-pointer"
                                                     >
                                                         <span className="font-medium">{item.label}</span>
                                                         <div
-                                                            className={`w-11 h-6 rounded-full relative transition-colors ${settings[item.key] ? 'bg-emerald-500' : 'bg-muted'}`}
+                                                            className={`w-11 h-6 rounded-full relative transition-colors ${settings[item.key] ? 'bg-[#0E334F]' : 'bg-muted'}`}
                                                         >
                                                             <div
                                                                 className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${settings[item.key] ? 'right-1' : 'left-1'}`}
@@ -369,16 +313,16 @@ const Settings = () => {
                                     {activeTab === 'security' && (
                                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                             <div>
-                                                <h2 className="text-xl font-bold font-display mb-1">Security</h2>
+                                                <h2 className="text-xl font-display font-semibold mb-1">Security</h2>
                                                 <p className="text-sm text-muted-foreground">Manage your account security.</p>
                                             </div>
 
                                             <div className="space-y-4">
-                                                <div className="p-4 rounded-xl bg-muted/20 border border-border">
+                                                <div className="p-4 rounded-xl bg-secondary/60 border border-border">
                                                     <h3 className="font-medium mb-1">Connected Account</h3>
                                                     <p className="text-sm text-muted-foreground">Signed in with {currentUser?.providerData?.[0]?.providerId || 'Email'}</p>
                                                 </div>
-                                                <div className="p-4 rounded-xl bg-muted/20 border border-border">
+                                                <div className="p-4 rounded-xl bg-secondary/60 border border-border">
                                                     <h3 className="font-medium mb-1">Last Login</h3>
                                                     <p className="text-sm text-muted-foreground">
                                                         {currentUser?.metadata?.lastSignInTime ? new Date(currentUser.metadata.lastSignInTime).toLocaleString() : 'Unknown'}
