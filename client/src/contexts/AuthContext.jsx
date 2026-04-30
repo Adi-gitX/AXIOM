@@ -20,6 +20,10 @@ export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Optional: client-side dev bypass — injects a mock user when VITE_DEV_BYPASS_AUTH=true.
+    // Lets developers preview the app shell/UI without a real Firebase login.
+    const devBypass = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
+
     const syncUserToDatabase = async (user) => {
         const email = String(user?.email || '').trim().toLowerCase();
         if (!email) return null;
@@ -70,6 +74,19 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        if (devBypass) {
+            // Inject a mock user — UI-only preview; no Firebase token, no DB sync
+            const mockUser = {
+                uid: 'dev-preview-uid',
+                email: 'dev@axiom.local',
+                displayName: 'Dev Preview',
+                photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dev@axiom.local',
+            };
+            setCurrentUser(mockUser);
+            setLoading(false);
+            return undefined;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
             setLoading(false);
@@ -79,7 +96,7 @@ export const AuthProvider = ({ children }) => {
         });
 
         return unsubscribe;
-    }, []);
+    }, [devBypass]);
 
     const value = {
         currentUser,
