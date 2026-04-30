@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { interviewApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { PageHeader } from '../components/ui/AppPrimitives';
 
 const InterviewPrep = () => {
     const { currentUser } = useAuth();
@@ -85,38 +86,36 @@ const InterviewPrep = () => {
     };
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
             <div className="max-w-5xl mx-auto">
 
-                <motion.header
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mb-12 space-y-3"
-                >
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Interview Prep</h1>
-                    <p className="text-muted-foreground text-lg mt-1">Resources to ace your interviews</p>
-                    {error && (
-                        <div className="mt-3 flex flex-wrap items-center gap-3">
-                            <p className="text-sm text-rose-400">{error}</p>
-                            <button
-                                type="button"
-                                onClick={() => setRetryNonce((prev) => prev + 1)}
-                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
-                            >
-                                Retry
-                            </button>
-                        </div>
-                    )}
-                </motion.header>
+                <PageHeader
+                    eyebrow="Career"
+                    title="Interview Prep"
+                    tail="— ready when it counts."
+                    meta="Behavioral · system design · DSA · curated resources"
+                />
+                {error && (
+                    <div className="mb-6 flex flex-wrap items-center gap-3">
+                        <p className="text-sm text-[#9C2A1F]">{error}</p>
+                        <button
+                            type="button"
+                            onClick={() => setRetryNonce((prev) => prev + 1)}
+                            className="rounded-full bg-card border border-border px-3 h-8 text-xs font-semibold text-foreground hover:border-foreground/15 transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
 
                 <div className="flex flex-wrap gap-2 mb-8">
                     {categories.map((c) => (
                         <button
                             key={c}
                             onClick={() => setCat(c)}
-                            className={`px-4 py-2 text-sm rounded-full transition-all border ${cat === c
-                                ? 'bg-foreground text-background border-foreground shadow-glow font-medium'
-                                : 'bg-muted text-muted-foreground border-border hover:bg-accent hover:text-foreground'
+                            className={`inline-flex items-center h-8 px-3.5 text-[13px] rounded-full transition-colors border font-semibold ${cat === c
+                                ? 'bg-foreground text-background border-foreground'
+                                : 'bg-card text-muted-foreground border-border hover:text-foreground'
                                 }`}
                         >
                             {c}
@@ -139,7 +138,7 @@ const InterviewPrep = () => {
                                 <div className="flex items-start justify-between gap-2">
                                     <span className="text-xs text-muted-foreground font-mono">{r.category}</span>
                                     <span className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded-full border ${r.completed
-                                        ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10'
+                                        ? 'border-[#0E334F]/25 text-[#0E334F] bg-[#E8F2E5]'
                                         : 'border-border text-muted-foreground bg-muted/50'
                                         }`}>
                                         {r.completed ? 'Completed' : 'Pending'}
@@ -152,7 +151,7 @@ const InterviewPrep = () => {
                                         onClick={() => toggleCompleted(r)}
                                         disabled={!currentUser?.email || savingId === r.id}
                                         className={`w-full px-3 py-2 text-xs rounded-xl border transition-all ${r.completed
-                                            ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10'
+                                            ? 'border-[#0E334F]/15 text-[#0E334F] bg-[#E8F2E5]'
                                             : 'border-border text-foreground bg-muted hover:bg-accent'
                                             } disabled:opacity-60`}
                                     >
@@ -165,7 +164,7 @@ const InterviewPrep = () => {
                 )}
 
                 <div className="bg-background p-8 rounded-3xl border border-border">
-                    <h2 className="text-xs font-bold text-foreground uppercase tracking-widest mb-6 opacity-50">Quick Tips</h2>
+                    <h2 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-6 opacity-50">Quick Tips</h2>
                     <div className="space-y-4">
                         {(tips.length ? tips : ['No tips available']).map((tip, i) => (
                             <motion.div
