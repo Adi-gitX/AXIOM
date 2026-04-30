@@ -1,62 +1,108 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import logoWhite from '../assets/axiom-logo-white.png';
+import { Github } from 'lucide-react';
 
 const PublicNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [scrolled, setScrolled] = useState(false);
 
-    // Helper to check if link is active
-    const isActive = (path) => location.pathname === path;
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    const scrollTo = (id) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    // Honest, product-aligned nav — what AXIOM actually is, not generic SaaS labels.
+    const links = [
+        { label: 'Product', kind: 'scroll', target: 'product' },
+        { label: 'Pricing', kind: 'route', path: '/pricing' },
+        { label: 'Docs', kind: 'route', path: '/docs' },
+        { label: 'Changelog', kind: 'scroll', target: 'changelog' },
+    ];
+
+    const isActive = (link) => link.kind === 'route' && location.pathname === link.path;
+
+    const handleClick = (link) => {
+        if (link.kind === 'route') navigate(link.path);
+        else scrollTo(link.target);
+    };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-6 bg-black/50 backdrop-blur-2xl border-b border-white/5 shadow-sm transition-all duration-300">
-            <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-2 cursor-pointer"
+        <header
+            data-testid="public-navbar"
+            className={`fixed top-0 left-0 right-0 z-50 transition-[background,box-shadow] duration-300 ${
+                scrolled
+                    ? 'bg-[#FAF8F2]/85 backdrop-blur-xl shadow-[0_1px_0_rgba(15,20,25,0.06)]'
+                    : 'bg-transparent'
+            }`}
+        >
+            <div className="max-w-[1280px] mx-auto flex items-center justify-between px-6 md:px-10 h-[68px]">
+                {/* Brand — wordmark only, no ornament */}
+                <button
+                    data-testid="brand-logo"
                     onClick={() => navigate('/')}
+                    className="flex items-baseline gap-1 group"
                 >
-                    <img src={logoWhite} alt="Axiom" className="h-9 w-9 object-contain" />
-                    <span className="text-xl font-bold tracking-tight text-white font-display">AXIOM</span>
-                </motion.div>
+                    <span className="font-display text-[22px] tracking-[-0.025em] font-semibold text-[#0F1419]">
+                        axiom
+                    </span>
+                    <span className="font-serif italic text-[13px] text-[#0F1419]/45 -ml-0.5">/dev</span>
+                </button>
 
-                <motion.nav
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="hidden md:flex gap-1 text-sm font-medium text-gray-400 bg-white/5 p-1.5 rounded-full border border-white/10"
-                >
-                    {[
-                        { label: 'Home', path: '/' },
-                        { label: 'Documentation', path: '/docs' },
-                        { label: 'OSS', path: '/app/oss' },
-                        { label: 'GSOC', path: '/app/gsoc' },
-                        { label: 'Pricing', path: '/pricing' }
-                    ].map(item => (
+                {/* Center nav */}
+                <nav className="hidden md:flex items-center gap-1">
+                    {links.map((item) => (
                         <button
                             key={item.label}
-                            onClick={() => navigate(item.path)}
-                            className={`px-6 py-2 rounded-full transition-all duration-300 tracking-wide uppercase text-xs ${isActive(item.path)
-                                ? 'bg-white text-black shadow-glow font-bold'
-                                : 'hover:bg-white/10 hover:text-white text-gray-400'
-                                }`}
+                            data-testid={`nav-${item.label.toLowerCase()}`}
+                            onClick={() => handleClick(item)}
+                            className={`px-3.5 py-2 text-[13.5px] font-medium tracking-[-0.005em] rounded-md transition-colors ${
+                                isActive(item)
+                                    ? 'text-[#0F1419]'
+                                    : 'text-[#0F1419]/65 hover:text-[#0F1419]'
+                            }`}
                         >
                             {item.label}
                         </button>
                     ))}
-                </motion.nav>
+                </nav>
 
-                <motion.button
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    onClick={() => navigate('/app')}
-                    className="px-6 py-2.5 text-sm font-bold bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-glow hover:bg-gray-200 tracking-wide"
-                >
-                    Launch App
-                </motion.button>
+                {/* Right cluster */}
+                <div className="flex items-center gap-2">
+                    <a
+                        href="https://github.com/Adi-gitX/AXIOM"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-testid="nav-github"
+                        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium text-[#0F1419]/70 hover:text-[#0F1419] rounded-md transition-colors"
+                    >
+                        <Github className="w-4 h-4" strokeWidth={1.6} />
+                        GitHub
+                    </a>
+                    <button
+                        data-testid="nav-signin-btn"
+                        onClick={() => navigate('/login')}
+                        className="hidden sm:inline-flex px-3.5 py-2 text-[13.5px] font-medium text-[#0F1419]/70 hover:text-[#0F1419] rounded-md transition-colors"
+                    >
+                        Sign in
+                    </button>
+                    <button
+                        data-testid="nav-cta-btn"
+                        onClick={() => navigate('/signup')}
+                        className="px-4 py-2 text-[13.5px] font-medium bg-[#0F1419] text-[#FAF8F2] rounded-full hover:bg-[#0E334F] transition-colors"
+                    >
+                        Get started
+                    </button>
+                </div>
             </div>
         </header>
     );
