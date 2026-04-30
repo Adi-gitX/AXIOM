@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect } from "react"
 
 const ThemeProviderContext = createContext({
     theme: "system",
@@ -7,39 +7,23 @@ const ThemeProviderContext = createContext({
 
 export function ThemeProvider({
     children,
-    defaultTheme = "system",
-    storageKey = "vite-ui-theme",
     ...props
 }) {
-    const [theme, setTheme] = useState(
-        () => (localStorage.getItem(storageKey)) || defaultTheme
-    )
+    // Theme is permanently locked to "light" — AXIOM is a single-theme app
+    // matching the painterly Duna aesthetic. Dark mode is intentionally disabled.
+    const theme = "light"
+    const setTheme = () => {}
 
     useEffect(() => {
         const root = window.document.documentElement
+        root.classList.remove("dark")
+        root.classList.add("light")
+        // Clear any stale theme from previous installs
+        try { localStorage.removeItem("vite-ui-theme"); } catch (e) {}
+        try { localStorage.removeItem("axiom-theme-v2"); } catch (e) {}
+    }, [])
 
-        root.classList.remove("light", "dark")
-
-        if (theme === "system") {
-            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-                .matches
-                ? "dark"
-                : "light"
-
-            root.classList.add(systemTheme)
-            return
-        }
-
-        root.classList.add(theme)
-    }, [theme])
-
-    const value = {
-        theme,
-        setTheme: (theme) => {
-            localStorage.setItem(storageKey, theme)
-            setTheme(theme)
-        },
-    }
+    const value = { theme, setTheme }
 
     return (
         <ThemeProviderContext.Provider {...props} value={value}>
