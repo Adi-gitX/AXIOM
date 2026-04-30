@@ -316,7 +316,7 @@ const DeveloperConnect = () => {
             {/* Sidebar */}
             <div className="w-60 border-r border-border p-6 shrink-0 hidden lg:block bg-background/40">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xs font-bold text-foreground uppercase tracking-widest opacity-50">Channels</h2>
+                    <h2 className="text-xs font-semibold text-foreground uppercase tracking-widest opacity-50">Channels</h2>
                     <button
                         onClick={() => setShowCreateChannel(true)}
                         className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
@@ -369,7 +369,7 @@ const DeveloperConnect = () => {
 
                 {/* Online Users */}
                 <div className="mt-8">
-                    <h3 className="text-xs font-bold text-foreground uppercase tracking-widest mb-4 opacity-50">Online</h3>
+                    <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-4 opacity-50">Online</h3>
                     <div className="space-y-2">
                         {combinedOnlineUsers.length === 0 ? (
                             <p className="text-xs text-muted-foreground px-2">No users active in the last 30 mins</p>
@@ -382,7 +382,7 @@ const DeveloperConnect = () => {
                                             alt=""
                                             className="w-8 h-8 rounded-full bg-muted"
                                         />
-                                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-card" />
+                                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#0E334F] border-2 border-card" />
                                     </div>
                                     <span className="text-sm text-foreground truncate">{user.name || user.email}</span>
                                 </div>
@@ -404,7 +404,7 @@ const DeveloperConnect = () => {
                         {activeChannelData.description}
                     </p>
                     {error && (
-                        <p className="text-xs text-rose-400 mt-2">{error}</p>
+                        <p className="text-xs text-[#9C2A1F] mt-2">{error}</p>
                     )}
                     {isPrivateChannel && (
                         <div className="mt-4 rounded-2xl border border-border bg-background/40 px-4 py-3 space-y-3">
@@ -421,7 +421,7 @@ const DeveloperConnect = () => {
                             </div>
 
                             {memberError && (
-                                <p className="text-xs text-rose-400">{memberError}</p>
+                                <p className="text-xs text-[#9C2A1F]">{memberError}</p>
                             )}
 
                             {!membersLoading && (
@@ -442,7 +442,7 @@ const DeveloperConnect = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => handleRemoveMember(member.email)}
-                                                        className="text-xs text-rose-400 hover:text-rose-300"
+                                                        className="text-xs text-[#9C2A1F] hover:text-[#9C2A1F]/70"
                                                         disabled={memberActionLoading}
                                                     >
                                                         Remove
@@ -506,7 +506,7 @@ const DeveloperConnect = () => {
                                     />
                                     <div>
                                         <div className="flex items-center gap-3">
-                                            <span className="font-bold text-foreground text-sm">{msg.user || msg.username}</span>
+                                            <span className="font-semibold text-foreground text-sm">{msg.user || msg.username}</span>
                                             <span className="text-xs text-muted-foreground">
                                                 {formatTime(msg.time || msg.created_at)}
                                             </span>
@@ -565,7 +565,7 @@ const DeveloperConnect = () => {
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold text-foreground">Create Channel</h2>
+                                <h2 className="text-2xl font-semibold text-foreground">Create Channel</h2>
                                 <button
                                     onClick={() => setShowCreateChannel(false)}
                                     className="p-2 rounded-xl hover:bg-muted transition-colors"
@@ -629,7 +629,7 @@ const DeveloperConnect = () => {
                                     <button
                                         type="submit"
                                         disabled={createLoading || !newChannel.name.trim()}
-                                        className="flex-1 px-4 py-3 rounded-xl bg-foreground text-background font-bold hover:opacity-90 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex-1 px-4 h-10 rounded-full bg-foreground text-background font-semibold hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {createLoading ? 'Creating...' : 'Create Channel'}
                                     </button>
