@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import { CalendarClock, Target, BellOff, Bell, ArrowUpRight } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
+import { PageHeader } from '../components/ui/AppPrimitives';
 import { useAuth } from '../contexts/AuthContext';
 import { gsocApi } from '../lib/api';
 
@@ -108,23 +108,23 @@ const GsocAccelerator = () => {
         : reminders.active;
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
-            <div className="max-w-6xl mx-auto space-y-6">
-                <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">GSOC Accelerator</h1>
-                    <p className="text-muted-foreground text-lg font-light">
-                        Timeline, reminders, target organizations, and a practical readiness score for GSOC 2026.
-                    </p>
-                </motion.header>
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
+            <div className="max-w-[1180px] mx-auto">
+                <PageHeader
+                    eyebrow="Engineering"
+                    title="GSOC Accelerator"
+                    tail="— know exactly where you stand."
+                    meta="Timeline · target organizations · readiness score"
+                />
 
                 {error && (
-                    <GlassCard className="p-4" hoverEffect={false}>
+                    <GlassCard className="p-4 mb-6" hoverEffect={false}>
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                            <p className="text-sm text-rose-500">{error}</p>
+                            <p className="text-sm text-[#9C2A1F]">{error}</p>
                             <button
                                 type="button"
                                 onClick={() => setRetryNonce((prev) => prev + 1)}
-                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                className="rounded-full bg-card border px-3 h-8 text-xs font-semibold text-foreground hover:border-foreground/15 transition-colors"
                             >
                                 Retry
                             </button>
@@ -132,7 +132,7 @@ const GsocAccelerator = () => {
                     </GlassCard>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                     <GlassCard className="p-5 lg:col-span-2" hoverEffect={false}>
                         <div className="flex items-center gap-2 mb-3">
                             <CalendarClock className="w-4 h-4 text-foreground" />
@@ -189,7 +189,7 @@ const GsocAccelerator = () => {
                     </GlassCard>
                 </div>
 
-                <GlassCard className="p-5" hoverEffect={false}>
+                <GlassCard className="p-5 mb-6" hoverEffect={false}>
                     <div className="flex items-center justify-between gap-3 mb-3">
                         <p className="text-sm font-semibold text-foreground">Automatic Reminders</p>
                         <span className="text-xs text-muted-foreground font-mono">{reminders.active.length} active</span>
@@ -200,7 +200,7 @@ const GsocAccelerator = () => {
                     ) : (
                         <>
                             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                                <div className="inline-flex rounded-xl border border-border bg-background/50 p-1">
+                                <div className="inline-flex rounded-xl border border-border bg-card p-1">
                                     <button
                                         type="button"
                                         onClick={() => setShowDismissedReminders(false)}
@@ -282,12 +282,12 @@ const GsocAccelerator = () => {
                             value={filters.q}
                             onChange={(event) => setFilters((prev) => ({ ...prev, q: event.target.value }))}
                             placeholder="Search org or tag"
-                            className="md:col-span-2 rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                            className="md:col-span-2 rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
                         />
                         <select
                             value={filters.difficulty}
                             onChange={(event) => setFilters((prev) => ({ ...prev, difficulty: event.target.value }))}
-                            className="rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                            className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
                         >
                             <option value="">All difficulties</option>
                             <option value="Beginner">Beginner</option>
@@ -297,7 +297,7 @@ const GsocAccelerator = () => {
                         <select
                             value={filters.language}
                             onChange={(event) => setFilters((prev) => ({ ...prev, language: event.target.value }))}
-                            className="rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                            className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
                         >
                             <option value="">All languages</option>
                             {uniqueLanguages.map((lang) => (
@@ -311,7 +311,7 @@ const GsocAccelerator = () => {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {orgs.map((org) => (
-                                <div key={org.id} className="rounded-xl border border-border bg-background/40 px-3 py-3">
+                                <div key={org.id} className="rounded-xl border border-border bg-card px-3 py-3">
                                     <div className="flex items-start justify-between gap-2">
                                         <p className="text-sm font-semibold text-foreground">{org.name}</p>
                                         <span className="text-[10px] px-2 py-0.5 rounded-full border border-border text-muted-foreground uppercase tracking-wider">
