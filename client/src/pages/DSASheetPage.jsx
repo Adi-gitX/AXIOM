@@ -186,29 +186,40 @@ const DSASheetPage = () => {
     const sheetStats = sheet ? (sheetStatsById[sheet.id] || { solved: 0, total: 0, progress: 0 }) : null;
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
             <div className="max-w-6xl mx-auto space-y-6">
-                <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+                <header className="space-y-3">
                     <button
                         type="button"
                         onClick={() => navigate('/app/dsa')}
-                        className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors"
                     >
-                        ← Back to DSA Home
+                        ← Back to DSA
                     </button>
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">
-                        {sheet?.name || 'Loading Sheet...'}
-                    </h1>
-                    {sheetStats && (
-                        <p className="text-sm text-muted-foreground">
-                            {sheetStats.solved}/{sheetStats.total} solved • {sheetStats.progress}% complete
-                        </p>
-                    )}
-                </motion.header>
+                    <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+                        <div className="min-w-0">
+                            <div className="mb-3.5">
+                                <span className="inline-flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/75">
+                                    <span className="inline-block w-3.5 h-px bg-foreground/30" />
+                                    Engineering · Sheet
+                                </span>
+                            </div>
+                            <h1 className="font-display font-semibold text-[30px] md:text-[38px] leading-[1.04] tracking-[-0.028em] text-foreground">
+                                {sheet?.name || 'Loading Sheet…'}
+                            </h1>
+                            {sheetStats && (
+                                <p className="mt-3 text-[13.5px] text-muted-foreground tabular">
+                                    {sheetStats.solved}/{sheetStats.total} solved
+                                    <span className="italic-accent text-foreground/70"> — {sheetStats.progress}% complete.</span>
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </header>
 
                 {error && !loading && (
                     <GlassCard className="p-6" hoverEffect={false}>
-                        <p className="text-sm text-rose-500 mb-3">{error}</p>
+                        <p className="text-sm text-[#9C2A1F] mb-3">{error}</p>
                         <button
                             type="button"
                             onClick={refresh}
@@ -221,14 +232,14 @@ const DSASheetPage = () => {
 
                 {warning && !loading && (
                     <GlassCard className="p-4" hoverEffect={false}>
-                        <p className="text-sm text-amber-500">{warning}</p>
+                        <p className="text-sm text-[#7A4A1F]">{warning}</p>
                     </GlassCard>
                 )}
 
                 {dsaLastError && (
                     <GlassCard className="p-4" hoverEffect={false}>
                         <div className="flex items-center justify-between gap-3">
-                            <p className="text-sm text-rose-500">
+                            <p className="text-sm text-[#9C2A1F]">
                                 {dsaLastError.code === 'AUTH_MISSING_TOKEN'
                                     ? 'Session not ready. Please retry this toggle in a moment.'
                                     : dsaLastError.message}
@@ -283,7 +294,7 @@ const DSASheetPage = () => {
                                     }}
                                     className="text-left py-2 border-b border-border/50 hover:pl-2 transition-all group"
                                 >
-                                    <p className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-glow transition-all">{item.title}</p>
+                                    <p className="text-sm font-medium text-foreground line-clamp-1 transition-all">{item.title}</p>
                                     <p className="text-[11px] text-muted-foreground mt-0.5">
                                         Due {item.reviewDueDate || 'today'} • {item.topicName}
                                     </p>
