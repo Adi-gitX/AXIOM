@@ -11,6 +11,7 @@
     },
     "dependencies": {
         "@radix-ui/react-slot": "^1.2.4",
+        "@sentry/react": "^10.50.0",
         "@studio-freight/react-lenis": "^0.0.47",
         "class-variance-authority": "^0.7.1",
         "cloudinary": "^2.8.0",
