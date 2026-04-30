@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Github, RefreshCw, Link2, Flame, Star, GitPullRequest, ArrowUpRight, Unplug } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
+import { PageHeader } from '../components/ui/AppPrimitives';
 import { useAuth } from '../contexts/AuthContext';
 import { ossApi } from '../lib/api';
 
@@ -222,23 +222,23 @@ const OssContributionEngine = () => {
     };
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
-            <div className="max-w-6xl mx-auto space-y-6">
-                <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">OSS Contribution Engine</h1>
-                    <p className="text-muted-foreground text-lg font-light mt-1">
-                        Link GitHub, import PR history, and get issue recommendations.
-                    </p>
-                </motion.header>
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
+            <div className="max-w-[1180px] mx-auto">
+                <PageHeader
+                    eyebrow="Engineering"
+                    title="OSS Engine"
+                    tail="— GitHub turned into momentum."
+                    meta="Track GitHub contributions · merged PRs · good first issues"
+                />
 
                 {error && (
-                    <GlassCard className="p-4" hoverEffect={false}>
+                    <GlassCard className="p-4 mb-6" hoverEffect={false}>
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                            <p className="text-sm text-rose-500">{error}</p>
+                            <p className="text-sm text-[#9C2A1F]">{error}</p>
                             <button
                                 type="button"
                                 onClick={() => setRetryNonce((prev) => prev + 1)}
-                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                className="rounded-full bg-card border px-3 h-8 text-xs font-semibold text-foreground hover:border-foreground/15 transition-colors"
                             >
                                 Retry
                             </button>
@@ -266,7 +266,7 @@ const OssContributionEngine = () => {
                                 </p>
                             )}
                             {connected && syncStatus.syncError && (
-                                <p className="text-[11px] text-rose-500 mt-1">
+                                <p className="text-[11px] text-[#9C2A1F] mt-1">
                                     Sync issue: {syncStatus.syncError}
                                 </p>
                             )}
@@ -277,7 +277,7 @@ const OssContributionEngine = () => {
                                 <button
                                     type="button"
                                     onClick={connectGithub}
-                                    className="rounded-xl bg-foreground text-background px-4 py-2 text-sm font-semibold inline-flex items-center gap-2"
+                                    className="rounded-full bg-foreground text-background px-4 h-9 text-[13px] font-semibold inline-flex items-center gap-2"
                                 >
                                     <Github className="w-4 h-4" /> Connect GitHub
                                 </button>
@@ -321,7 +321,7 @@ const OssContributionEngine = () => {
                     <GlassCard className="p-5" hoverEffect={false}>
                         <p className="text-xs uppercase tracking-wider text-muted-foreground">Merged Streak</p>
                         <p className="text-3xl font-light mt-2 inline-flex items-center gap-2">
-                            <Flame className="w-5 h-5 text-orange-500" />
+                            <Flame className="w-5 h-5 text-[#7A4A1F]" />
                             {loading ? '...' : (summary?.mergedPrStreak ?? 0)}
                         </p>
                     </GlassCard>
@@ -349,7 +349,7 @@ const OssContributionEngine = () => {
                                         className="block py-3 group hover:pl-2 transition-all"
                                     >
                                         <div className="flex items-center justify-between gap-2 min-w-0">
-                                            <p className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-glow transition-all">{pr.title}</p>
+                                            <p className="text-sm font-medium text-foreground line-clamp-1 transition-all">{pr.title}</p>
                                             <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                                         </div>
                                         <p className="text-[11px] text-muted-foreground mt-0.5">
