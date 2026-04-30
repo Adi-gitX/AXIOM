@@ -17,11 +17,17 @@ import settingsRoutes from './routes/settingsRoutes.js';
 import interviewRoutes from './routes/interviewRoutes.js';
 import ossRoutes from './routes/ossRoutes.js';
 import gsocRoutes from './routes/gsocRoutes.js';
+import companiesRoutes from './routes/companiesRoutes.js';
+import interviewExperienceRoutes from './routes/interviewExperienceRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import publicIngestRoutes from './routes/publicIngestRoutes.js';
 
 // Middleware imports
 import { sanitizeBody } from './middleware/validation.js';
+import { initSentry, Sentry } from './config/sentry.js';
 
 loadEnv();
+initSentry();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -193,19 +199,43 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // CORS configuration
-const configuredOrigins = [
-    'http://localhost:5173',
-    'http://localhost:5174', // Vite fallback port
-    'http://localhost:3000',
-    'https://axiomdev.vercel.app',
-    'https://axiom-client.vercel.app',
-    ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
-].map((origin) => origin.trim()).filter(Boolean);
+//
+// Production lockdown: when NODE_ENV=production AND PRODUCTION_FRONTEND_URL is
+// set, ONLY that single origin (plus FRONTEND_URLS extras) is allowed. This
+// prevents arbitrary previews from talking to the prod API.
+const productionPrimary = (process.env.PRODUCTION_FRONTEND_URL || '').trim();
+
+const configuredOrigins = isProduction && productionPrimary
+    ? [
+        productionPrimary,
+        ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
+    ].map((o) => o.trim()).filter(Boolean)
+    : [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:3000',
+        'https://axiomdev.vercel.app',
+        'https://axiom-client.vercel.app',
+        'https://axiomdev.free.nf',
+        'http://axiomdev.free.nf',
+        ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
+    ].map((origin) => origin.trim()).filter(Boolean);
 
 const allowedOrigins = new Set(configuredOrigins);
 const isVercelPreview = (origin) => {
+    if (isProduction) return false;
     try {
         return new URL(origin).hostname.endsWith('.vercel.app');
+    } catch {
+        return false;
+    }
+};
+
+// Allow any *.preview.emergentagent.com (preview / Playwright hosts) — only in non-prod
+const isEmergentPreview = (origin) => {
+    if (!origin || isProduction) return false;
+    try {
+        return new URL(origin).hostname.endsWith('.preview.emergentagent.com');
     } catch {
         return false;
     }
@@ -218,7 +248,7 @@ app.use(cors({
             return;
         }
 
-        if (allowedOrigins.has(origin) || isLocalOrigin(origin) || isVercelPreview(origin)) {
+        if (allowedOrigins.has(origin) || isLocalOrigin(origin) || isVercelPreview(origin) || isEmergentPreview(origin)) {
             callback(null, true);
             return;
         }
@@ -265,6 +295,18 @@ app.use('/api/oss', ossRoutes);
 
 // GSOC accelerator routes
 app.use('/api/gsoc', gsocRoutes);
+
+// Company-grouped DSA problem bank
+app.use('/api/dsa/companies', companiesRoutes);
+
+// Real interview experiences (community-submitted)
+app.use('/api/interviews', interviewExperienceRoutes);
+
+// AI helpers (powered by Emergent Universal LLM Key — gpt-4o-mini)
+app.use('/api/ai', aiRoutes);
+
+// Live public-API ingestion (RemoteOK + Arbeitnow + HackerNews + Dev.to)
+app.use('/api/public', publicIngestRoutes);
 
 // ========================================
 // Health & Root Endpoints
@@ -316,7 +358,18 @@ app.use((err, req, res, next) => {
         console.error(err.stack);
     }
 
-    res.status(err.status || 500).json({
+    // Forward 5xx errors to Sentry (no-op if SENTRY_DSN unset).
+    // 4xx are user errors and don't need to page anyone.
+    const status = err.status || 500;
+    if (status >= 500 && Sentry) {
+        try {
+            Sentry.captureException(err);
+        } catch (sentryErr) {
+            console.warn('[sentry] capture failed:', sentryErr?.message);
+        }
+    }
+
+    res.status(status).json({
         status: 'error',
         message: process.env.NODE_ENV === 'production'
             ? 'Internal Server Error'
@@ -334,9 +387,16 @@ const shouldStartHttpServer = (
 );
 
 if (shouldStartHttpServer) {
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
         console.log(`\n🚀 AXIOM Server running on http://localhost:${PORT}`);
         console.log(`📍 API endpoints available at /api/*\n`);
+        // Idempotent boot-time seed so Jobs/Posts always have data on cold start.
+        try {
+            const { runBootstrapSeeds } = await import('./config/bootstrapSeeds.js');
+            await runBootstrapSeeds();
+        } catch (err) {
+            console.warn('[boot] bootstrap seeds skipped:', err?.message || err);
+        }
     });
 }
 
