@@ -21,7 +21,8 @@ import {
     Calendar,
     Trash2,
     X,
-    Share2
+    Share2,
+    Sparkles
 } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { cn } from '../lib/utils';
@@ -43,7 +44,7 @@ const Toast = ({ message, type = 'success', onClose }) => {
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             className={cn(
                 "fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 backdrop-blur-xl border font-medium",
-                type === 'success' ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-red-500/10 border-red-500/20 text-red-500"
+                type === 'success' ? "bg-[#E8F2E5] border-[#0E334F]/15 text-[#0E334F]" : "bg-[#FEF1F0] border-[#F4C7C2] text-[#9C2A1F]"
             )}
         >
             {type === 'success' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
@@ -76,7 +77,7 @@ const Profile = () => {
         location: 'San Francisco, CA',
         bio: 'Building the future of developer tools. Passionate about distributed systems, UI/UX, and AI agents.',
         avatar: currentUser?.photoURL || 'https://github.com/shadcn.png',
-        banner: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop',
+        banner: '',
         resumeName: '',
         resumeUrl: '',
         username: currentUser?.email?.split('@')[0] || 'developer',
@@ -407,16 +408,18 @@ const Profile = () => {
     };
 
     if (isLoading) {
-        return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading Profile...</div>;
+        return <div className="p-8 text-center text-muted-foreground">Loading Profile...</div>;
     }
 
     return (
-        <div className="flex-1 min-h-screen bg-transparent text-foreground font-sans p-4 md:p-8 overflow-y-auto custom-scrollbar pb-32">
-            <div className="max-w-5xl mx-auto space-y-8">
-                <div className="relative group rounded-2xl overflow-hidden bg-background border border-border transition-all duration-300">
-                    <div className="h-64 md:h-80 w-full overflow-hidden relative">
-                        <img src={user.banner} alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
+        <div className="flex-1 min-h-screen bg-transparent text-foreground font-sans px-5 sm:px-8 lg:px-14 py-8 lg:py-12 overflow-y-auto custom-scrollbar pb-32">
+            <div className="max-w-[1180px] mx-auto space-y-6">
+                <div className="relative group rounded-2xl overflow-hidden bg-card border border-border">
+                    <div className="h-44 md:h-56 w-full overflow-hidden relative" style={{ background: 'linear-gradient(135deg, hsl(var(--paper-soft)) 0%, hsl(var(--paper)) 50%, hsl(var(--teal-soft)) 100%)' }}>
+                        {user.banner && (
+                            <img src={user.banner} alt="Banner" className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(hsl(var(--ink)/0.08) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
                         <input
                             type="file"
                             ref={bannerInputRef}
@@ -427,15 +430,15 @@ const Profile = () => {
                         {isEditing && (
                             <button
                                 onClick={() => bannerInputRef.current?.click()}
-                                className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md transition-all z-10"
+                                className="absolute top-4 right-4 p-2 bg-foreground/80 hover:bg-foreground text-background rounded-full backdrop-blur-md transition-all z-10"
                             >
-                                <Camera className="w-5 h-5" />
+                                <Camera className="w-4 h-4" />
                             </button>
                         )}
                     </div>
-                    <div className="px-8 pb-8 -mt-20 relative flex flex-col md:flex-row items-end md:items-start gap-6">
+                    <div className="px-8 pb-8 -mt-16 relative flex flex-col md:flex-row items-end md:items-start gap-6">
                         <div className="relative">
-                            <div className="w-40 h-40 rounded-2xl border-4 border-background overflow-hidden relative group/avatar shadow-lg bg-muted">
+                            <div className="w-32 h-32 rounded-2xl border-4 border-card overflow-hidden relative group/avatar bg-muted">
                                 <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                                 <input
                                     type="file"
@@ -447,15 +450,15 @@ const Profile = () => {
                                 {isEditing && (
                                     <div
                                         onClick={() => avatarInputRef.current?.click()}
-                                        className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer backdrop-blur-[1px] transition-opacity"
+                                        className="absolute inset-0 bg-foreground/40 flex items-center justify-center cursor-pointer backdrop-blur-[1px] transition-opacity"
                                     >
-                                        <Camera className="w-8 h-8 text-white" />
+                                        <Camera className="w-7 h-7 text-background" />
                                     </div>
                                 )}
                             </div>
-                            <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-background shadow-lg" />
+                            <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full border-2 border-card" style={{ backgroundColor: 'hsl(156 70% 38%)' }} />
                         </div>
-                        <div className="flex-1 pt-20 md:pt-24 min-w-0 text-center md:text-left w-full">
+                        <div className="flex-1 pt-16 md:pt-20 min-w-0 text-center md:text-left w-full">
                             <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
                                 <div className="space-y-2 w-full md:w-auto">
                                     {isEditing ? (
@@ -463,7 +466,7 @@ const Profile = () => {
                                             <input
                                                 value={user.name}
                                                 onChange={(e) => setUser({ ...user, name: e.target.value })}
-                                                className="text-4xl font-bold font-display bg-transparent border-b border-border focus:border-foreground focus:outline-none w-full md:w-auto"
+                                                className="font-display font-semibold text-[28px] md:text-[32px] leading-[1.1] tracking-[-0.022em] bg-transparent border-b border-border focus:border-foreground focus:outline-none w-full md:w-auto"
                                             />
                                             <input
                                                 value={user.role}
@@ -478,7 +481,7 @@ const Profile = () => {
                                         </div>
                                     ) : (
                                         <>
-                                            <h1 className="text-4xl font-bold font-display tracking-tight text-foreground">{user.name}</h1>
+                                            <h1 className="font-display font-semibold text-[28px] md:text-[32px] leading-[1.1] tracking-[-0.022em] text-foreground">{user.name}</h1>
                                             <p className="text-lg text-muted-foreground font-medium">{user.role}</p>
                                             <div className="flex items-center justify-center md:justify-start gap-4 mt-2 text-sm text-muted-foreground/80">
                                                 <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {user.location}</span>
@@ -489,17 +492,17 @@ const Profile = () => {
                                 </div>
                                 <div className="flex gap-3">
                                     {isEditing ? (
-                                        <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-foreground text-background font-medium text-sm hover:opacity-90 transition-all flex items-center gap-2">
+                                        <button onClick={handleSave} className="h-9 px-5 rounded-full bg-foreground text-background font-medium text-[13px] hover:opacity-90 transition-colors flex items-center gap-2">
                                             <Check className="w-4 h-4" /> Save
                                         </button>
                                     ) : (
-                                        <button onClick={() => setIsEditing(true)} className="px-5 py-2 rounded-xl bg-foreground text-background font-medium text-sm hover:opacity-90 transition-all">
+                                        <button onClick={() => setIsEditing(true)} className="h-9 px-5 rounded-full bg-foreground text-background font-medium text-[13px] hover:opacity-90 transition-colors">
                                             Edit Profile
                                         </button>
                                     )}
                                     <button
                                         onClick={handleCopyPublicProfile}
-                                        className="p-2 rounded-xl border border-border hover:bg-foreground/5 transition-all"
+                                        className="h-9 w-9 rounded-full border border-border hover:bg-secondary transition-colors flex items-center justify-center"
                                         title="Copy public profile URL"
                                     >
                                         <Settings className="w-5 h-5 text-muted-foreground" />
@@ -513,10 +516,19 @@ const Profile = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-8">
                         <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
-                            <h2 className="text-xl font-bold font-display mb-4 flex items-center gap-2">
-                                About
-                                {isEditing && <span className="text-xs font-sans font-normal text-muted-foreground bg-muted px-2 py-1 rounded-full">Editing</span>}
-                            </h2>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-display font-semibold flex items-center gap-2">
+                                    About
+                                    {isEditing && <span className="text-xs font-sans font-normal text-muted-foreground bg-muted px-2 py-1 rounded-full">Editing</span>}
+                                </h2>
+                                {isEditing && (
+                                    <BioAiButton
+                                        bio={user.bio}
+                                        role={user.role || ''}
+                                        onAccept={(v) => setUser({ ...user, bio: v })}
+                                    />
+                                )}
+                            </div>
                             {isEditing ? (
                                 <textarea
                                     value={user.bio}
@@ -530,9 +542,9 @@ const Profile = () => {
 
                         <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
                             <div className="flex items-center justify-between mb-8">
-                                <h2 className="text-xl font-bold font-display">Experience</h2>
+                                <h2 className="text-xl font-display font-semibold">Experience</h2>
                                 {isEditing && (
-                                    <button onClick={addExperience} className="text-xs flex items-center gap-1 bg-foreground/5 hover:bg-foreground/10 px-3 py-1.5 rounded-full transition-colors">
+                                    <button onClick={addExperience} className="text-xs flex items-center gap-1 bg-secondary hover:bg-secondary/70 px-3 py-1.5 rounded-full transition-colors">
                                         <Plus className="w-3 h-3" /> Add Role
                                     </button>
                                 )}
@@ -556,10 +568,10 @@ const Profile = () => {
                                                         <input
                                                             value={exp.role}
                                                             onChange={(e) => handleExperienceChange(exp.id, 'role', e.target.value)}
-                                                            className="font-bold bg-transparent border-b border-border w-full focus:outline-none focus:border-foreground"
+                                                            className="font-semibold bg-transparent border-b border-border w-full focus:outline-none focus:border-foreground"
                                                             placeholder="Role"
                                                         />
-                                                        <button onClick={() => removeExperience(exp.id)} className="text-red-400 hover:text-red-500 p-1"><Trash2 className="w-4 h-4" /></button>
+                                                        <button onClick={() => removeExperience(exp.id)} className="text-[#9C2A1F]/70 hover:text-[#9C2A1F] p-1"><Trash2 className="w-4 h-4" /></button>
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <input
@@ -585,7 +597,7 @@ const Profile = () => {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <h3 className="font-bold text-lg text-foreground">{exp.role}</h3>
+                                                    <h3 className="font-semibold text-lg text-foreground">{exp.role}</h3>
                                                     <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1 mb-2">
                                                         <span className="font-medium text-foreground/80">{exp.company}</span>
                                                         <span>•</span>
@@ -601,7 +613,7 @@ const Profile = () => {
                         </section>
 
                         <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
-                            <h2 className="text-xl font-bold font-display mb-6">Tech Stack</h2>
+                            <h2 className="text-xl font-display font-semibold mb-6">Tech Stack</h2>
                             <div className="flex flex-wrap gap-3">
                                 <AnimatePresence>
                                     {skills.map((tech) => (
@@ -611,15 +623,15 @@ const Profile = () => {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
-                                            className="group relative pl-4 pr-4 py-3 rounded-2xl bg-background border border-border flex items-center gap-3 hover:bg-foreground/5 transition-all cursor-default select-none shadow-sm"
+                                            className="group relative pl-4 pr-4 py-3 rounded-2xl bg-background border border-border flex items-center gap-3 hover:bg-secondary transition-all cursor-default select-none shadow-sm"
                                         >
                                             <span className="font-semibold text-foreground/80 text-sm">{tech}</span>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-green-400 to-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-[#46838b] to-[#0E334F] shadow-[0_0_8px_rgba(70,131,139,0.4)]" />
 
                                             {isEditing && (
                                                 <button
                                                     onClick={() => removeSkill(tech)}
-                                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    className="absolute -top-1 -right-1 bg-[#9C2A1F] text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 >
                                                     <X className="w-3 h-3" />
                                                 </button>
@@ -629,7 +641,7 @@ const Profile = () => {
                                 </AnimatePresence>
 
                                 {isEditing && (
-                                    <div className="flex items-center gap-2 pl-3 pr-2 py-2 rounded-2xl bg-background border border-dashed border-border focus-within:border-foreground/40 focus-within:bg-foreground/5 transition-colors">
+                                    <div className="flex items-center gap-2 pl-3 pr-2 py-2 rounded-2xl bg-background border border-dashed border-border focus-within:border-foreground/40 focus-within:bg-secondary/60 transition-colors">
                                         <Plus className="w-4 h-4 text-muted-foreground" />
                                         <input
                                             type="text"
@@ -648,7 +660,7 @@ const Profile = () => {
                     <div className="space-y-6">
                         <div className="p-6 rounded-2xl bg-background border border-border shadow-sm">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="font-bold font-display">Connect</h3>
+                                <h3 className="font-display font-semibold">Connect</h3>
                                 <button onClick={() => setShowSocialModal(true)} className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground">
                                     <Plus className="w-5 h-5" />
                                 </button>
@@ -685,7 +697,7 @@ const Profile = () => {
                                                 {isEditing && (
                                                     <button
                                                         onClick={() => removeSocial(social.id)}
-                                                        className="absolute top-1/2 -translate-y-1/2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                                        className="absolute top-1/2 -translate-y-1/2 -right-2 bg-[#9C2A1F] text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-md"
                                                     >
                                                         <X className="w-3 h-3" />
                                                     </button>
@@ -704,13 +716,13 @@ const Profile = () => {
 
                         {(user.resumeUrl || isEditing) && (
                             <section className="p-8 rounded-2xl bg-background border border-border shadow-sm">
-                                <h2 className="text-xl font-bold font-display mb-6">Resume</h2>
+                                <h2 className="text-xl font-display font-semibold mb-6">Resume</h2>
 
                                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-background border border-border">
                                     <FileText className="w-10 h-10 text-primary" />
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold truncate">{user.resumeName || 'No resume uploaded'}</p>
-                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold">PDF Format</p>
+                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">PDF Format</p>
                                     </div>
 
                                     {user.resumeUrl && (
@@ -735,7 +747,7 @@ const Profile = () => {
                                             />
                                             <label
                                                 htmlFor="resume-upload"
-                                                className="flex items-center gap-2 cursor-pointer bg-foreground text-background px-4 py-2 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
+                                                className="flex items-center gap-2 cursor-pointer bg-foreground text-background px-4 py-2 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
                                             >
                                                 <Upload className="w-4 h-4" />
                                                 {user.resumeUrl ? 'Replace Resume' : 'Upload Resume'}
@@ -761,21 +773,21 @@ const Profile = () => {
 
                         <div className="p-6 rounded-2xl bg-background border border-border shadow-sm space-y-4">
                             <div className="flex items-center gap-3 text-sm">
-                                <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
+                                <div className="p-2 bg-[#E8F2E5] rounded-lg text-[#0E334F]">
                                     <Globe className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-foreground">Public Profile</p>
+                                    <p className="font-semibold text-foreground">Public Profile</p>
                                     <p className="text-muted-foreground text-xs truncate max-w-[180px]">{publicProfileUrl || 'Unavailable'}</p>
                                 </div>
                             </div>
-                            <div className="h-px bg-white/5" />
+                            <div className="h-px bg-black/[0.06]" />
                             <div className="flex items-center gap-3 text-sm">
-                                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                                <div className="p-2 bg-[#E5E8F2] rounded-lg text-[#0E334F]">
                                     <Calendar className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-foreground">ATS Score {ats.score}/100</p>
+                                    <p className="font-semibold text-foreground">ATS Score {ats.score}/100</p>
                                     <p className="text-muted-foreground text-xs">
                                         {ossSummary?.connected
                                             ? `OSS merged PRs: ${ossSummary?.prsMerged || 0}`
@@ -795,10 +807,10 @@ const Profile = () => {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="w-full max-w-md bg-background rounded-[2rem] border border-white/20 shadow-2xl p-6"
+                            className="w-full max-w-md bg-background rounded-[2rem] border border-black/[0.08] shadow-2xl p-6"
                         >
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-bold font-display">Add Social Link</h3>
+                                <h3 className="text-xl font-display font-semibold">Add Social Link</h3>
                                 <button onClick={() => setShowSocialModal(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
                                     <X className="w-5 h-5" />
                                 </button>
@@ -806,7 +818,7 @@ const Profile = () => {
 
                             <div className="space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Platform</label>
+                                    <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Platform</label>
                                     <div className="grid grid-cols-5 gap-2">
                                         {platforms.map(p => (
                                             <button
@@ -815,14 +827,14 @@ const Profile = () => {
                                                 className={`p-2 rounded-xl border flex flex-col items-center gap-2 transition-all ${newSocial.platform === p.name ? 'bg-primary/10 border-primary text-primary scale-105 shadow-md' : 'border-border hover:bg-muted/50'}`}
                                             >
                                                 <p.icon className="w-5 h-5" />
-                                                <span className="text-[9px] font-bold">{p.name}</span>
+                                                <span className="text-[9px] font-semibold">{p.name}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-sm font-bold text-muted-foreground uppercase tracking-wider">URL</label>
+                                    <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">URL</label>
                                     <input
                                         type="text"
                                         value={newSocial.url}
@@ -832,7 +844,7 @@ const Profile = () => {
                                     />
                                 </div>
 
-                                <button onClick={handleAddSocial} className="w-full py-4 rounded-xl bg-foreground text-background font-bold hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                                <button onClick={handleAddSocial} className="w-full py-4 rounded-xl bg-foreground text-background font-semibold hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                                     Add Link
                                 </button>
                             </div>
@@ -852,6 +864,72 @@ const Profile = () => {
                 )}
             </AnimatePresence>
 
+        </div>
+    );
+};
+
+const BioAiButton = ({ bio, role, onAccept }) => {
+    const [loading, setLoading] = useState(false);
+    const [draft, setDraft] = useState('');
+    const [err, setErr] = useState('');
+
+    const handleClick = async () => {
+        if (loading) return;
+        if (!bio || bio.trim().length < 10) { setErr('Bio needs at least 10 characters.'); return; }
+        setLoading(true); setErr('');
+        try {
+            const r = await fetch('/api/ai/bio-rewrite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bio, role }),
+            });
+            if (!r.ok) {
+                const j = await r.json().catch(() => ({}));
+                setErr(j?.error || 'AI rewrite unavailable.');
+                return;
+            }
+            const d = await r.json();
+            setDraft(d.rewritten || '');
+        } catch {
+            setErr('Network error.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (draft) {
+        return (
+            <div className="flex flex-col items-end gap-2 w-full max-w-md">
+                <div className="w-full p-3 rounded-xl bg-fabric-mist border border-[#0E334F]/10 text-[13px] text-[#0E334F] leading-relaxed">
+                    {draft}
+                </div>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => setDraft('')} className="text-[11px] font-semibold text-muted-foreground hover:text-foreground">Discard</button>
+                    <button
+                        onClick={() => { onAccept(draft); setDraft(''); }}
+                        data-testid="bio-accept-btn"
+                        className="inline-flex items-center gap-1 h-7 px-3 rounded-full bg-foreground text-background text-[11.5px] font-semibold hover:opacity-90 transition-opacity"
+                    >
+                        <Check className="w-3 h-3" /> Use this
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-center gap-2">
+            {err && <span className="text-[10.5px] text-[#9C2A1F]">{err}</span>}
+            <button
+                onClick={handleClick}
+                disabled={loading}
+                data-testid="bio-ai-rewrite-btn"
+                className="inline-flex items-center gap-1 h-7 px-2.5 rounded-full bg-secondary border text-[10.5px] font-semibold text-foreground hover:border-foreground/15 transition-colors disabled:opacity-50"
+                style={{ borderColor: 'hsl(var(--hair))' }}
+            >
+                {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                {loading ? 'Rewriting…' : 'AI rewrite'}
+            </button>
         </div>
     );
 };
