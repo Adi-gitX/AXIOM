@@ -4,306 +4,204 @@
 
 @layer base {
   :root {
-    /* Base - Light Mode */
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    /* AXIOM Painterly Cream Palette */
+    --paper: 36 33% 96%;
+    --paper-elev: 0 0% 100%;
+    --paper-soft: 36 25% 93%;
+    --ink: 215 38% 8%;
+    --ink-soft: 215 14% 38%;
+    --ink-faint: 215 14% 60%;
+    --hair: 215 20% 90%;
+    --hair-strong: 215 20% 84%;
+    --teal: 188 32% 41%;
+    --teal-deep: 205 75% 18%;
+    --teal-soft: 188 26% 92%;
+    --peach: 28 70% 80%;
+    --peach-soft: 30 70% 95%;
+    --amber: 28 80% 35%;
+    --rose: 0 60% 48%;
 
-    /* Glass Cards & Surfaces - Light */
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    /* Painterly fabric tones — used for tinted card surfaces */
+    --fabric-sage: 110 25% 92%;
+    --fabric-peach: 32 75% 93%;
+    --fabric-mist: 220 22% 92%;
+    --fabric-rose: 340 25% 92%;
+    --fabric-sand: 36 22% 90%;
+    --fabric-teal: 180 18% 89%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 43%;
-
-    --accent: 220 14% 96%;
-    --accent-foreground: 0 0% 9%;
-
-    --destructive: 0 84.2% 60.2%;
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --card: var(--paper-elev);
+    --card-foreground: var(--ink);
+    --popover: var(--paper-elev);
+    --popover-foreground: var(--ink);
+    --primary: var(--ink);
+    --primary-foreground: var(--paper);
+    --secondary: var(--paper-soft);
+    --secondary-foreground: var(--ink);
+    --muted: var(--paper-soft);
+    --muted-foreground: var(--ink-soft);
+    --accent: var(--teal);
+    --accent-foreground: var(--paper);
+    --destructive: var(--rose);
     --destructive-foreground: 0 0% 98%;
-
-    --border: 220 13% 87%;
-    --input: 220 13% 87%;
-    --ring: 222 47% 11%;
-
-    --radius: 1.5rem;
-
-    /* Glass Tokens - Light (visible borders & subtle depth) */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(0, 0, 0, 0.08);
-    --glass-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 4px 12px rgba(0, 0, 0, 0.03);
-    --glass-hover-bg: rgba(255, 255, 255, 0.9);
-    --glass-hover-border: rgba(0, 0, 0, 0.12);
-
-    --glow-color: rgba(56, 189, 248, 0.3);
-
-    /* DSA contribution graph tokens */
-    --contrib-l0: rgba(15, 23, 42, 0.07);
-    --contrib-b0: rgba(15, 23, 42, 0.12);
-    --contrib-l1: rgba(16, 185, 129, 0.2);
-    --contrib-b1: rgba(16, 185, 129, 0.32);
-    --contrib-l2: rgba(16, 185, 129, 0.34);
-    --contrib-b2: rgba(16, 185, 129, 0.44);
-    --contrib-l3: rgba(16, 185, 129, 0.52);
-    --contrib-b3: rgba(16, 185, 129, 0.6);
-    --contrib-l4: rgba(16, 185, 129, 0.78);
-    --contrib-b4: rgba(16, 185, 129, 0.9);
+    --border: var(--hair);
+    --input: var(--hair);
+    --ring: var(--teal);
+    --radius: 1rem;
   }
 
   .dark {
-    /* Base - Deep Dark */
-    --background: 0 0% 0%;
-    /* #000000 */
-    --foreground: 0 0% 98%;
-    /* #fafafa */
-
-    /* Glass Cards & Surfaces */
-    --card: 0 0% 5%;
-    /* Elevated from pure black */
-    --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 4%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
-
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 12%;
-    /* Subtle thin border */
-    --input: 0 0% 12%;
-    --ring: 0 0% 83%;
-
-    /* Glass Tokens - Dark */
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --glass-hover-bg: rgba(255, 255, 255, 0.05);
-    --glass-hover-border: rgba(255, 255, 255, 0.1);
-
-    --glow-color: rgba(255, 255, 255, 0.3);
-
-    /* DSA contribution graph tokens */
-    --contrib-l0: rgba(255, 255, 255, 0.08);
-    --contrib-b0: rgba(255, 255, 255, 0.15);
-    --contrib-l1: rgba(16, 185, 129, 0.25);
-    --contrib-b1: rgba(16, 185, 129, 0.38);
-    --contrib-l2: rgba(16, 185, 129, 0.4);
-    --contrib-b2: rgba(16, 185, 129, 0.52);
-    --contrib-l3: rgba(16, 185, 129, 0.58);
-    --contrib-b3: rgba(16, 185, 129, 0.68);
-    --contrib-l4: rgba(16, 185, 129, 0.84);
-    --contrib-b4: rgba(16, 185, 129, 0.95);
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --card: var(--paper-elev);
+    --card-foreground: var(--ink);
+    --primary: var(--ink);
+    --primary-foreground: var(--paper);
+    --muted: var(--paper-soft);
+    --muted-foreground: var(--ink-soft);
+    --border: var(--hair);
   }
 }
 
 @layer base {
-  * {
-    border-color: hsla(var(--border), 0.5);
-    /* Increased visibility */
-  }
+  * { border-color: hsl(var(--border)); }
 
+  /* Render type fast — system fonts kick in immediately, custom fonts swap on load */
+  html {
+    font-feature-settings: "ss01", "cv11", "tnum";
+    text-rendering: optimizeLegibility;
+  }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    min-height: 100vh;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-
-  /* Grain Texture Overlay (using grain-106px.png) */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('./assets/grain-106px.png') repeat;
-    background-size: 106px 106px;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.04;
-    mix-blend-mode: overlay;
+  /* Text/cursor feedback should be instant */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .dark body::before {
-    opacity: 0.035;
-  }
+  ::selection { background: hsl(var(--ink)); color: hsl(var(--paper)); }
 }
 
-/* View Transition Styles for Circular Reveal */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-old(root) {
-  z-index: 1;
-}
-
-::view-transition-new(root) {
-  z-index: 2147483646;
-}
-
-
-@font-face {
-  font-family: 'Terminal Grotesque';
-  src: url('./assets/fonts/terminal-grotesque.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-.glass-card-hover {
-  @apply hover:-translate-y-1;
-}
-
-.text-glow {
-  text-shadow: 0 0 20px var(--glow-color);
-}
-
-.premium-card {
-  isolation: isolate;
-}
-
-.premium-card-border {
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 250ms ease;
-  background:
-    linear-gradient(130deg,
-      transparent 10%,
-      rgba(255, 255, 255, 0.32) 35%,
-      transparent 60%);
-  z-index: 0;
-}
-
-.premium-card-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 250ms ease;
-  background:
-    radial-gradient(420px circle at 12% 0%,
-      rgba(255, 255, 255, 0.12),
-      transparent 45%);
-  z-index: 0;
-}
-
-.premium-card:hover .premium-card-border,
-.premium-card:hover .premium-card-glow {
-  opacity: 1;
-}
-
-.premium-progress-track {
+/* ─────────────────────────────────────────────────────────────────────────
+   Painterly grain texture — barely-perceptible warmth across the inside-app
+   surface. Inline SVG noise filter applied via background-image utility.
+   ───────────────────────────────────────────────────────────────────────── */
+.app-grain {
   position: relative;
-  overflow: hidden;
 }
-
-.premium-progress-fill {
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-progress-fill::after {
+.app-grain::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(100deg,
-      transparent 15%,
-      rgba(255, 255, 255, 0.35) 50%,
-      transparent 85%);
-  transform: translateX(-140%);
-  animation: premium-shimmer 3s linear infinite;
-  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.06  0 0 0 0 0.08  0 0 0 0 0.10  0 0 0 0.50 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+  opacity: 0.045;
+  mix-blend-mode: multiply;
 }
 
-@keyframes premium-shimmer {
-  100% {
-    transform: translateX(140%);
-  }
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Custom Scrollbar - Minimal & Dark */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+/* Custom scrollbar — refined */
+.custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(215 14% 80%);
   border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: hsl(215 14% 65%); background-clip: content-box; }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: hsl(215 14% 80%) transparent; }
+
+.tabular { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
+
+/* Editorial italic accent — pairs with display headings */
+.italic-accent {
+  font-family: 'Newsreader', 'Source Serif Pro', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+/* Hand-drawn underline — gives certain links a non-AI editorial signature */
+.hand-underline {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8'><path d='M2 5 Q 50 2 100 5 T 198 5' stroke='currentColor' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='0.55'/></svg>");
+  background-position: 0 100%;
+  background-size: 100% 0.4em;
+  background-repeat: no-repeat;
+  padding-bottom: 0.1em;
 }
 
-/* Font smoothing */
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+/* "Live dot" — the breathing pulse on Live mode toggles */
+.live-dot {
+  position: relative;
+  display: inline-block;
+}
+.live-dot::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  opacity: 0.35;
+  animation: live-pulse 1.6s ease-out infinite;
+}
+@keyframes live-pulse {
+  0% { transform: scale(0.8); opacity: 0.55; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* Animations */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
+/* Pinch a handful of letters by ~0.005em via display class — adds distinct weight to display headings */
+.font-display {
+  font-feature-settings: 'ss01', 'cv11', 'tnum';
+  font-variation-settings: 'opsz' 32;
+}
+
+/* Hover-lift utility — subtle painterly card raise */
+.hover-lift {
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), border-color 100ms ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  border-color: hsl(var(--ink) / 0.15);
+}
+
+/* Fast feel — shorten default transition durations app-wide */
+@layer utilities {
+  .transition-colors {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 100ms;
+  }
+  .transition-opacity {
+    transition-duration: 100ms;
+  }
+  .transition-all {
+    transition-duration: 120ms;
   }
 
-  100% {
-    transform: translateX(-50%);
-  }
+  /* Painterly fabric tones */
+  .bg-fabric-sage { background-color: hsl(var(--fabric-sage)); }
+  .bg-fabric-peach { background-color: hsl(var(--fabric-peach)); }
+  .bg-fabric-mist { background-color: hsl(var(--fabric-mist)); }
+  .bg-fabric-rose { background-color: hsl(var(--fabric-rose)); }
+  .bg-fabric-sand { background-color: hsl(var(--fabric-sand)); }
+  .bg-fabric-teal { background-color: hsl(var(--fabric-teal)); }
 }
 
-.animate-marquee {
-  animation: marquee 25s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+/* Heatmap — teal scale */
+:root {
+  --contrib-l0: rgba(15, 20, 25, 0.05);
+  --contrib-b0: rgba(15, 20, 25, 0.10);
+  --contrib-l1: rgba(70, 131, 139, 0.18);
+  --contrib-b1: rgba(70, 131, 139, 0.32);
+  --contrib-l2: rgba(70, 131, 139, 0.36);
+  --contrib-b2: rgba(70, 131, 139, 0.50);
+  --contrib-l3: rgba(70, 131, 139, 0.58);
+  --contrib-b3: rgba(70, 131, 139, 0.72);
+  --contrib-l4: rgba(70, 131, 139, 0.85);
+  --contrib-b4: rgba(70, 131, 139, 1);
 }
