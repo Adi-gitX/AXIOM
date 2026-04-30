@@ -1,30 +1,28 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { twMerge } from 'tailwind-merge';
 
-const GlassCard = ({ children, className, hoverEffect = true, premium = false, ...props }) => {
+/**
+ * Legacy card wrapper — pure div, no entrance animation.
+ * Pages still using GlassCard get instant render.
+ */
+const GlassCard = ({ children, className, hoverEffect = true, premium = false, ...rest }) => {
+    // Pull off motion-only props so they don't leak to the DOM
+    const {
+        initial: _i, animate: _a, exit: _e, transition: _t, whileHover: _wh, whileTap: _wt,
+        ...props
+    } = rest;
+    void _i; void _a; void _e; void _t; void _wh; void _wt; void premium;
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+        <div
             className={twMerge(
-                'relative overflow-hidden rounded-2xl p-6 group bg-card border border-border shadow-sm',
-                hoverEffect && 'hover:border-foreground/30 cursor-pointer transition-colors duration-300',
-                premium && 'premium-card',
+                'relative overflow-hidden rounded-xl bg-card border border-border',
+                hoverEffect && 'hover:border-foreground/15 transition-colors',
                 className
             )}
             {...props}
         >
-            {premium && (
-                <>
-                    <div className="premium-card-border" />
-                    <div className="premium-card-glow" />
-                </>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-br from-foreground/[0.03] to-transparent pointer-events-none opacity-50" />
-            <div className="relative z-10">{children}</div>
-        </motion.div>
+            {children}
+        </div>
     );
 };
 
