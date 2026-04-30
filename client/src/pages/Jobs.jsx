@@ -1,8 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Briefcase, MapPin, Bookmark, ExternalLink, Building2 } from 'lucide-react';
 import { jobsApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import GlassCard from '../components/ui/GlassCard';
+import { PageHeader, Surface, EmptyState, Kicker } from '../components/ui/AppPrimitives';
+
+const isTransient = (err) => err?.status === 401 || err?.status === 429 || err?.status === 503 || err?.code === 'BACKEND_UNAVAILABLE';
+
+const formatPosted = (date) => {
+    if (!date) return 'New';
+    if (typeof date === 'string' && date.includes('ago')) return date;
+    const posted = new Date(date);
+    const diff = Math.floor((new Date() - posted) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return 'Today';
+    if (diff === 1) return '1d ago';
+    if (diff < 7) return `${diff}d ago`;
+    if (diff < 30) return `${Math.floor(diff / 7)}w ago`;
+    return `${Math.floor(diff / 30)}mo ago`;
+};
 
 const Jobs = () => {
     const { currentUser } = useAuth();
@@ -13,225 +27,249 @@ const Jobs = () => {
     const [appliedJobIds, setAppliedJobIds] = useState([]);
     const [error, setError] = useState('');
     const [retryNonce, setRetryNonce] = useState(0);
-    const isTransientApiError = (err) => (
-        err?.status === 401
-        || err?.status === 429
-        || err?.status === 503
-        || err?.code === 'BACKEND_UNAVAILABLE'
-    );
+    const [liveMode, setLiveMode] = useState(true); // default: real RemoteOK + Arbeitnow data
 
     const filters = ['All', 'Remote', 'Full-time', 'Contract', 'Internship'];
 
-    // Fetch jobs from API
     useEffect(() => {
         const fetchJobs = async () => {
             setLoading(true);
             setError('');
             try {
-                const params = {};
-                if (filter === 'Remote') params.remote = 'true';
-                else if (filter !== 'All') params.type = filter;
-                if (currentUser?.email) params.email = currentUser.email;
-
-                const data = await jobsApi.getAll(params);
-                const jobsList = data.jobs || [];
-                setJobs(jobsList);
-                setSavedJobIds(jobsList.filter((job) => job.is_saved).map((job) => job.id));
-                setAppliedJobIds(jobsList.filter((job) => job.is_applied).map((job) => job.id));
-            } catch (err) {
-                if (!isTransientApiError(err)) {
-                    console.error('Failed to fetch jobs:', err);
+                if (liveMode) {
+                    const apiBase = (import.meta.env.VITE_API_URL || '') + '/api/public/jobs';
+                    const r = await fetch(apiBase);
+                    if (!r.ok) throw new Error(`live jobs ${r.status}`);
+                    const data = await r.json();
+                    const list = (data.jobs || []).filter((j) => {
+                        if (filter === 'All') return true;
+                        if (filter === 'Remote') return j.is_remote === 1;
+                        return j.job_type === filter;
+                    });
+                    setJobs(list);
+                    setSavedJobIds([]);
+                    setAppliedJobIds([]);
+                } else {
+                    const params = {};
+                    if (filter === 'Remote') params.remote = 'true';
+                    else if (filter !== 'All') params.type = filter;
+                    if (currentUser?.email) params.email = currentUser.email;
+                    const data = await jobsApi.getAll(params);
+                    const list = data.jobs || [];
+                    setJobs(list);
+                    setSavedJobIds(list.filter((j) => j.is_saved).map((j) => j.id));
+                    setAppliedJobIds(list.filter((j) => j.is_applied).map((j) => j.id));
                 }
-                // Fallback to empty list on error
-                setJobs([]);
-                setSavedJobIds([]);
-                setAppliedJobIds([]);
+            } catch (err) {
+                if (!isTransient(err)) console.error('Failed to fetch jobs:', err);
+                setJobs([]); setSavedJobIds([]); setAppliedJobIds([]);
                 setError('Unable to refresh jobs right now.');
-            } finally {
-                setLoading(false);
-            }
+            } finally { setLoading(false); }
         };
-
         fetchJobs();
-    }, [filter, currentUser?.email, retryNonce]);
+    }, [filter, currentUser?.email, retryNonce, liveMode]);
 
-    // Handle save job toggle
+    const filterCounts = useMemo(() => ({
+        All: jobs.length,
+        Remote: jobs.filter((j) => j.is_remote).length,
+        'Full-time': jobs.filter((j) => j.job_type === 'Full-time').length,
+        Contract: jobs.filter((j) => j.job_type === 'Contract').length,
+        Internship: jobs.filter((j) => j.job_type === 'Internship').length,
+    }), [jobs]);
+
     const handleSaveJob = async (jobId) => {
-        // Optimistic update
         const wasSaved = savedJobIds.includes(jobId);
-        setSavedJobIds(prev =>
-            wasSaved ? prev.filter(id => id !== jobId) : [...prev, jobId]
-        );
-
+        setSavedJobIds((prev) => wasSaved ? prev.filter((id) => id !== jobId) : [...prev, jobId]);
         if (currentUser?.email) {
             try {
-                if (wasSaved) {
-                    await jobsApi.unsave(currentUser.email, jobId);
-                } else {
-                    await jobsApi.save(currentUser.email, jobId);
-                }
+                if (wasSaved) await jobsApi.unsave(currentUser.email, jobId);
+                else await jobsApi.save(currentUser.email, jobId);
             } catch (err) {
-                console.error('Failed to save/unsave job:', err);
-                // Revert on error
-                setSavedJobIds(prev =>
-                    wasSaved ? [...prev, jobId] : prev.filter(id => id !== jobId)
-                );
+                console.error(err);
+                setSavedJobIds((prev) => wasSaved ? [...prev, jobId] : prev.filter((id) => id !== jobId));
             }
         }
     };
-
-    const isJobSaved = (jobId) => savedJobIds.includes(jobId);
-    const isJobApplied = (jobId) => appliedJobIds.includes(jobId);
 
     const handleApplyJob = async (job) => {
-        const alreadyApplied = isJobApplied(job.id);
-        if (alreadyApplied) return;
-
-        setAppliedJobIds(prev => [...prev, job.id]);
-
+        if (appliedJobIds.includes(job.id)) {
+            if (job.apply_url) window.open(job.apply_url, '_blank', 'noopener,noreferrer');
+            return;
+        }
+        setAppliedJobIds((prev) => [...prev, job.id]);
         if (currentUser?.email) {
-            try {
-                await jobsApi.apply(currentUser.email, job.id, null);
-            } catch (err) {
-                console.error('Failed to track job application:', err);
-                setAppliedJobIds(prev => prev.filter(id => id !== job.id));
+            try { await jobsApi.apply(currentUser.email, job.id, null); }
+            catch (err) {
+                console.error(err);
+                setAppliedJobIds((prev) => prev.filter((id) => id !== job.id));
             }
         }
-
-        if (job.apply_url) {
-            window.open(job.apply_url, '_blank', 'noopener,noreferrer');
-        }
-    };
-
-    // Format posted date
-    const formatPosted = (date) => {
-        if (!date) return 'N/A';
-        if (typeof date === 'string' && date.includes('ago')) return date;
-
-        const posted = new Date(date);
-        const now = new Date();
-        const diff = Math.floor((now - posted) / (1000 * 60 * 60 * 24));
-
-        if (diff === 0) return 'Today';
-        if (diff === 1) return '1d ago';
-        if (diff < 7) return `${diff}d ago`;
-        if (diff < 30) return `${Math.floor(diff / 7)}w ago`;
-        return `${Math.floor(diff / 30)}mo ago`;
+        if (job.apply_url) window.open(job.apply_url, '_blank', 'noopener,noreferrer');
     };
 
     return (
-        <div className="min-h-screen p-8 lg:p-12">
-            <div className="max-w-5xl mx-auto">
-
-                {/* Header */}
-                <motion.header
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mb-12 space-y-3"
-                >
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-foreground font-display tracking-tight">Jobs</h1>
-                    <p className="text-muted-foreground text-lg mt-1">Find your next opportunity</p>
-                    {error && (
-                        <div className="mt-3 flex flex-wrap items-center gap-3">
-                            <p className="text-sm text-rose-400">{error}</p>
+        <div className="px-5 sm:px-8 lg:px-14 py-8 lg:py-16">
+            <div className="mx-auto max-w-[1280px]">
+                <PageHeader
+                    eyebrow="Career"
+                    title="Jobs"
+                    tail={liveMode ? '— live from RemoteOK + Arbeitnow.' : '— curated picks.'}
+                    meta={`${jobs.length} opportunities · ${liveMode ? 'refreshed every 30 min' : 'curated daily'}`}
+                    action={
+                        <div className="inline-flex items-center gap-1 bg-card border rounded-full p-1" style={{ borderColor: 'hsl(var(--hair))' }}>
                             <button
-                                type="button"
-                                onClick={() => setRetryNonce((prev) => prev + 1)}
-                                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground/40"
+                                data-testid="jobs-mode-live"
+                                onClick={() => setLiveMode(true)}
+                                className={`h-7 px-3 rounded-full text-[12px] font-semibold transition-colors ${liveMode ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                <span className={`inline-block w-1.5 h-1.5 rounded-full bg-[#0E334F] mr-2 align-middle ${liveMode ? 'live-dot' : ''}`} /> Live
+                            </button>
+                            <button
+                                data-testid="jobs-mode-curated"
+                                onClick={() => setLiveMode(false)}
+                                className={`h-7 px-3 rounded-full text-[12px] font-semibold transition-colors ${!liveMode ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                Curated
+                            </button>
+                        </div>
+                    }
+                />
+
+                {error && (
+                    <Surface className="p-4 mb-6">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <p className="text-sm text-[#9C2A1F]">{error}</p>
+                            <button
+                                onClick={() => setRetryNonce((p) => p + 1)}
+                                className="rounded-full px-4 h-8 bg-foreground text-background text-[12px] font-semibold hover:opacity-90"
                             >
                                 Retry
                             </button>
                         </div>
-                    )}
-                </motion.header>
+                    </Surface>
+                )}
 
-                {/* Filters */}
+                {/* Filter chips with counts */}
                 <div className="flex flex-wrap gap-2 mb-8">
-                    {filters.map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => { setFilter(f); setLoading(true); }}
-                            className={`px-4 py-2 text-sm rounded-full transition-all border ${filter === f
-                                ? 'bg-foreground text-background border-foreground font-medium'
-                                : 'bg-muted text-muted-foreground border-border hover:bg-accent hover:text-foreground'
+                    {filters.map((f) => {
+                        const isActive = filter === f;
+                        return (
+                            <button
+                                key={f}
+                                data-testid={`jobs-filter-${f.toLowerCase()}`}
+                                onClick={() => setFilter(f)}
+                                className={`inline-flex items-center gap-2 h-8 px-3.5 rounded-full text-[13px] font-semibold border transition-colors ${
+                                    isActive
+                                        ? 'bg-foreground text-background border-foreground'
+                                        : 'bg-card text-muted-foreground hover:text-foreground'
                                 }`}
-                        >
-                            {f}
-                        </button>
-                    ))}
+                                style={!isActive ? { borderColor: 'hsl(var(--hair))' } : {}}
+                            >
+                                {f}
+                                <span className={`text-[11px] font-mono tabular ${isActive ? 'text-background/60' : 'text-muted-foreground/70'}`}>
+                                    {filterCounts[f] || 0}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
 
-                {/* Jobs List */}
-                <div className="space-y-4">
-                    {loading ? (
-                        <div className="text-center py-12">
-                            <p className="text-muted-foreground">Loading jobs...</p>
-                        </div>
-                    ) : jobs.length === 0 ? (
-                        <div className="text-center py-24">
-                            <div className="w-16 h-16 rounded-2xl bg-muted/50 border border-border flex items-center justify-center mx-auto mb-6">
-                                <svg className="w-8 h-8 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" /></svg>
-                            </div>
-                            <h3 className="text-lg font-medium text-foreground mb-2">No opportunities yet</h3>
-                            <p className="text-muted-foreground text-sm max-w-xs mx-auto">New positions are posted regularly. Check back soon for the latest openings.</p>
-                        </div>
-                    ) : (
-                        jobs.map((job, i) => {
-                            const saved = isJobSaved(job.id);
+                {/* List */}
+                {loading ? (
+                    <div className="grid grid-cols-1 gap-3">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <Surface key={i} className="p-6">
+                                <div className="h-5 w-1/2 bg-secondary rounded animate-pulse mb-3" />
+                                <div className="h-3 w-1/3 bg-secondary rounded animate-pulse" />
+                            </Surface>
+                        ))}
+                    </div>
+                ) : jobs.length === 0 ? (
+                    <EmptyState
+                        title="No opportunities right now"
+                        description="New positions are posted daily. Check back soon, or browse a different filter."
+                    />
+                ) : (
+                    <div className="grid grid-cols-1 gap-3">
+                        {jobs.map((job, i) => {
+                            const saved = savedJobIds.includes(job.id);
+                            const applied = appliedJobIds.includes(job.id);
                             return (
-                                <motion.div
-                                    key={job.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.03 }}
-                                >
-                                    <GlassCard hoverEffect={true} className="p-6">
-                                        <div className="flex items-start justify-between">
-                                            <div>
-                                                <h3 className="text-lg font-medium text-foreground">{job.title}</h3>
-                                                <p className="text-sm text-muted-foreground mt-1">{job.company}</p>
-                                                <div className="flex items-center gap-3 mt-4 text-xs text-muted-foreground font-mono">
-                                                    <span className="bg-muted px-2 py-1 rounded border border-border">
-                                                        {job.is_remote ? 'Remote' : job.location}
+                                <div key={job.id}>
+                                    <Surface className="p-5 group hover:border-foreground/15 transition-colors">
+                                        <div className="flex items-start gap-4">
+                                            {/* Company avatar */}
+                                            <div
+                                                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 font-display font-semibold text-[15px] text-foreground tracking-tight"
+                                                style={{ backgroundColor: 'hsl(var(--paper-soft))' }}
+                                            >
+                                                {(job.company || '?').slice(0, 1).toUpperCase()}
+                                            </div>
+
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="min-w-0">
+                                                        <h3 className="font-display font-semibold text-[16.5px] tracking-[-0.012em] text-foreground truncate">
+                                                            {job.title}
+                                                        </h3>
+                                                        <p className="text-[13px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
+                                                            <Building2 className="w-3.5 h-3.5" />
+                                                            {job.company}
+                                                        </p>
+                                                    </div>
+                                                    <span
+                                                        className="hidden md:inline-flex items-center px-2.5 py-1 rounded-full bg-secondary text-[10.5px] font-mono uppercase tracking-[0.08em] text-muted-foreground border shrink-0"
+                                                        style={{ borderColor: 'hsl(var(--hair))' }}
+                                                    >
+                                                        {job.job_type || 'Full-time'}
                                                     </span>
-                                                    <span>{job.salary}</span>
-                                                    <span>{formatPosted(job.posted_at)}</span>
+                                                </div>
+
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-[12px] text-muted-foreground">
+                                                    <span className="inline-flex items-center gap-1">
+                                                        <MapPin className="w-3.5 h-3.5" />
+                                                        {job.is_remote ? 'Remote' : (job.location || '—')}
+                                                    </span>
+                                                    {job.salary && <span className="font-mono">{job.salary}</span>}
+                                                    <span className="font-mono">· {formatPosted(job.posted_at)}</span>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => handleApplyJob(job)}
-                                                    disabled={isJobApplied(job.id)}
-                                                    className={`px-3 py-2 rounded-xl text-xs font-medium transition-all ${isJobApplied(job.id)
-                                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default'
-                                                        : 'bg-muted text-foreground hover:bg-accent border border-border'
-                                                        }`}
-                                                >
-                                                    {isJobApplied(job.id) ? 'Applied' : 'Apply'}
-                                                </button>
-                                                <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
-                                                    {job.job_type}
-                                                </span>
+
+                                            <div className="flex items-center gap-1.5 shrink-0">
                                                 <button
                                                     onClick={() => handleSaveJob(job.id)}
-                                                    className={`p-2 rounded-xl transition-all ${saved
-                                                        ? 'bg-foreground text-background hover:opacity-90'
-                                                        : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-accent'
-                                                        }`}
+                                                    data-testid={`job-save-${job.id}`}
+                                                    className={`w-9 h-9 inline-flex items-center justify-center rounded-full border transition-colors ${
+                                                        saved
+                                                            ? 'bg-foreground text-background border-foreground'
+                                                            : 'bg-card text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                    style={!saved ? { borderColor: 'hsl(var(--hair))' } : {}}
+                                                    title={saved ? 'Saved' : 'Save job'}
                                                 >
-                                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
-                                                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" />
-                                                    </svg>
+                                                    <Bookmark className="w-4 h-4" fill={saved ? 'currentColor' : 'none'} strokeWidth={1.7} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleApplyJob(job)}
+                                                    data-testid={`job-apply-${job.id}`}
+                                                    className={`inline-flex items-center gap-1.5 h-9 px-4 rounded-full text-[12.5px] font-semibold transition-colors border ${
+                                                        applied
+                                                            ? 'bg-secondary text-foreground'
+                                                            : 'bg-foreground text-background border-foreground hover:opacity-90'
+                                                    }`}
+                                                    style={applied ? { borderColor: 'hsl(var(--hair))' } : {}}
+                                                >
+                                                    {applied ? 'Applied' : 'Apply'}
+                                                    <ExternalLink className="w-3 h-3" />
                                                 </button>
                                             </div>
                                         </div>
-                                    </GlassCard>
-                                </motion.div>
+                                    </Surface>
+                                </div>
                             );
-                        })
-                    )}
-                </div>
-
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
