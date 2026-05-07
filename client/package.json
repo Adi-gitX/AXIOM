@@ -10,9 +10,15 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@codemirror/lang-javascript": "^6.2.2",
+        "@codemirror/lang-python": "^6.1.6",
+        "@codemirror/state": "^6.5.2",
+        "@codemirror/view": "^6.36.2",
         "@radix-ui/react-slot": "^1.2.4",
         "@sentry/react": "^10.50.0",
         "@studio-freight/react-lenis": "^0.0.47",
+        "@tracecode/harness": "file:./vendor/tracecode-harness",
+        "@uiw/react-codemirror": "^4.23.7",
         "class-variance-authority": "^0.7.1",
         "cloudinary": "^2.8.0",
         "clsx": "^2.1.1",
@@ -27,6 +33,9 @@
         "react-router-dom": "^6.20.1",
         "tailwind-merge": "^3.4.0",
         "tailwindcss-animate": "^1.0.7",
+        "y-codemirror.next": "^0.3.5",
+        "y-websocket": "^2.1.0",
+        "yjs": "^13.6.31",
         "zustand": "^5.0.9"
     },
     "devDependencies": {
