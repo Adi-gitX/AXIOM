@@ -278,6 +278,283 @@ const ensureRuntimeSchema = () => {
         role: "TEXT DEFAULT 'member'",
         invited_at: 'TEXT DEFAULT CURRENT_TIMESTAMP',
         accepted_at: 'TEXT',
+    });
 
+    db.run(`
+        CREATE TABLE IF NOT EXISTS dsa_problem_journal (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            problem_id TEXT NOT NULL,
+            notes TEXT,
+            time_spent_minutes INTEGER DEFAULT 0,
+            attempts INTEGER DEFAULT 0,
+            last_attempted_at TEXT,
+            review_interval_days INTEGER DEFAULT 1,
+            review_due_date TEXT,
+            last_reviewed_at TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_email, problem_id)
+        )
+    `);
 
-// TODO: Complete implementation in subsequent commits (Stage 1/2)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS github_connections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT UNIQUE NOT NULL,
+            github_user_id TEXT,
+            username TEXT,
+            avatar_url TEXT,
+            access_token_enc TEXT,
+            scope TEXT,
+            stars_total INTEGER DEFAULT 0,
+            connected_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            last_sync_at TEXT,
+            sync_error TEXT
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS github_pull_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            pr_id INTEGER NOT NULL,
+            repo_full_name TEXT,
+            title TEXT,
+            state TEXT,
+            merged_at TEXT,
+            created_at TEXT,
+            html_url TEXT,
+            UNIQUE(user_email, pr_id)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS github_contribution_daily (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            activity_date TEXT NOT NULL,
+            prs_opened INTEGER DEFAULT 0,
+            prs_merged INTEGER DEFAULT 0,
+            stars_gained INTEGER DEFAULT 0,
+            UNIQUE(user_email, activity_date)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS good_first_issue_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            repo_full_name TEXT NOT NULL,
+            issue_number INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            html_url TEXT NOT NULL,
+            labels_json TEXT DEFAULT '[]',
+            language TEXT,
+            is_open INTEGER DEFAULT 1,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(repo_full_name, issue_number)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS gsoc_reminder_state (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            milestone_id TEXT NOT NULL,
+            dismissed_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_email, milestone_id)
+        )
+    `);
+
+    // Code Lab — per-problem solution submissions (run-against-tests history).
+    db.run(`
+        CREATE TABLE IF NOT EXISTS code_submissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            problem_id TEXT NOT NULL,
+            language TEXT NOT NULL,
+            code TEXT NOT NULL,
+            status TEXT NOT NULL,
+            passed INTEGER DEFAULT 0,
+            total INTEGER DEFAULT 0,
+            runtime_ms INTEGER,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_code_submissions_user ON code_submissions(user_email, problem_id)');
+
+    // Peer Interviews — rooms, post-session feedback, and per-user rating/level stats.
+    db.run(`
+        CREATE TABLE IF NOT EXISTS peer_rooms (
+            id TEXT PRIMARY KEY,
+            host_email TEXT NOT NULL,
+            host_name TEXT,
+            guest_email TEXT,
+            guest_name TEXT,
+            level TEXT NOT NULL DEFAULT 'Intermediate',
+            topic TEXT,
+            problem_id TEXT,
+            language TEXT DEFAULT 'javascript',
+            status TEXT NOT NULL DEFAULT 'open',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            started_at TEXT,
+            ended_at TEXT
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_peer_rooms_status ON peer_rooms(status, level)');
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS peer_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_id TEXT NOT NULL,
+            from_email TEXT NOT NULL,
+            to_email TEXT NOT NULL,
+            problem_solving INTEGER DEFAULT 0,
+            communication INTEGER DEFAULT 0,
+            code_quality INTEGER DEFAULT 0,
+            notes TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(room_id, from_email)
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_peer_feedback_to ON peer_feedback(to_email)');
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS peer_stats (
+            user_email TEXT PRIMARY KEY,
+            name TEXT,
+            avatar TEXT,
+            rating INTEGER DEFAULT 1200,
+            level TEXT DEFAULT 'Intermediate',
+            sessions INTEGER DEFAULT 0,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_peer_stats_rating ON peer_stats(rating DESC)');
+};
+
+const initDb = async () => {
+    if (db) return db;
+
+    SQL = await initSqlJs();
+
+    // Load existing database or create new one
+    if (fs.existsSync(dbPath)) {
+        const buffer = fs.readFileSync(dbPath);
+        db = new SQL.Database(buffer);
+        console.log('✅ SQLite database loaded:', dbPath);
+    } else {
+        db = new SQL.Database();
+        console.log('✅ New SQLite database created:', dbPath);
+    }
+
+    try {
+        ensureSchema();
+    } catch (err) {
+        // Avoid taking down every endpoint on local migration edge-cases.
+        console.error('[db] Schema bootstrap failed:', err?.message || err);
+    }
+
+    return db;
+};
+
+// Save database to disk
+const saveDb = () => {
+    if (db) {
+        const data = db.export();
+        const buffer = Buffer.from(data);
+        fs.writeFileSync(dbPath, buffer);
+    }
+};
+
+// Save on process exit
+process.on('exit', saveDb);
+process.on('SIGINT', () => { saveDb(); process.exit(); });
+process.on('SIGTERM', () => { saveDb(); process.exit(); });
+
+// Query wrapper to match PostgreSQL-style interface
+export const query = async (text, params = []) => {
+    // Wait for driver selection to finish before first query.
+    await driverReady;
+
+    // Postgres branch — clean pass-through. Codebase already uses $1, $2... placeholders.
+    if (usingPostgres) {
+        try {
+            return await pgQuery(text, params);
+        } catch (err) {
+            console.error('[db:postgres] query error:', err.message, '\n  SQL:', text.slice(0, 160));
+            throw err;
+        }
+    }
+
+    try {
+        const database = await initDb();
+
+        const { sqliteQuery, sqliteParams } = transformQuery(text, params);
+
+        // Determine if this is a SELECT query
+        const isSelect = sqliteQuery.trim().toUpperCase().startsWith('SELECT');
+        const isReturning = sqliteQuery.toUpperCase().includes('RETURNING');
+
+        if (isSelect || isReturning) {
+            try {
+                const stmt = database.prepare(sqliteQuery);
+                if (sqliteParams.length > 0) {
+                    stmt.bind(sqliteParams);
+                }
+
+                const rows = [];
+                while (stmt.step()) {
+                    rows.push(stmt.getAsObject());
+                }
+                stmt.free();
+                saveDb();
+                return { rows, rowCount: rows.length };
+            } catch (err) {
+                if (!isReturning) {
+                    throw err;
+                }
+
+                // Fallback for environments without RETURNING support
+                const cleanQuery = sqliteQuery.replace(/RETURNING\s+\*\s*;?$/i, '').trim();
+                database.run(cleanQuery, sqliteParams);
+
+                if (cleanQuery.toUpperCase().startsWith('INSERT')) {
+                    const tableName = cleanQuery.match(/INTO\s+(\w+)/i)?.[1];
+                    if (tableName) {
+                        const lastId = database.exec('SELECT last_insert_rowid() as id')[0]?.values?.[0]?.[0];
+                        if (lastId) {
+                            const result = database.exec(`SELECT * FROM ${tableName} WHERE id = ${lastId}`);
+                            if (result.length > 0 && result[0].values.length > 0) {
+                                const columns = result[0].columns;
+                                const values = result[0].values[0];
+                                const row = {};
+                                columns.forEach((col, i) => { row[col] = values[i]; });
+                                saveDb();
+                                return { rows: [row], rowCount: 1 };
+                            }
+                        }
+                    }
+                }
+
+                saveDb();
+                return { rows: [], rowCount: database.getRowsModified() };
+            }
+        } else {
+            database.run(sqliteQuery, sqliteParams);
+            saveDb();
+            return {
+                rows: [],
+                rowCount: database.getRowsModified()
+            };
+        }
+    } catch (err) {
+        console.error('Database query error:', err.message);
+        throw err;
+    }
+};
+
+// Initialize sql.js eagerly; it's a no-op if Postgres claims the driver later.
+initDb().catch(err => console.error('Failed to init database:', err.message));
+
+export default { query };
