@@ -105,6 +105,110 @@ function errMessage(err) {
     if (err instanceof Error) return err.message;
     if (typeof err === 'string') return err;
     try {
+        return JSON.stringify(err);
+    } catch {
+        return String(err);
+    }
+}
 
+function normalizeRun(res) {
+    return {
+        ok: Boolean(res?.success),
+        output: res?.output,
+        stdout: Array.isArray(res?.consoleOutput) ? res.consoleOutput : [],
+        error: res?.error || null,
+        errorLine: typeof res?.errorLine === 'number' ? res.errorLine : null,
+        timeoutReason: res?.timeoutReason || null,
+        diagnosticStage: res?.diagnosticStage || null,
+        timings: res?.timings || null,
+    };
+}
 
-// TODO: Complete implementation in subsequent commits (Stage 1/2)
+function normalizeTrace(res, languageId) {
+    const base = normalizeRun(res);
+    const trace = res?.trace || {};
+    return {
+        ...base,
+        executionTimeMs: res?.executionTimeMs ?? null,
+        trace: {
+            language: trace.language || getLanguage(languageId).engineId,
+            events: Array.isArray(trace.events) ? trace.events : [],
+            steps: trace.traceStepCount ?? res?.traceStepCount ?? null,
+            lineEvents: trace.lineEventCount ?? res?.lineEventCount ?? null,
+            truncated: Boolean(res?.traceLimitExceeded),
+        },
+    };
+}
+
+/**
+ * Execute code and return its function output + stdout (no trace).
+ * @param {{language: string, code: string, functionName?: string|null,
+ *          inputs?: Record<string, unknown>, executionStyle?: 'function'|'solution-method'|'ops-class'}} opts
+ * @returns {Promise<ReturnType<typeof normalizeRun>>}
+ */
+export async function runCode(opts) {
+    const { language, code, functionName, inputs = {}, executionStyle = 'function' } = opts;
+    const lang = getLanguage(language);
+    const fnName = functionName ?? lang.defaultFunctionName ?? 'solve';
+    try {
+        await ensureInit(lang.id);
+        const { client } = clientFor(lang.id);
+        const res = await client.executeCode(code, fnName, inputs, executionStyle);
+        return normalizeRun(res);
+    } catch (err) {
+        return { ok: false, output: undefined, stdout: [], error: errMessage(err), errorLine: null, timeoutReason: null, diagnosticStage: 'runtime', timings: null };
+    }
+}
+
+/**
+ * Execute code with full step tracing for the algorithm visualizer.
+ * @param {{language: string, code: string, functionName?: string|null,
+ *          inputs?: Record<string, unknown>, executionStyle?: 'function'|'solution-method'|'ops-class',
+ *          budget?: object}} opts
+ */
+export async function traceCode(opts) {
+    const { language, code, functionName, inputs = {}, executionStyle = 'function', budget } = opts;
+    const lang = getLanguage(language);
+    const fnName = functionName ?? lang.defaultFunctionName ?? 'solve';
+    try {
+        await ensureInit(lang.id);
+        const { client } = clientFor(lang.id);
+        const res = await client.executeWithTracing(
+            code,
+            fnName,
+            inputs,
+            { ...DEFAULT_TRACE_BUDGET, ...(budget || {}) },
+            executionStyle,
+        );
+        return normalizeTrace(res, lang.id);
+    } catch (err) {
+        return {
+            ok: false,
+            output: undefined,
+            stdout: [],
+            error: errMessage(err),
+            errorLine: null,
+            timeoutReason: null,
+            diagnosticStage: 'trace',
+            timings: null,
+            executionTimeMs: null,
+            trace: { language: lang.engineId, events: [], steps: 0, lineEvents: 0, truncated: false },
+        };
+    }
+}
+
+/**
+ * Whether the engine supports step tracing for a language (drives the Visualize tab).
+ */
+export function supportsTracing(languageId) {
+    try {
+        const lang = getLanguage(languageId);
+        const profile = harness().getProfile(lang.engineId);
+        return Boolean(profile?.capabilities?.tracing?.supported);
+    } catch {
+        // Python/JS/TS all support tracing; assume true when the profile isn't reachable (SSR).
+        return true;
+    }
+}
+
+export { isBrowser };
