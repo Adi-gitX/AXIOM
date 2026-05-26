@@ -120,6 +120,125 @@ export const PROBLEMS = [
             { name: 'Profit', input: { prices: [7, 1, 5, 3, 6, 4] }, expected: 5 },
             { name: 'No profit', input: { prices: [7, 6, 4, 3, 1] }, expected: 0 },
             { name: 'Two days', input: { prices: [1, 2] }, expected: 1, hidden: true },
+            { name: 'Late peak', input: { prices: [2, 4, 1, 7] }, expected: 6, hidden: true },
+        ],
+    },
+    {
+        id: 'maximum-subarray',
+        title: 'Maximum Subarray',
+        difficulty: 'Medium',
+        topic: 'Dynamic Programming',
+        tags: ['array', 'dynamic programming', 'divide and conquer'],
+        functionName: 'maxSubArray',
+        statement:
+            'Given an integer array `nums`, find the contiguous subarray (containing at least one number) with the largest sum, and return that sum.',
+        examples: [
+            { input: 'nums = [-2,1,-3,4,-1,2,1,-5,4]', output: '6', explanation: '[4,-1,2,1] has the largest sum 6.' },
+            { input: 'nums = [1]', output: '1' },
+        ],
+        constraints: ['1 ≤ nums.length ≤ 10⁵', '-10⁴ ≤ nums[i] ≤ 10⁴'],
+        starter: {
+            python: 'def maxSubArray(nums):\n    pass\n',
+            javascript: 'function maxSubArray(nums) {\n}\n',
+            typescript: 'function maxSubArray(nums: number[]): number {\n  return 0;\n}\n',
+        },
+        tests: [
+            { name: 'Mixed', input: { nums: [-2, 1, -3, 4, -1, 2, 1, -5, 4] }, expected: 6 },
+            { name: 'Single', input: { nums: [1] }, expected: 1 },
+            { name: 'All negative', input: { nums: [-3, -1, -2] }, expected: -1, hidden: true },
+            { name: 'All positive', input: { nums: [5, 4, 1, 7, 8] }, expected: 25, hidden: true },
+        ],
+    },
+    {
+        id: 'binary-search',
+        title: 'Binary Search',
+        difficulty: 'Easy',
+        topic: 'Binary Search',
+        tags: ['array', 'binary search'],
+        functionName: 'search',
+        statement:
+            'Given a sorted (ascending) array of distinct integers `nums` and a `target`, return the index of `target` if it exists, otherwise `-1`. Aim for O(log n) time.',
+        examples: [
+            { input: 'nums = [-1,0,3,5,9,12], target = 9', output: '4' },
+            { input: 'nums = [-1,0,3,5,9,12], target = 2', output: '-1' },
+        ],
+        constraints: ['1 ≤ nums.length ≤ 10⁴', 'nums is sorted ascending with distinct values.'],
+        starter: {
+            python: 'def search(nums, target):\n    pass\n',
+            javascript: 'function search(nums, target) {\n}\n',
+            typescript: 'function search(nums: number[], target: number): number {\n  return -1;\n}\n',
+        },
+        tests: [
+            { name: 'Found', input: { nums: [-1, 0, 3, 5, 9, 12], target: 9 }, expected: 4 },
+            { name: 'Missing', input: { nums: [-1, 0, 3, 5, 9, 12], target: 2 }, expected: -1 },
+            { name: 'First', input: { nums: [1, 2, 3, 4, 5], target: 1 }, expected: 0, hidden: true },
+            { name: 'Last', input: { nums: [1, 2, 3, 4, 5], target: 5 }, expected: 4, hidden: true },
+        ],
+    },
+    {
+        id: 'move-zeroes',
+        title: 'Move Zeroes',
+        difficulty: 'Easy',
+        topic: 'Two Pointers',
+        tags: ['array', 'two pointers'],
+        functionName: 'moveZeroes',
+        statement:
+            'Given an integer array `nums`, move all `0`s to the end while keeping the relative order of the non-zero elements. Return the modified array.',
+        examples: [
+            { input: 'nums = [0,1,0,3,12]', output: '[1,3,12,0,0]' },
+            { input: 'nums = [0]', output: '[0]' },
+        ],
+        constraints: ['1 ≤ nums.length ≤ 10⁴', '-2³¹ ≤ nums[i] ≤ 2³¹ - 1'],
+        starter: {
+            python: 'def moveZeroes(nums):\n    # Move zeroes to the end, then return nums\n    return nums\n',
+            javascript: 'function moveZeroes(nums) {\n  // Move zeroes to the end, then return nums\n  return nums;\n}\n',
+            typescript: 'function moveZeroes(nums: number[]): number[] {\n  // Move zeroes to the end, then return nums\n  return nums;\n}\n',
+        },
+        tests: [
+            { name: 'Mixed', input: { nums: [0, 1, 0, 3, 12] }, expected: [1, 3, 12, 0, 0] },
+            { name: 'Single zero', input: { nums: [0] }, expected: [0] },
+            { name: 'No zeroes', input: { nums: [1, 2, 3] }, expected: [1, 2, 3], hidden: true },
+            { name: 'Leading zeroes', input: { nums: [0, 0, 1] }, expected: [1, 0, 0], hidden: true },
+        ],
+    },
+    {
+        id: 'climbing-stairs',
+        title: 'Climbing Stairs',
+        difficulty: 'Easy',
+        topic: 'Dynamic Programming',
+        tags: ['math', 'dynamic programming'],
+        functionName: 'climbStairs',
+        statement:
+            'You are climbing a staircase with `n` steps. Each time you can climb 1 or 2 steps. Return the number of distinct ways to reach the top.',
+        examples: [
+            { input: 'n = 2', output: '2', explanation: '1+1 or 2.' },
+            { input: 'n = 3', output: '3', explanation: '1+1+1, 1+2, 2+1.' },
+        ],
+        constraints: ['1 ≤ n ≤ 45'],
+        starter: {
+            python: 'def climbStairs(n):\n    pass\n',
+            javascript: 'function climbStairs(n) {\n}\n',
+            typescript: 'function climbStairs(n: number): number {\n  return 0;\n}\n',
+        },
+        tests: [
+            { name: 'n=2', input: { n: 2 }, expected: 2 },
+            { name: 'n=3', input: { n: 3 }, expected: 3 },
+            { name: 'n=5', input: { n: 5 }, expected: 8, hidden: true },
+            { name: 'n=10', input: { n: 10 }, expected: 89, hidden: true },
+        ],
+    },
+];
 
+export const DIFFICULTY_ORDER = { Easy: 0, Medium: 1, Hard: 2 };
 
-// TODO: Complete implementation in subsequent commits (Stage 1/2)
+export function getProblem(id) {
+    return PROBLEMS.find((p) => p.id === id) || null;
+}
+
+export function listProblems() {
+    return PROBLEMS;
+}
+
+export function visibleTests(problem) {
+    return (problem?.tests || []).filter((t) => !t.hidden);
+}
