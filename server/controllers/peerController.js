@@ -152,6 +152,80 @@ export const endRoom = async (req, res) => {
         const updated = await query(
             "UPDATE peer_rooms SET status = 'ended', ended_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *",
             [roomId],
+        );
+        // bump session counts
+        for (const e of [room.host_email, room.guest_email].filter(Boolean)) {
+            await query('UPDATE peer_stats SET sessions = sessions + 1, updated_at = CURRENT_TIMESTAMP WHERE user_email = $1', [e]).catch(() => {});
+        }
+        res.json({ room: updated.rows?.[0] || room });
+    } catch (err) {
+        console.error('endRoom error:', err.message);
+        res.status(500).json({ error: 'Failed to end room.' });
+    }
+};
 
+/** POST /api/peer/feedback — rate your peer; updates their rating. */
+export const submitFeedback = async (req, res) => {
+    try {
+        const from = req.authEmail || req.body?.email;
+        if (!from) return res.status(401).json({ error: 'Unauthorized' });
+        const { roomId, problemSolving, communication, codeQuality, notes } = req.body || {};
+        if (!roomId) return res.status(400).json({ error: 'roomId required.' });
 
-// TODO: Complete implementation in subsequent commits (Stage 2/3)
+        // Integrity: only a participant may rate, and only their actual peer — derive
+        // toEmail from the room rather than trusting the client (prevents rating abuse).
+        const found = await query('SELECT host_email, guest_email FROM peer_rooms WHERE id = $1', [roomId]);
+        const room = found.rows?.[0];
+        if (!room) return res.status(404).json({ error: 'Room not found.' });
+        if (room.host_email !== from && room.guest_email !== from) {
+            return res.status(403).json({ error: 'Only a participant can leave feedback.' });
+        }
+        const toEmail = room.host_email === from ? room.guest_email : room.host_email;
+        if (!toEmail) return res.status(400).json({ error: 'No peer to rate in this room.' });
+
+        const ps = clampScore(problemSolving);
+        const co = clampScore(communication);
+        const cq = clampScore(codeQuality);
+        await query(
+            `INSERT INTO peer_feedback (room_id, from_email, to_email, problem_solving, communication, code_quality, notes)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [roomId, from, toEmail, ps, co, cq, String(notes || '').slice(0, 2000)],
+        );
+        // Rating update: average (1-5) maps to ±20 around the neutral 3.
+        const avg = (ps + co + cq) / 3;
+        const delta = Math.round((avg - 3) * 10);
+        await ensureStats(toEmail);
+        await query('UPDATE peer_stats SET rating = MAX(0, rating + $1), updated_at = CURRENT_TIMESTAMP WHERE user_email = $2', [delta, toEmail]).catch(() => {});
+        res.status(201).json({ ok: true, delta });
+    } catch (err) {
+        console.error('submitFeedback error:', err.message);
+        res.status(500).json({ error: 'Failed to submit feedback.' });
+    }
+};
+
+/** GET /api/peer/leaderboard */
+export const getLeaderboard = async (req, res) => {
+    try {
+        const result = await query(
+            'SELECT user_email, name, avatar, rating, level, sessions FROM peer_stats ORDER BY rating DESC, sessions DESC LIMIT 25',
+        );
+        res.json({ leaderboard: result.rows || [] });
+    } catch (err) {
+        console.error('getLeaderboard error:', err.message);
+        res.status(500).json({ error: 'Failed to load leaderboard.' });
+    }
+};
+
+/** GET /api/peer/stats/:email — my stats (creates a default row if missing). */
+export const getMyStats = async (req, res) => {
+    try {
+        const email = req.authEmail || req.params.email;
+        if (!email) return res.status(401).json({ error: 'Unauthorized' });
+        await ensureStats(email);
+        const result = await query('SELECT user_email, name, avatar, rating, level, sessions FROM peer_stats WHERE user_email = $1', [email]);
+        res.json({ stats: result.rows?.[0] || { user_email: email, rating: 1200, level: 'Intermediate', sessions: 0 } });
+    } catch (err) {
+        console.error('getMyStats error:', err.message);
+        res.status(500).json({ error: 'Failed to load stats.' });
+    }
+};
