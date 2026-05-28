@@ -54,6 +54,59 @@ export default function CollabCodeEditor({ roomId, language = 'javascript', init
         const color = user?.color || USER_COLORS[Math.abs(hashCode(user?.name || 'peer')) % USER_COLORS.length];
         provider.awareness.setLocalStateField('user', { name: user?.name || 'Peer', color, colorLight: `${color}33` });
 
+        const seedIfEmpty = () => {
+            if (isHost && ytext.length === 0 && initialCode) {
+                ydoc.transact(() => ytext.insert(0, initialCode));
+            }
+        };
+        provider.on('sync', (isSynced) => {
+            if (onStatus) onStatus(isSynced);
+            if (isSynced) seedIfEmpty();
+        });
+        provider.on('status', (e) => { if (onStatus) onStatus(e?.status === 'connected'); });
 
+        if (codeRef) {
+            codeRef.current = () => ytext.toString();
+            ytext.observe(() => { codeRef.current = () => ytext.toString(); });
+        }
 
-// TODO: Complete implementation in subsequent commits (Stage 1/2)
+        const state = EditorState.create({
+            doc: ytext.toString(),
+            extensions: [
+                lineNumbers(),
+                highlightActiveLineGutter(),
+                highlightActiveLine(),
+                drawSelection(),
+                history(),
+                indentOnInput(),
+                bracketMatching(),
+                closeBrackets(),
+                keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, indentWithTab]),
+                langExt(language),
+                ...axiomCodeMirror,
+                EditorView.lineWrapping,
+                yCollab(ytext, provider.awareness, { undoManager }),
+            ],
+        });
+        const view = new EditorView({ state, parent: hostElRef.current });
+
+        // Fallback: seed shortly after mount even if the provider can't connect (solo use).
+        const seedTimer = setTimeout(seedIfEmpty, 1200);
+
+        return () => {
+            clearTimeout(seedTimer);
+            view.destroy();
+            provider.destroy();
+            ydoc.destroy();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [roomId, language]);
+
+    return <div ref={hostElRef} className="axiom-cm h-full overflow-hidden" />;
+}
+
+function hashCode(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i += 1) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
+    return h;
+}
