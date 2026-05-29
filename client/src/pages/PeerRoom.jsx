@@ -180,5 +180,93 @@ export default function PeerRoom() {
                     )}
                 </div>
 
+                {/* Editor + results */}
+                <div className="flex-1 min-h-0 flex flex-col border-b lg:border-b-0 lg:border-r" style={{ borderColor: 'hsl(var(--hair))' }}>
+                    <div className="flex-1 min-h-[200px] overflow-hidden">
+                        <CollabCodeEditor
+                            roomId={roomId}
+                            language={room.language}
+                            initialCode={initialCode}
+                            isHost={isHost}
+                            user={{ name: myName }}
+                            codeRef={codeRef}
+                            onStatus={setConnected}
+                        />
+                    </div>
+                    {problem && (
+                        <div className="h-[34%] min-h-[140px] border-t" style={{ borderColor: 'hsl(var(--hair))' }}>
+                            <TestResultsPanel run={run} />
+                        </div>
+                    )}
+                </div>
 
-// TODO: Complete implementation in subsequent commits (Stage 2/3)
+                {/* Video */}
+                <div className="lg:w-[30%] lg:max-w-[420px] h-[260px] lg:h-auto lg:min-h-0">
+                    <JitsiVideo roomId={roomId} displayName={myName} />
+                </div>
+            </div>
+
+            {showFeedback && (
+                <FeedbackModal
+                    peerName={peerName}
+                    onClose={() => setShowFeedback(false)}
+                    onSubmit={async (scores) => {
+                        try {
+                            if (peerEmail) await peerApi.submitFeedback({ email: me, roomId, toEmail: peerEmail, ...scores });
+                        } catch { /* non-blocking */ }
+                        await endAndLeave();
+                    }}
+                />
+            )}
+        </div>
+    );
+}
+
+function FeedbackModal({ peerName, onClose, onSubmit }) {
+    const [problemSolving, setPs] = useState(3);
+    const [communication, setCo] = useState(3);
+    const [codeQuality, setCq] = useState(3);
+    const [notes, setNotes] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    const rows = [
+        ['Problem solving', problemSolving, setPs],
+        ['Communication', communication, setCo],
+        ['Code quality', codeQuality, setCq],
+    ];
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
+            <div className="w-full max-w-[420px] rounded-2xl bg-card border shadow-xl p-5" style={{ borderColor: 'hsl(var(--hair))' }}>
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-display font-semibold text-[16px] text-foreground">Rate {peerName || 'your peer'}</h3>
+                    <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+                </div>
+                <div className="space-y-3">
+                    {rows.map(([label, val, setter]) => (
+                        <div key={label}>
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-[12.5px] text-foreground">{label}</span>
+                                <span className="text-[12px] text-muted-foreground tabular">{val}/5</span>
+                            </div>
+                            <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                    <button key={n} type="button" onClick={() => setter(n)} className="p-0.5" title={`${n}`}>
+                                        <Star className={`w-5 h-5 ${n <= val ? 'fill-[#7A4A1F] text-[#7A4A1F]' : 'text-muted-foreground/30'}`} />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                    <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Optional: what went well, what to improve…" className="w-full px-3 py-2 rounded-md bg-background border text-[13px] text-foreground resize-y focus:outline-none focus:ring-2 focus:ring-[#0E334F]/15" style={{ borderColor: 'hsl(var(--hair))' }} />
+                </div>
+                <div className="flex items-center gap-2 mt-4">
+                    <button type="button" onClick={onClose} className="flex-1 h-9 rounded-lg bg-secondary text-[13px] font-medium text-foreground hover:opacity-90">Skip</button>
+                    <button type="button" disabled={submitting} onClick={async () => { setSubmitting(true); await onSubmit({ problemSolving, communication, codeQuality, notes }); }} className="flex-1 h-9 rounded-lg bg-[#0E334F] text-[13px] font-semibold text-white hover:opacity-90 disabled:opacity-50 inline-flex items-center justify-center gap-1.5">
+                        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Submit & finish
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
