@@ -14,6 +14,11 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Education = lazy(() => import('./pages/Education'));
 const DSATracker = lazy(() => import('./pages/DSATracker'));
 const DSASheetPage = lazy(() => import('./pages/DSASheetPage'));
+const CodeLab = lazy(() => import('./pages/CodeLab'));
+const ProblemList = lazy(() => import('./pages/ProblemList'));
+const ProblemSolve = lazy(() => import('./pages/ProblemSolve'));
+const PeerLobby = lazy(() => import('./pages/PeerLobby'));
+const PeerRoom = lazy(() => import('./pages/PeerRoom'));
 const InterviewPrep = lazy(() => import('./pages/InterviewPrep'));
 const DeveloperConnect = lazy(() => import('./pages/DeveloperConnect'));
 const Jobs = lazy(() => import('./pages/Jobs'));
@@ -59,12 +64,17 @@ function App() {
                             }>
                                 <Route index element={<Dashboard />} />
                                 <Route path="education" element={<Education />} />
+                                <Route path="lab" element={<CodeLab />} />
+                                <Route path="problems" element={<ProblemList />} />
+                                <Route path="problems/:problemId" element={<ProblemSolve />} />
                                 <Route path="dsa" element={<DSATracker />} />
                                 <Route path="dsa/companies" element={<Companies />} />
                                 <Route path="dsa/companies/:slug" element={<CompanyDetail />} />
                                 <Route path="dsa/:sheetId" element={<DSASheetPage />} />
                                 <Route path="interview" element={<InterviewPrep />} />
                                 <Route path="interviews" element={<InterviewExperiences />} />
+                                <Route path="peer" element={<PeerLobby />} />
+                                <Route path="peer/:roomId" element={<PeerRoom />} />
                                 <Route path="connect" element={<DeveloperConnect />} />
                                 <Route path="oss" element={<OssContributionEngine />} />
                                 <Route path="gsoc" element={<GsocAccelerator />} />
