@@ -1,0 +1,55 @@
+# Self-hosted Judge0 CE for AXIOM's optional server-side judge.
+# Usage:  cd server/judge0 && docker compose up -d   ->   API at http://localhost:2358
+# Then set JUDGE0_URL=http://localhost:2358 in the AXIOM server environment.
+#
+# Pinned to a known-good Judge0 CE release. See https://github.com/judge0/judge0.
+
+x-judge0-env: &judge0-env
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: judge0
+  POSTGRES_USER: judge0
+  POSTGRES_PASSWORD: judge0pass
+  # Sandbox limits (tune for your workload)
+  MAX_CPU_TIME_LIMIT: "15"
+  MAX_MEMORY_LIMIT: "512000"
+  ENABLE_WAIT_RESULT: "true"
+
+services:
+  server:
+    image: judge0/judge0:1.13.1
+    command: ["./scripts/server"]
+    environment: *judge0-env
+    ports:
+      - "2358:2358"
+    privileged: true
+    depends_on: [db, redis]
+    restart: unless-stopped
+
+  worker:
+    image: judge0/judge0:1.13.1
+    command: ["./scripts/workers"]
+    environment: *judge0-env
+    privileged: true
+    depends_on: [db, redis]
+    restart: unless-stopped
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: judge0
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0pass
+    volumes:
+      - judge0-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "no"]
+    restart: unless-stopped
+
+volumes:
+  judge0-db:
