@@ -40,6 +40,45 @@ export const judge0Languages = () => Object.keys(JUDGE0_LANGUAGE_IDS);
 export async function runOnJudge0({ language, code, stdin = '', cpuTimeLimit = 5, memoryLimitKb = 256000 }) {
     if (!JUDGE0_URL) {
         const e = new Error('Server judge is not configured (set JUDGE0_URL).');
+        e.status = 503;
+        throw e;
+    }
+    const language_id = JUDGE0_LANGUAGE_IDS[language];
+    if (!language_id) {
+        const e = new Error(`Language "${language}" is not supported by the server judge.`);
+        e.status = 400;
+        throw e;
+    }
 
+    const headers = { 'Content-Type': 'application/json' };
+    if (JUDGE0_KEY) headers['X-RapidAPI-Key'] = JUDGE0_KEY;
+    if (JUDGE0_HOST) headers['X-RapidAPI-Host'] = JUDGE0_HOST;
 
-// TODO: Complete implementation in subsequent commits (Stage 1/2)
+    const resp = await fetch(`${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+            language_id,
+            source_code: code,
+            stdin,
+            cpu_time_limit: cpuTimeLimit,
+            memory_limit: memoryLimitKb,
+        }),
+    });
+
+    if (!resp.ok) {
+        const body = await resp.text();
+        const e = new Error(`Judge0 error ${resp.status}: ${body.slice(0, 200)}`);
+        e.status = 502;
+        throw e;
+    }
+
+    const d = await resp.json();
+    return {
+        stdout: d.stdout || '',
+        stderr: d.stderr || d.compile_output || d.message || '',
+        status: d.status?.description || 'Unknown',
+        timeMs: d.time != null ? Math.round(Number(d.time) * 1000) : null,
+        memoryKb: d.memory ?? null,
+    };
+}
