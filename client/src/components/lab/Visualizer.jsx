@@ -164,6 +164,89 @@ function computePointers(arrName, len, vars) {
     return ptrs.map((p) => ({ ...p, color: colorByName[p.name] }));
 }
 
+function ArrayStage({ name, value, prevValue, pointers, highlight }) {
+    const len = value.length;
+    const slot = CELL + GAP;
+    // stack pointers that share an index
+    const byIndex = {};
+    pointers.forEach((p) => { (byIndex[p.index] = byIndex[p.index] || []).push(p); });
+
+    return (
+        <div>
+            <div className="flex items-baseline gap-2 mb-1">
+                <span className="font-mono text-[12px] text-[#7A1F4A]">{name}</span>
+                <span className="font-mono text-[11px] text-muted-foreground/50">len {len}</span>
+            </div>
+            <div className="overflow-x-auto custom-scrollbar pb-1">
+                <div className="relative" style={{ width: Math.max(len * slot, slot), minWidth: '100%' }}>
+                    {/* pointer arrows */}
+                    <div className="relative h-9" style={{ width: len * slot }}>
+                        {Object.entries(byIndex).map(([index, group]) => (
+                            <motion.div
+                                key={group.map((g) => g.name).join('-')}
+                                className="absolute flex flex-col items-center"
+                                initial={false}
+                                animate={{ left: Number(index) * slot }}
+                                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                                style={{ width: CELL }}
+                            >
+                                <div className="flex gap-1 mb-0.5">
+                                    {group.map((p) => (
+                                        <span key={p.name} className="px-1 rounded text-[10px] font-mono font-semibold leading-tight" style={{ color: p.color }}>{p.name}</span>
+                                    ))}
+                                </div>
+                                <ChevronDown className="w-3.5 h-3.5 -mt-0.5" style={{ color: group[0].color }} />
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {/* cells */}
+                    <div className="flex" style={{ gap: GAP }}>
+                        <AnimatePresence initial={false}>
+                            {value.map((el, i) => {
+                                const isHi = highlight && highlight.path && highlight.path[0] === i;
+                                const isRead = isHi && highlight.kind === 'read';
+                                const changed = !sameJson(el, prevValue?.[i]);
+                                const bg = isHi ? (isRead ? '#DCEFEC' : '#E2EEE1') : changed ? '#FBF3E6' : '#FFFFFF';
+                                const border = isHi ? (isRead ? '#2E7D7A' : '#0E334F') : 'hsl(214 20% 88%)';
+                                return (
+                                    <motion.div
+                                        key={i}
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: isHi ? 1.06 : 1, backgroundColor: bg, borderColor: border }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        transition={{ duration: 0.18 }}
+                                        className="flex flex-col items-center justify-center rounded-md border font-mono shrink-0"
+                                        style={{ width: CELL, height: CELL, borderWidth: isHi ? 2 : 1 }}
+                                    >
+                                        <span className="text-[12.5px] text-[#16263a] leading-none">{cellText(el)}</span>
+                                    </motion.div>
+                                );
+                            })}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* index labels */}
+                    <div className="flex mt-1" style={{ gap: GAP }}>
+                        {value.map((_, i) => (
+                            <span key={i} className="text-center text-[9.5px] font-mono text-muted-foreground/45 shrink-0" style={{ width: CELL }}>{i}</span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ── Scalar / map / set chip ────────────────────────────────────────────── */
+function VarChip({ name, value, changed, highlight }) {
+    const kind = valueKind(value);
+    const isHi = Boolean(highlight);
+    const ring = isHi ? (highlight.kind === 'read' ? 'ring-2 ring-[#2E7D7A]/60' : 'ring-2 ring-[#0E334F]') : changed ? 'ring-1 ring-[#7A4A1F]/40' : '';
+    return (
+        <motion.div layout initial={false} animate={{ scale: isHi ? 1.04 : 1 }} transition={{ duration: 0.15 }} className={`rounded-lg border bg-card px-2.5 py-1.5 ${ring}`} style={{ borderColor: 'hsl(var(--hair))' }}>
+            <div className="flex items-center gap-1.5">
 
 
-// TODO: Complete implementation in subsequent commits (Stage 2/4)
+// TODO: Complete implementation in subsequent commits (Stage 3/4)
