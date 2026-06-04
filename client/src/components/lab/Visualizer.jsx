@@ -247,6 +247,86 @@ function VarChip({ name, value, changed, highlight }) {
     return (
         <motion.div layout initial={false} animate={{ scale: isHi ? 1.04 : 1 }} transition={{ duration: 0.15 }} className={`rounded-lg border bg-card px-2.5 py-1.5 ${ring}`} style={{ borderColor: 'hsl(var(--hair))' }}>
             <div className="flex items-center gap-1.5">
+                <span className="font-mono text-[11.5px] text-[#7A1F4A]">{name}</span>
+                <span className="font-mono text-[11px] text-muted-foreground/40">=</span>
+                {kind === 'map' ? <MapMini value={value} /> : kind === 'set' ? <SetMini value={value} /> : <span className="font-mono text-[12px] text-[#16263a]">{deepText(value)}</span>}
+            </div>
+        </motion.div>
+    );
+}
 
+function MapMini({ value }) {
+    const entries = mapEntries(value);
+    if (!entries.length) return <span className="font-mono text-[12px] text-muted-foreground/60">Map(0)</span>;
+    return (
+        <span className="inline-flex flex-wrap gap-1">
+            {entries.slice(0, 8).map(([k, v], i) => (
+                <span key={i} className="font-mono text-[11px] px-1 rounded bg-secondary/60"><span className="text-[#7A4A1F]">{cellText(k)}</span><span className="text-muted-foreground/40">→</span><span className="text-[#16263a]">{cellText(v)}</span></span>
+            ))}
+            {entries.length > 8 && <span className="text-[10px] text-muted-foreground/50">+{entries.length - 8}</span>}
+        </span>
+    );
+}
 
-// TODO: Complete implementation in subsequent commits (Stage 3/4)
+function SetMini({ value }) {
+    const vals = setValues(value);
+    if (!vals.length) return <span className="font-mono text-[12px] text-muted-foreground/60">Set(0)</span>;
+    return (
+        <span className="inline-flex flex-wrap gap-1">
+            {vals.slice(0, 10).map((v, i) => <span key={i} className="font-mono text-[11px] px-1 rounded bg-secondary/60 text-[#16263a]">{cellText(v)}</span>)}
+            {vals.length > 10 && <span className="text-[10px] text-muted-foreground/50">+{vals.length - 10}</span>}
+        </span>
+    );
+}
+
+/* ── helpers + chrome ───────────────────────────────────────────────────── */
+function cellText(v) {
+    if (v === null) return '∅';
+    if (v === undefined) return '·';
+    if (typeof v === 'string') return v.length <= 4 ? v : `${v.slice(0, 3)}…`;
+    if (typeof v === 'object') return Array.isArray(v) ? `[${v.length}]` : '{}';
+    return String(v);
+}
+function deepText(v) {
+    if (v === undefined) return 'undefined';
+    if (v === null) return 'null';
+    if (typeof v === 'string') return `"${v}"`;
+    try { const s = JSON.stringify(v); return s.length > 80 ? `${s.slice(0, 79)}…` : s; } catch { return String(v); }
+}
+function sameJson(a, b) {
+    try { return JSON.stringify(a) === JSON.stringify(b); } catch { return a === b; }
+}
+
+function IconBtn({ children, onClick, title }) {
+    return <button type="button" onClick={onClick} title={title} aria-label={title} className="inline-flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">{children}</button>;
+}
+function PanelLabel({ children }) {
+    return <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/60 mb-2">{children}</p>;
+}
+
+const OP_TONE = {
+    write: { bg: 'bg-fabric-sage', ink: '#0E334F' }, mutate: { bg: 'bg-fabric-sage', ink: '#0E334F' },
+    read: { bg: 'bg-fabric-mist', ink: '#0E334F' }, call: { bg: 'bg-fabric-peach', ink: '#7A4A1F' },
+    return: { bg: 'bg-fabric-peach', ink: '#7A4A1F' }, stdout: { bg: 'bg-secondary', ink: '#444' },
+    exception: { bg: 'bg-[#9C2A1F]/10', ink: '#9C2A1F' }, timeout: { bg: 'bg-[#9C2A1F]/10', ink: '#9C2A1F' },
+};
+function OpBanner({ op, line }) {
+    const tone = (op && OP_TONE[op.kind]) || { bg: 'bg-secondary/60', ink: '#555' };
+    return (
+        <div className={`flex items-center gap-2 rounded-lg px-3 py-2 ${tone.bg}`}>
+            <span className="text-[10.5px] font-mono px-1.5 py-0.5 rounded bg-white/60" style={{ color: tone.ink }}>L{line ?? '—'}</span>
+            <span className="text-[12.5px] font-mono truncate" style={{ color: tone.ink }}>{op ? op.text : 'executing line'}</span>
+        </div>
+    );
+}
+function EmptyVisual({ title, body }) {
+    return (
+        <div className="h-full flex items-center justify-center px-8 text-center">
+            <div className="max-w-[320px]">
+                <div className="mx-auto mb-3 w-10 h-10 rounded-full bg-fabric-sage flex items-center justify-center"><Play className="w-4 h-4 text-[#0E334F]" /></div>
+                <h3 className="font-display font-semibold text-[15px] text-foreground mb-1.5">{title}</h3>
+                <p className="text-[12.5px] text-muted-foreground leading-relaxed">{body}</p>
+            </div>
+        </div>
+    );
+}
