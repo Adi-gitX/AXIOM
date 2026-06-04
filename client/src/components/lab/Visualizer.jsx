@@ -81,6 +81,89 @@ export default function Visualizer({ trace, onActiveLineChange }) {
                     <IconBtn onClick={() => { setPlaying(false); setIdx((i) => Math.max(0, i - 1)); }} title="Previous"><SkipBack className="w-4 h-4" /></IconBtn>
                     <button type="button" onClick={() => { if (idx >= steps.length - 1) setIdx(0); setPlaying((p) => !p); }} className="inline-flex items-center justify-center w-9 h-8 rounded-md bg-[#0E334F] text-white hover:opacity-90 transition-opacity" title={playing ? 'Pause' : 'Play'}>
                         {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </button>
+                    <IconBtn onClick={() => { setPlaying(false); setIdx((i) => Math.min(steps.length - 1, i + 1)); }} title="Next"><SkipForward className="w-4 h-4" /></IconBtn>
+                    <IconBtn onClick={() => { setPlaying(false); setIdx(steps.length - 1); }} title="To end"><ChevronsRight className="w-4 h-4" /></IconBtn>
+                    <div className="flex-1" />
+                    <button type="button" onClick={() => setSpeed((s) => SPEEDS[(SPEEDS.indexOf(s) + 1) % SPEEDS.length])} className="inline-flex items-center gap-1 h-7 px-2 rounded-md text-[11.5px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors tabular" title="Playback speed"><Gauge className="w-3.5 h-3.5" /> {speed}×</button>
+                    <span className="text-[11.5px] text-muted-foreground tabular w-20 text-right">{idx + 1} / {steps.length}</span>
+                </div>
+                <input type="range" min={0} max={steps.length - 1} value={idx} onChange={(e) => { setPlaying(false); setIdx(Number(e.target.value)); }} className="w-full mt-2 accent-[#0E334F] h-1" />
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3.5 space-y-4">
+                <OpBanner op={step.op} line={step.line} />
+
+                {/* Arrays — the main stage */}
+                {arrays.map(([name, value]) => (
+                    <ArrayStage
+                        key={name}
+                        name={name}
+                        value={value}
+                        prevValue={prevVars[name]}
+                        pointers={computePointers(name, value.length, frame.vars)}
+                        highlight={step.highlight && step.highlight.name === name ? step.highlight : null}
+                    />
+                ))}
+
+                {/* Scalars / maps / sets */}
+                {others.length > 0 && (
+                    <div>
+                        <PanelLabel>Variables{step.stack.length > 1 ? ` · ${frame.function}` : ''}</PanelLabel>
+                        <div className="flex flex-wrap gap-2">
+                            {others.map(([name, value]) => (
+                                <VarChip key={name} name={name} value={value} changed={!sameJson(value, prevVars[name])} highlight={step.highlight && step.highlight.name === name ? step.highlight : null} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Call stack */}
+                {step.stack.length > 1 && (
+                    <div>
+                        <PanelLabel>Call stack</PanelLabel>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            {step.stack.map((f, i) => (
+                                <span key={i} className={`px-2 py-0.5 rounded-md text-[11.5px] font-mono ${i === step.stack.length - 1 ? 'bg-[#0E334F] text-white' : 'bg-secondary text-muted-foreground'}`}>{f.function}</span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {step.hasReturn && (
+                    <div>
+                        <PanelLabel>Returned</PanelLabel>
+                        <span className="inline-block px-2.5 py-1 rounded-md bg-fabric-peach font-mono text-[12.5px] text-[#7A4A1F]">{deepText(step.returnValue)}</span>
+                    </div>
+                )}
+
+                {step.stdout.length > 0 && (
+                    <div>
+                        <PanelLabel>stdout</PanelLabel>
+                        <div className="rounded-md bg-secondary/50 px-2.5 py-1.5 font-mono text-[12px] text-foreground/90 whitespace-pre-wrap">{step.stdout.join('')}</div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+/* ── Array stage with pointer arrows ────────────────────────────────────── */
+function computePointers(arrName, len, vars) {
+    const ptrs = [];
+    let ci = 0;
+    for (const [k, v] of Object.entries(vars)) {
+        if (k === arrName) continue;
+        if (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= len) {
+            ptrs.push({ name: k, index: v });
+        }
+    }
+    // group by index for vertical stacking; assign stable colors by name
+    const colorByName = {};
+    ptrs.forEach((p) => { if (!(p.name in colorByName)) { colorByName[p.name] = POINTER_COLORS[ci % POINTER_COLORS.length]; ci += 1; } });
+    return ptrs.map((p) => ({ ...p, color: colorByName[p.name] }));
+}
 
 
-// TODO: Complete implementation in subsequent commits (Stage 1/4)
+
+// TODO: Complete implementation in subsequent commits (Stage 2/4)
