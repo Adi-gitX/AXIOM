@@ -289,6 +289,79 @@ export default function ProblemSolve() {
             </div>
 
             {/* Body */}
+            <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
+                {/* Left: statement / submissions */}
+                <div className="lg:w-[36%] lg:max-w-[460px] min-h-[200px] lg:min-h-0 flex flex-col border-b lg:border-b-0 lg:border-r" style={{ borderColor: 'hsl(var(--hair))' }}>
+                    <div className="shrink-0 flex items-center gap-1 px-3 h-9 border-b bg-card/40" style={{ borderColor: 'hsl(var(--hair))' }}>
+                        <MiniTab active={leftTab === 'description'} onClick={() => setLeftTab('description')} icon={ListChecks} label="Description" />
+                        <MiniTab active={leftTab === 'submissions'} onClick={() => setLeftTab('submissions')} icon={History} label={`Submissions${submissions.length ? ` (${submissions.length})` : ''}`} />
+                    </div>
+                    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4">
+                        {leftTab === 'description' ? (
+                            <ProblemDescription problem={problem} />
+                        ) : (
+                            <SubmissionsList submissions={submissions} />
+                        )}
+                    </div>
+                </div>
+
+                {/* Right: editor + panel */}
+                <div className="flex-1 min-h-0 flex flex-col">
+                    <div className="flex-1 min-h-[200px] overflow-hidden border-b" style={{ borderColor: 'hsl(var(--hair))' }}>
+                        <CodeEditor
+                            value={code}
+                            onChange={setCode}
+                            language={language}
+                            errorLine={errorLine}
+                            activeLine={panelTab === 'visualize' ? vizLine : null}
+                        />
+                    </div>
+
+                    <div className="h-[42%] min-h-[180px] flex flex-col">
+                        <div className="shrink-0 flex items-center gap-1 px-3 h-9 border-b bg-card/40" style={{ borderColor: 'hsl(var(--hair))' }}>
+                            <MiniTab active={panelTab === 'tests'} onClick={() => setPanelTab('tests')} icon={ListChecks} label="Tests" />
+                            <MiniTab active={panelTab === 'console'} onClick={() => setPanelTab('console')} icon={Terminal} label="Console" />
+                            <MiniTab active={panelTab === 'visualize'} onClick={() => setPanelTab('visualize')} icon={Eye} label="Visualize" />
+                            <MiniTab active={panelTab === 'tutor'} onClick={() => setPanelTab('tutor')} icon={Sparkles} label="Tutor" />
+                            <div className="flex-1" />
+                            <StatusDot status={status} />
+                        </div>
+                        <div className="flex-1 min-h-0 overflow-hidden">
+                            {panelTab === 'tests' && <TestResultsPanel run={run} />}
+                            {panelTab === 'console' && (
+                                <div className="h-full flex flex-col">
+                                    <div className="shrink-0 px-3 py-2 border-b bg-secondary/20" style={{ borderColor: 'hsl(var(--hair))' }}>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">Custom input — JSON args for <span className="font-mono normal-case tracking-normal">{problem.functionName}(…)</span></span>
+                                            <button type="button" onClick={handleCustomRun} disabled={busy} className="inline-flex items-center gap-1 h-6 px-2 rounded bg-[#0E334F] text-white text-[11px] font-medium hover:opacity-90 disabled:opacity-50">
+                                                <Play className="w-3 h-3" /> Run
+                                            </button>
+                                        </div>
+                                        <textarea value={customInput} onChange={(e) => setCustomInput(e.target.value)} spellCheck={false} rows={2} className="w-full px-2 py-1.5 rounded-md bg-card border text-[12px] font-mono text-foreground resize-y focus:outline-none focus:ring-2 focus:ring-[#0E334F]/15" style={{ borderColor: 'hsl(var(--hair))' }} />
+                                    </div>
+                                    <div className="flex-1 min-h-0"><ConsolePanel result={consoleResult} language={language} /></div>
+                                </div>
+                            )}
+                            {panelTab === 'visualize' && <Visualizer trace={trace} language={language} onActiveLineChange={setVizLine} />}
+                            {panelTab === 'tutor' && <AITutorPanel getContext={tutorContext} />}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ProblemDescription({ problem }) {
+    return (
+        <div>
+            <Markdownish text={problem.statement} className="text-[13.5px] text-foreground/90" />
+
+            {problem.examples?.length > 0 && (
+                <div className="mt-4 space-y-2.5">
+                    {problem.examples.map((ex, i) => (
+                        <div key={i} className="rounded-lg border bg-secondary/30 p-3" style={{ borderColor: 'hsl(var(--hair))' }}>
+                            <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70 mb-1.5">Example {i + 1}</p>
 
 
-// TODO: Complete implementation in subsequent commits (Stage 4/6)
+// TODO: Complete implementation in subsequent commits (Stage 5/6)
