@@ -362,6 +362,76 @@ function ProblemDescription({ problem }) {
                     {problem.examples.map((ex, i) => (
                         <div key={i} className="rounded-lg border bg-secondary/30 p-3" style={{ borderColor: 'hsl(var(--hair))' }}>
                             <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70 mb-1.5">Example {i + 1}</p>
+                            <p className="font-mono text-[12px] text-foreground"><span className="text-muted-foreground/70">Input:</span> {ex.input}</p>
+                            <p className="font-mono text-[12px] text-foreground"><span className="text-muted-foreground/70">Output:</span> {ex.output}</p>
+                            {ex.explanation && <p className="text-[12px] text-muted-foreground mt-1">{ex.explanation}</p>}
+                        </div>
+                    ))}
+                </div>
+            )}
 
+            {problem.constraints?.length > 0 && (
+                <div className="mt-4">
+                    <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70 mb-1.5">Constraints</p>
+                    <ul className="space-y-1">
+                        {problem.constraints.map((c, i) => (
+                            <li key={i} className="font-mono text-[12px] text-muted-foreground">{c}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
-// TODO: Complete implementation in subsequent commits (Stage 5/6)
+            {problem.tags?.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                    {problem.tags.map((t) => (
+                        <span key={t} className="text-[11px] px-2 py-0.5 rounded-full bg-secondary/60 text-muted-foreground">{t}</span>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function SubmissionsList({ submissions }) {
+    if (!submissions.length) {
+        return <p className="text-[13px] text-muted-foreground">No submissions yet. Hit Submit to run against all tests.</p>;
+    }
+    const fmt = (s) => {
+        try { return new Date(s).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch { return s; }
+    };
+    return (
+        <div className="space-y-1.5">
+            {submissions.map((s) => (
+                <div key={s.id} className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2" style={{ borderColor: 'hsl(var(--hair))' }}>
+                    <span className={`text-[11.5px] font-semibold ${s.status === 'accepted' ? 'text-emerald-700' : 'text-[#9C2A1F]'}`}>
+                        {s.status === 'accepted' ? 'Accepted' : s.status === 'runtime_error' ? 'Runtime Error' : 'Wrong Answer'}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground tabular">{s.passed}/{s.total}</span>
+                    <span className="text-[11px] text-muted-foreground uppercase">{s.language}</span>
+                    <span className="ml-auto text-[11px] text-muted-foreground/70">{fmt(s.created_at)}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function MiniTab({ active, onClick, icon: Icon, label }) {
+    return (
+        <button type="button" onClick={onClick} className={`inline-flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[12px] font-medium transition-colors ${active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+            <Icon className="w-3.5 h-3.5" /> {label}
+        </button>
+    );
+}
+
+function StatusDot({ status }) {
+    const map = {
+        idle: 'bg-muted-foreground/40', loading: 'bg-amber-500 animate-pulse', running: 'bg-[#2E7D7A] animate-pulse', success: 'bg-emerald-600', error: 'bg-[#9C2A1F]',
+    };
+    return (
+        <span className="inline-flex items-center gap-1.5 text-[11.5px] text-muted-foreground tabular pr-1">
+            <span className={`w-1.5 h-1.5 rounded-full ${map[status.state] || map.idle}`} /> {status.label}
+        </span>
+    );
+}
+
+export { DIFFICULTY_ORDER };
