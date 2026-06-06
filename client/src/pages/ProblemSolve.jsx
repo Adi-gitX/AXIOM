@@ -143,6 +143,79 @@ export default function ProblemSolve() {
         const out = await execTests(problem.tests, 'submit');
         // Record the submission.
         const status = out.allPassed
+            ? 'accepted'
+            : out.results.some((r) => r.error)
+                ? 'runtime_error'
+                : 'wrong_answer';
+        const runtimeMs = out.results.reduce((sum, r) => sum + (r.timeMs || 0), 0);
+        if (currentUser?.email) {
+            try {
+                await submissionsApi.create({
+                    email: currentUser.email,
+                    problemId: problem.id,
+                    language,
+                    code,
+                    status,
+                    passed: out.passed,
+                    total: out.total,
+                    runtimeMs,
+                });
+                refreshSubmissions();
+            } catch {
+                /* non-blocking */
+            }
+        }
+    }, [problem, execTests, currentUser?.email, language, code, refreshSubmissions]);
+
+    const handleVisualize = useCallback(async () => {
+        if (!problem) return;
+        setBusy(true);
+        setPanelTab('visualize');
+        setStatus({ state: 'running', label: 'Tracing…' });
+        const sample = visibleTests(problem)[0];
+        const res = await traceCode({ language, code, functionName: problem.functionName, inputs: sample?.input || {} });
+        setTrace(res);
+        setStatus({ state: res.trace.events.length ? 'success' : 'error', label: res.trace.events.length ? `Traced · ${res.trace.steps ?? res.trace.events.length} steps` : 'No trace' });
+        setBusy(false);
+    }, [problem, language, code]);
+
+    const handleCustomRun = useCallback(async () => {
+        if (!problem) return;
+        setBusy(true);
+        setPanelTab('console');
+        setStatus({ state: 'running', label: 'Running…' });
+        try {
+            const inputs = JSON.parse(customInput || '{}');
+            if (inputs === null || typeof inputs !== 'object' || Array.isArray(inputs)) {
+                throw new Error('Custom input must be a JSON object of arguments.');
+            }
+            const res = await runCode({ language, code, functionName: problem.functionName, inputs });
+            setConsoleResult(res);
+            setStatus(res.ok ? { state: 'success', label: 'Done' } : { state: 'error', label: 'Runtime error' });
+        } catch (err) {
+            setConsoleResult({ ok: false, error: err.message, stdout: [], output: undefined, errorLine: null });
+            setStatus({ state: 'error', label: 'Invalid input' });
+        } finally {
+            setBusy(false);
+        }
+    }, [problem, language, code, customInput]);
+
+    const handleReset = useCallback(() => {
+        if (!problem) return;
+        setCode(problem.starter[language] ?? '');
+        setRun(null);
+        setConsoleResult(null);
+        setTrace(null);
+        setStatus({ state: 'idle', label: 'Ready' });
+    }, [problem, language, setCode]);
+
+    const tutorContext = useCallback(() => {
+        const failing = run?.results?.find((r) => !r.passed);
+        return {
+            code,
+            language,
+            problemTitle: problem?.title,
+            statement: problem?.statement,
 
 
-// TODO: Complete implementation in subsequent commits (Stage 2/6)
+// TODO: Complete implementation in subsequent commits (Stage 3/6)
