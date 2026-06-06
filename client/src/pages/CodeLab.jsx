@@ -61,6 +61,69 @@ export default function CodeLab() {
         return () => {
             alive = false;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language]);
+
+    const setCode = useCallback(
+        (next) => setCodeByLang((prev) => ({ ...prev, [language]: next })),
+        [language],
+    );
+
+    const parseInputs = useCallback(() => {
+        const text = inputsText.trim();
+        if (!text) return {};
+        const parsed = JSON.parse(text);
+        if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            throw new Error('Inputs must be a JSON object mapping argument names to values.');
+        }
+        return parsed;
+    }, [inputsText]);
+
+    const handleRun = useCallback(async () => {
+        setBusy(true);
+        setTab('console');
+        setStatus({ state: 'running', label: 'Running…' });
+        try {
+            const inputs = parseInputs();
+            const res = await runCode({ language, code, functionName, inputs });
+            setResult(res);
+            setStatus(
+                res.ok
+                    ? { state: 'success', label: `Done${res.timings?.totalMs ? ` · ${Math.round(res.timings.totalMs)}ms` : ''}` }
+                    : { state: 'error', label: 'Runtime error' },
+            );
+        } catch (err) {
+            setResult({ ok: false, error: err.message, stdout: [], output: undefined, errorLine: null });
+            setStatus({ state: 'error', label: 'Invalid inputs' });
+        } finally {
+            setBusy(false);
+        }
+    }, [language, code, functionName, parseInputs]);
+
+    const handleVisualize = useCallback(async () => {
+        setBusy(true);
+        setTab('visualize');
+        setStatus({ state: 'running', label: 'Tracing…' });
+        try {
+            const inputs = parseInputs();
+            const res = await traceCode({ language, code, functionName, inputs });
+            setTrace(res);
+            setResult(res);
+            setStatus(
+                res.ok || res.trace.events.length
+                    ? { state: 'success', label: `Traced · ${res.trace.steps ?? res.trace.events.length} steps${res.trace.truncated ? ' (truncated)' : ''}` }
+                    : { state: 'error', label: res.error ? 'Trace error' : 'No trace' },
+            );
+        } catch (err) {
+            setTrace(null);
+            setResult({ ok: false, error: err.message, stdout: [], output: undefined, errorLine: null });
+            setStatus({ state: 'error', label: 'Invalid inputs' });
+        } finally {
+            setBusy(false);
+        }
+    }, [language, code, functionName, parseInputs]);
+
+    const handleReset = useCallback(() => {
 
 
-// TODO: Complete implementation in subsequent commits (Stage 1/5)
+// TODO: Complete implementation in subsequent commits (Stage 2/5)
