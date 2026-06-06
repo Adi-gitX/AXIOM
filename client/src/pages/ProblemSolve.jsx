@@ -70,6 +70,79 @@ export default function ProblemSolve() {
         }
     }, [problem]);
 
+    // Warm runtime on language change.
+    useEffect(() => {
+        setStatus({ state: 'loading', label: `Loading ${getLanguage(language).label}…` });
+        let alive = true;
+        warmLanguage(language).then((r) => {
+            if (alive) setStatus(r.ok ? { state: 'idle', label: 'Ready' } : { state: 'error', label: 'Runtime failed' });
+        });
+        return () => { alive = false; };
+    }, [language]);
+
+    // Load submissions for solved badge + history.
+    const refreshSubmissions = useCallback(async () => {
+        if (!currentUser?.email || !problem) return;
+        try {
+            const res = await submissionsApi.list(currentUser.email, problem.id);
+            setSubmissions(res?.submissions || []);
+        } catch {
+            /* ignore */
+        }
+    }, [currentUser?.email, problem]);
+
+    useEffect(() => { refreshSubmissions(); }, [refreshSubmissions]);
+
+    const code = codeByLang[language] ?? '';
+    const setCode = useCallback((next) => {
+        setCodeByLang((p) => {
+            const updated = { ...p, [language]: next };
+            persistDraft(language, updated);
+            return updated;
+        });
+    }, [language, persistDraft]);
+    const changeLanguage = useCallback((l) => {
+        setLanguage(l);
+        persistDraft(l, codeByLang);
+    }, [codeByLang, persistDraft]);
+    const solved = submissions.some((s) => s.status === 'accepted');
+
+    const consoleFromFirst = (results) => {
+        const first = results[0];
+        if (!first) return null;
+        return {
+            ok: !first.error,
+            output: first.actual,
+            stdout: first.stdout || [],
+            error: first.error,
+            errorLine: first.errorLine,
+            timeoutReason: first.timeoutReason,
+        };
+    };
+
+    const execTests = useCallback(async (tests, mode) => {
+        setBusy(true);
+        setPanelTab('tests');
+        setRun({ results: [], passed: 0, total: tests.length, allPassed: false, running: true });
+        setStatus({ state: 'running', label: mode === 'submit' ? 'Submitting…' : 'Running…' });
+        const out = await runAgainstTests({ language, code, functionName: problem.functionName, tests, compare: problem.compare || 'deep' });
+        setRun({ ...out, running: false });
+        setConsoleResult(consoleFromFirst(out.results));
+        setStatus(out.allPassed ? { state: 'success', label: 'Accepted' } : { state: 'error', label: `${out.passed}/${out.total} passed` });
+        setBusy(false);
+        return out;
+    }, [language, code, problem]);
+
+    const handleRun = useCallback(() => {
+        if (!problem) return;
+        execTests(visibleTests(problem), 'run');
+    }, [problem, execTests]);
+
+    const handleSubmit = useCallback(async () => {
+        if (!problem) return;
+        const out = await execTests(problem.tests, 'submit');
+        // Record the submission.
+        const status = out.allPassed
 
 
-// TODO: Complete implementation in subsequent commits (Stage 1/6)
+// TODO: Complete implementation in subsequent commits (Stage 2/6)
