@@ -15,6 +15,9 @@ import {
     Star,
     Building2,
     BookOpen,
+    FlaskConical,
+    ListChecks,
+    Users,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserStore } from '../stores/useUserStore';
@@ -31,6 +34,8 @@ const GROUPS = [
         label: 'Engineering',
         items: [
             { path: '/app/dsa', label: 'DSA Tracker', icon: Code2, end: true },
+            { path: '/app/problems', label: 'Problems', icon: ListChecks },
+            { path: '/app/lab', label: 'Code Lab', icon: FlaskConical },
             { path: '/app/dsa/companies', label: 'Companies', icon: Building2 },
             { path: '/app/oss', label: 'OSS Engine', icon: GitBranch },
             { path: '/app/gsoc', label: 'GSOC', icon: Trophy },
@@ -41,6 +46,7 @@ const GROUPS = [
         items: [
             { path: '/app/education', label: 'Education', icon: GraduationCap },
             { path: '/app/interview', label: 'Interview Prep', icon: Layers },
+            { path: '/app/peer', label: 'Peer Interviews', icon: Users },
             { path: '/app/interviews', label: 'Interview Stories', icon: BookOpen },
             { path: '/app/jobs', label: 'Jobs', icon: Briefcase },
         ],

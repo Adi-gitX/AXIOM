@@ -1,0 +1,6 @@
+# The repo-wide `dist` ignore (root .gitignore) would also drop the vendored
+# execution engine's built bundles — but those are a `file:` dependency that MUST
+# be committed so fresh clones / CI / deploys can resolve @tracecode/harness.
+# Re-include the directory, then its contents.
+!vendor/tracecode-harness/dist/
+!vendor/tracecode-harness/dist/**

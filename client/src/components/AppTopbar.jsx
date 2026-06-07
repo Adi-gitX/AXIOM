@@ -6,11 +6,14 @@ import { useSidebar } from './Layout';
 const ROUTE_LABEL = {
     '/app': 'Dashboard',
     '/app/dsa': 'DSA Tracker',
+    '/app/lab': 'Code Lab',
+    '/app/problems': 'Problems',
     '/app/dsa/companies': 'Companies',
     '/app/oss': 'OSS Engine',
     '/app/gsoc': 'GSOC',
     '/app/education': 'Education',
     '/app/interview': 'Interview Prep',
+    '/app/peer': 'Peer Interviews',
     '/app/interviews': 'Interview Stories',
     '/app/connect': 'Dev Connect',
     '/app/jobs': 'Jobs',
@@ -22,11 +25,14 @@ const ROUTE_LABEL = {
 const ROUTE_GROUP = {
     '/app': 'Workspace',
     '/app/dsa': 'Engineering',
+    '/app/lab': 'Engineering',
+    '/app/problems': 'Engineering',
     '/app/dsa/companies': 'Engineering',
     '/app/oss': 'Engineering',
     '/app/gsoc': 'Engineering',
     '/app/education': 'Career',
     '/app/interview': 'Career',
+    '/app/peer': 'Career',
     '/app/interviews': 'Career',
     '/app/jobs': 'Career',
     '/app/connect': 'Community',
@@ -47,8 +53,17 @@ const AppTopbar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { setOpen } = useSidebar();
-    const label = ROUTE_LABEL[location.pathname] || 'AXIOM';
-    const group = ROUTE_GROUP[location.pathname] || 'Workspace';
+    // Resolve by exact match, else the longest registered path prefix (handles dynamic
+    // routes like /app/problems/:id → Problems).
+    const resolveByPath = (map, fallback) => {
+        if (map[location.pathname]) return map[location.pathname];
+        const match = Object.keys(map)
+            .filter((p) => p !== '/app' && location.pathname.startsWith(`${p}/`))
+            .sort((a, b) => b.length - a.length)[0];
+        return match ? map[match] : fallback;
+    };
+    const label = resolveByPath(ROUTE_LABEL, 'AXIOM');
+    const group = resolveByPath(ROUTE_GROUP, 'Workspace');
     const [today] = useState(fmtToday());
 
     return (

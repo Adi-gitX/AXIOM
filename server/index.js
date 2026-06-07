@@ -20,7 +20,11 @@ import gsocRoutes from './routes/gsocRoutes.js';
 import companiesRoutes from './routes/companiesRoutes.js';
 import interviewExperienceRoutes from './routes/interviewExperienceRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import submissionsRoutes from './routes/submissionsRoutes.js';
+import peerRoutes from './routes/peerRoutes.js';
+import judgeRoutes from './routes/judgeRoutes.js';
 import publicIngestRoutes from './routes/publicIngestRoutes.js';
+import { attachPeerRelay } from './services/peerRelay.js';
 
 // Middleware imports
 import { sanitizeBody } from './middleware/validation.js';
@@ -305,6 +309,15 @@ app.use('/api/interviews', interviewExperienceRoutes);
 // AI helpers (powered by Emergent Universal LLM Key — gpt-4o-mini)
 app.use('/api/ai', aiRoutes);
 
+// Code Lab — solution submissions (run-against-tests history)
+app.use('/api/submissions', submissionsRoutes);
+
+// Peer Interviews — rooms, matching, feedback, leaderboard
+app.use('/api/peer', peerRoutes);
+
+// Optional server-side judge (Judge0) — many languages + hardened sandbox
+app.use('/api/judge', judgeRoutes);
+
 // Live public-API ingestion (RemoteOK + Arbeitnow + HackerNews + Dev.to)
 app.use('/api/public', publicIngestRoutes);
 
@@ -387,7 +400,7 @@ const shouldStartHttpServer = (
 );
 
 if (shouldStartHttpServer) {
-    app.listen(PORT, async () => {
+    const httpServer = app.listen(PORT, async () => {
         console.log(`\n🚀 AXIOM Server running on http://localhost:${PORT}`);
         console.log(`📍 API endpoints available at /api/*\n`);
         // Idempotent boot-time seed so Jobs/Posts always have data on cold start.
@@ -398,6 +411,13 @@ if (shouldStartHttpServer) {
             console.warn('[boot] bootstrap seeds skipped:', err?.message || err);
         }
     });
+
+    // Real-time collaborative-editing relay for peer-interview rooms.
+    try {
+        attachPeerRelay(httpServer);
+    } catch (err) {
+        console.warn('[boot] peer relay not attached:', err?.message || err);
+    }
 }
 
 // Export app for Vercel

@@ -84,6 +84,18 @@ export default defineConfig({
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
+        // Force a single instance of these so CodeMirror's `instanceof` checks pass —
+        // y-codemirror.next, @uiw/react-codemirror, and our direct imports must share
+        // the SAME @codemirror/state & view (otherwise extensions are rejected).
+        dedupe: [
+            '@codemirror/state',
+            '@codemirror/view',
+            '@codemirror/language',
+            '@codemirror/commands',
+            '@codemirror/autocomplete',
+            '@lezer/highlight',
+            'yjs',
+        ],
     },
     build: {
         rollupOptions: {

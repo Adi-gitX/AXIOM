@@ -1,0 +1,53 @@
+{
+  "name": "@tracecode/harness",
+  "version": "0.7.0-beta9",
+  "description": "Vendored build of @tracecode/harness (browser code execution + tracing engine). Consumed by AXIOM behind a swappable adapter. AGPL-3.0-only — see LICENSE.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs",
+      "default": "./dist/core.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js",
+      "require": "./dist/browser.cjs",
+      "default": "./dist/browser.js"
+    },
+    "./internal/browser": {
+      "types": "./dist/internal/browser.d.ts",
+      "import": "./dist/internal/browser.js",
+      "require": "./dist/internal/browser.cjs",
+      "default": "./dist/internal/browser.js"
+    },
+    "./python": {
+      "types": "./dist/python.d.ts",
+      "import": "./dist/python.js",
+      "require": "./dist/python.cjs",
+      "default": "./dist/python.js"
+    },
+    "./javascript": {
+      "types": "./dist/javascript.d.ts",
+      "import": "./dist/javascript.js",
+      "require": "./dist/javascript.cjs",
+      "default": "./dist/javascript.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ]
+}

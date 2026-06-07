@@ -115,6 +115,75 @@ router.post('/problem-hint', async (req, res, next) => {
 });
 
 /**
+ * POST /api/ai/tutor
+ * In-editor coding tutor for the Code Lab. Modes:
+ *   - 'hint'       : Socratic nudge toward the next idea (never the full solution)
+ *   - 'explain'    : plain-English walkthrough of what the user's code does
+ *   - 'complexity' : time/space complexity analysis with one-line justification
+ *   - 'debug'      : given code (+ optional error/failing case), point at the likely bug
+ * Returns concise markdown in { text }.
+ */
+const TUTOR_MODES = {
+    hint: {
+        max: 180,
+        system: [
+            'You are a senior engineer giving a Socratic DSA hint.',
+            'Give 1-2 short hints that nudge toward the pattern or the next step.',
+            'NEVER write the full solution or more than a single line of code.',
+            'Be concrete about the data structure or technique. Keep it under 60 words.',
+        ],
+    },
+    explain: {
+        max: 320,
+        system: [
+            'You are a patient programming tutor.',
+            'Explain in plain English what the provided code does, step by step, briefly.',
+            'Point out the core idea and the time/space complexity in one line at the end.',
+            'Use short markdown bullets. Under 140 words. Do not rewrite the code.',
+        ],
+    },
+    complexity: {
+        max: 200,
+        system: [
+            'You are an algorithms expert.',
+            'State the time and space complexity of the provided code in Big-O, each with a one-line justification.',
+            'Format: "**Time:** O(...) — reason" and "**Space:** O(...) — reason". Under 80 words.',
+        ],
+    },
+    debug: {
+        max: 320,
+        system: [
+            'You are a debugging assistant for a coding student.',
+            'Given the code (and any error or failing case), identify the most likely bug and how to fix the idea.',
+            'Point to the specific line/logic. Suggest the fix in words, not a full rewrite. Under 130 words. Use markdown.',
+        ],
+    },
+};
+
+router.post('/tutor', async (req, res, next) => {
+    try {
+        const { mode = 'hint', code = '', language = '', problemTitle, statement, error, failingCase } = req.body || {};
+        const cfg = TUTOR_MODES[mode];
+        if (!cfg) return res.status(400).json({ error: `Unknown tutor mode "${mode}".` });
+        if ((mode === 'explain' || mode === 'complexity' || mode === 'debug') && code.trim().length < 5) {
+            return res.status(400).json({ error: 'Write some code first.' });
+        }
+
+        const parts = [];
+        if (problemTitle) parts.push(`Problem: ${truncate(problemTitle)}`);
+        if (statement) parts.push(`Statement:\n${truncate(statement)}`);
+        if (language) parts.push(`Language: ${language}`);
+        if (code) parts.push(`Code:\n"""\n${truncate(code)}\n"""`);
+        if (error) parts.push(`Error / output: ${truncate(error)}`);
+        if (failingCase) parts.push(`Failing case: ${truncate(failingCase)}`);
+        if (mode === 'hint' && !code.trim()) parts.push('The user has not written code yet — hint at how to start.');
+
+        const text = await callLLM({ system: cfg.system.join('\n'), user: parts.join('\n\n'), max_tokens: cfg.max });
+        res.json({ text });
+    } catch (err) { next(err); }
+});
+
+/**
  * POST /api/ai/bio-rewrite
  * Rewrite a developer bio to be sharper and outcomes-driven (Profile page hook).
  */

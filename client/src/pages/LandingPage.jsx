@@ -15,6 +15,8 @@ import {
     BookOpen,
     Users,
     Sparkles,
+    Play,
+    Activity,
 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import PublicNavbar from '../components/PublicNavbar';
@@ -1014,6 +1016,64 @@ const Footer = ({ navigate }) => {
 /* ============================================================================
  * Page
  * ========================================================================== */
+const CodeLabMock = () => (
+    <div className="bg-[#FCFBF7] rounded-3xl border border-black/[0.06] overflow-hidden shadow-[0_12px_40px_-12px_rgba(15,20,25,0.10)]">
+        {/* toolbar */}
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-black/[0.05] bg-white/60">
+            <div className="flex items-center gap-1 p-0.5 rounded-md bg-black/[0.04]">
+                <span className="px-2 py-0.5 rounded bg-white text-[11px] font-medium text-[#0F1419] shadow-sm">Python</span>
+                <span className="px-2 py-0.5 text-[11px] text-[#0F1419]/50">JS</span>
+                <span className="px-2 py-0.5 text-[11px] text-[#0F1419]/50">TS</span>
+            </div>
+            <div className="flex-1" />
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#E8F2E5] text-[10.5px] font-medium text-[#0E334F]">
+                <Activity className="w-3 h-3" /> Visualize
+            </span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0E334F] text-[10.5px] font-semibold text-white">
+                <Play className="w-3 h-3" /> Run
+            </span>
+        </div>
+        <div className="grid grid-cols-2">
+            {/* editor */}
+            <div className="p-4 font-mono text-[11px] leading-[1.7] border-r border-black/[0.05]">
+                {[
+                    <span key="1"><span className="text-[#0E5A6B]">def</span> <span className="text-[#0E334F] font-semibold">solve</span>(nums, target):</span>,
+                    <span key="2">    seen = {'{}'}</span>,
+                    <span key="3"><span className="text-[#0E5A6B]">for</span> i, v <span className="text-[#0E5A6B]">in</span> <span className="text-[#0E334F]">enumerate</span>(nums):</span>,
+                    <span key="4">        c = target - v</span>,
+                    <span key="5"><span className="text-[#0E5A6B]">if</span> c <span className="text-[#0E5A6B]">in</span> seen:</span>,
+                    <span key="6"><span className="text-[#0E5A6B]">return</span> [seen[c], i]</span>,
+                ].map((line, i) => (
+                    <div key={i} className={`flex gap-3 -mx-1 px-1 rounded ${i === 2 ? 'bg-[#2E7D7A]/14 shadow-[inset_2px_0_0_#2E7D7A]' : ''}`}>
+                        <span className="text-[#0F1419]/25 w-3 text-right select-none">{i + 1}</span>
+                        <span className="text-[#16263a] whitespace-pre">{line}</span>
+                    </div>
+                ))}
+            </div>
+            {/* visualizer */}
+            <div className="p-4 bg-white/40">
+                <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#0F1419]/45 mb-1.5">L3 · executing</div>
+                <div className="text-[10px] font-mono text-[#7A1F4A] mb-1">nums</div>
+                <div className="flex gap-px mb-3">
+                    {[2, 7, 11, 15].map((n, i) => (
+                        <div key={i} className="flex flex-col items-center">
+                            <div className={`min-w-[26px] px-1.5 py-1 text-center font-mono text-[11px] border ${i === 1 ? 'bg-[#E8F2E5] border-[#2E7D7A]' : 'bg-white border-black/[0.08]'}`}>{n}</div>
+                            <span className="text-[8px] font-mono text-[#0F1419]/35 mt-0.5">{i}</span>
+                        </div>
+                    ))}
+                </div>
+                <div className="text-[10px] font-mono text-[#7A1F4A] mb-1">seen</div>
+                <div className="flex items-center gap-1.5 font-mono text-[11px] mb-3">
+                    <span className="px-1.5 py-0.5 rounded bg-black/[0.05] text-[#7A4A1F]">2</span>
+                    <span className="text-[#0F1419]/40">→</span>
+                    <span className="text-[#16263a]">0</span>
+                </div>
+                <div className="text-[10px] font-mono"><span className="text-[#7A1F4A]">i</span> <span className="text-[#0F1419]/40">=</span> <span className="text-[#7A4A1F]">1</span></div>
+            </div>
+        </div>
+    </div>
+);
+
 const LandingPage = () => {
     const navigate = useNavigate();
 
@@ -1091,6 +1151,29 @@ const LandingPage = () => {
             <FeatureRow
                 navigate={navigate}
                 reverse
+                eyebrow="Code Lab"
+                title={
+                    <>
+                        Don’t just track problems —
+                        <br />
+                        <span className="italic font-light">solve and see them run.</span>
+                    </>
+                }
+                body="A full code editor in your browser. Write Python, JavaScript, or TypeScript, run against real test cases, and watch your algorithm execute step by step — arrays, variables, and the call stack, animated."
+                bullets={[
+                    {
+                        t: 'Runs entirely in your browser',
+                        d: 'Python, JS, and TS execute in a sandboxed Web Worker — no setup, no servers, instant.',
+                    },
+                    { t: 'Algorithm visualizer with step-through' },
+                    { t: 'Curated problems with hidden test cases' },
+                    { t: 'Built-in AI tutor: hints, explain, debug' },
+                ]}
+                mock={<CodeLabMock />}
+            />
+
+            <FeatureRow
+                navigate={navigate}
                 eyebrow="OSS Engine"
                 title={
                     <>
@@ -1114,6 +1197,7 @@ const LandingPage = () => {
 
             <FeatureRow
                 navigate={navigate}
+                reverse
                 eyebrow="GSOC Accelerator"
                 title={
                     <>
@@ -1137,7 +1221,6 @@ const LandingPage = () => {
 
             <FeatureRow
                 navigate={navigate}
-                reverse
                 eyebrow="Career Platform"
                 title={
                     <>

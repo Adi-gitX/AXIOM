@@ -125,3 +125,21 @@ Pods/
 
 # AXIOM runtime database (generated locally)
 server/data/axiom.db
+-e 
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
+-e 
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials

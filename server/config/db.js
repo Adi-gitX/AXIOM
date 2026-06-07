@@ -365,6 +365,72 @@ const ensureRuntimeSchema = () => {
             UNIQUE(user_email, milestone_id)
         )
     `);
+
+    // Code Lab — per-problem solution submissions (run-against-tests history).
+    db.run(`
+        CREATE TABLE IF NOT EXISTS code_submissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            problem_id TEXT NOT NULL,
+            language TEXT NOT NULL,
+            code TEXT NOT NULL,
+            status TEXT NOT NULL,
+            passed INTEGER DEFAULT 0,
+            total INTEGER DEFAULT 0,
+            runtime_ms INTEGER,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_code_submissions_user ON code_submissions(user_email, problem_id)');
+
+    // Peer Interviews — rooms, post-session feedback, and per-user rating/level stats.
+    db.run(`
+        CREATE TABLE IF NOT EXISTS peer_rooms (
+            id TEXT PRIMARY KEY,
+            host_email TEXT NOT NULL,
+            host_name TEXT,
+            guest_email TEXT,
+            guest_name TEXT,
+            level TEXT NOT NULL DEFAULT 'Intermediate',
+            topic TEXT,
+            problem_id TEXT,
+            language TEXT DEFAULT 'javascript',
+            status TEXT NOT NULL DEFAULT 'open',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            started_at TEXT,
+            ended_at TEXT
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_peer_rooms_status ON peer_rooms(status, level)');
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS peer_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_id TEXT NOT NULL,
+            from_email TEXT NOT NULL,
+            to_email TEXT NOT NULL,
+            problem_solving INTEGER DEFAULT 0,
+            communication INTEGER DEFAULT 0,
+            code_quality INTEGER DEFAULT 0,
+            notes TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(room_id, from_email)
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_peer_feedback_to ON peer_feedback(to_email)');
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS peer_stats (
+            user_email TEXT PRIMARY KEY,
+            name TEXT,
+            avatar TEXT,
+            rating INTEGER DEFAULT 1200,
+            level TEXT DEFAULT 'Intermediate',
+            sessions INTEGER DEFAULT 0,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_peer_stats_rating ON peer_stats(rating DESC)');
 };
 
 const initDb = async () => {

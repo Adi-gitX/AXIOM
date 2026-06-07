@@ -1083,6 +1083,63 @@ export const interviewApi = {
         }),
 };
 
+// ========================================
+// Code Lab — submissions API
+// ========================================
+
+export const submissionsApi = {
+    create: (payload) => fetchApi('/api/submissions', {
+        method: 'POST',
+        body: payload,
+    }),
+
+    list: (email, problemId) =>
+        fetchApi(`/api/submissions/${encodeURIComponent(email)}/${encodeURIComponent(problemId)}`),
+
+    summary: (email) => fetchApi(`/api/submissions/${encodeURIComponent(email)}`),
+};
+
+// ========================================
+// AI helpers (LLM gateway)
+// ========================================
+
+export const aiApi = {
+    tutor: (payload) => fetchApi('/api/ai/tutor', {
+        method: 'POST',
+        body: payload,
+    }),
+
+    problemHint: (title, difficulty) => fetchApi('/api/ai/problem-hint', {
+        method: 'POST',
+        body: { title, difficulty },
+    }),
+};
+
+// ========================================
+// Peer Interviews API
+// ========================================
+
+export const peerApi = {
+    createRoom: (payload) => fetchApi('/api/peer/rooms', { method: 'POST', body: payload }),
+    listRooms: (level) => fetchApi(`/api/peer/rooms${level ? `?level=${encodeURIComponent(level)}` : ''}`),
+    getRoom: (roomId) => fetchApi(`/api/peer/rooms/${encodeURIComponent(roomId)}`),
+    joinRoom: (roomId, payload) => fetchApi(`/api/peer/rooms/${encodeURIComponent(roomId)}/join`, { method: 'POST', body: payload }),
+    quickMatch: (payload) => fetchApi('/api/peer/quick-match', { method: 'POST', body: payload }),
+    endRoom: (roomId, email) => fetchApi(`/api/peer/rooms/${encodeURIComponent(roomId)}/end`, { method: 'POST', body: { email } }),
+    submitFeedback: (payload) => fetchApi('/api/peer/feedback', { method: 'POST', body: payload }),
+    leaderboard: () => fetchApi('/api/peer/leaderboard'),
+    myStats: (email) => fetchApi(`/api/peer/stats/${encodeURIComponent(email)}`),
+};
+
+// ========================================
+// Server-side judge (Judge0) — optional
+// ========================================
+
+export const judgeApi = {
+    status: () => fetchApi('/api/judge/status'),
+    run: (payload) => fetchApi('/api/judge/run', { method: 'POST', body: payload }),
+};
+
 export default {
     user: userApi,
     progress: progressApi,
@@ -1094,4 +1151,8 @@ export default {
     interview: interviewApi,
     oss: ossApi,
     gsoc: gsocApi,
+    submissions: submissionsApi,
+    ai: aiApi,
+    peer: peerApi,
+    judge: judgeApi,
 };
