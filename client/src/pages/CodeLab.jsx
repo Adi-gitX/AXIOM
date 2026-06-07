@@ -187,6 +187,69 @@ export default function CodeLab() {
                     onClick={() => setShowInputs((v) => !v)}
                     className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md text-[12px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                 >
+                    Inputs <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showInputs ? 'rotate-180' : ''}`} />
+                </button>
+
+                <div className="flex-1" />
+
+                <StatusPill status={status} />
+
+                <button
+                    type="button"
+                    onClick={handleReset}
+                    title="Reset to starter"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                    type="button"
+                    data-testid="lab-visualize"
+                    onClick={handleVisualize}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 h-7 px-3 rounded-md bg-fabric-sage text-[12.5px] font-medium text-[#0E334F] hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                    <Activity className="w-3.5 h-3.5" /> Visualize
+                </button>
+
+                <button
+                    type="button"
+                    data-testid="lab-run"
+                    onClick={handleRun}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 h-7 px-3.5 rounded-md bg-[#0E334F] text-[12.5px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                    {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />} Run
+                    <kbd className="ml-1 hidden sm:inline text-[9px] opacity-70 font-mono">⌘↵</kbd>
+                </button>
+            </div>
+
+            {/* Optional inputs row */}
+            {showInputs && (
+                <div className="shrink-0 px-4 sm:px-6 py-2 border-b bg-secondary/30" style={{ borderColor: 'hsl(var(--hair))' }}>
+                    <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70 mb-1">
+                        Inputs — JSON object of arguments to <span className="font-mono normal-case tracking-normal">{functionName}(…)</span>
+                    </p>
+                    <textarea
+                        value={inputsText}
+                        onChange={(e) => setInputsText(e.target.value)}
+                        spellCheck={false}
+                        rows={3}
+                        className="w-full px-3 py-2 rounded-md bg-card border text-[12.5px] font-mono text-foreground resize-y focus:outline-none focus:ring-2 focus:ring-[#0E334F]/15"
+                        style={{ borderColor: 'hsl(var(--hair))' }}
+                    />
+                </div>
+            )}
+
+            {/* Split: editor | output */}
+            <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
+                <div className="lg:w-[56%] min-h-[240px] lg:min-h-0 border-b lg:border-b-0 lg:border-r overflow-hidden" style={{ borderColor: 'hsl(var(--hair))' }}>
+                    <CodeEditor
+                        value={code}
+                        onChange={setCode}
+                        language={language}
+                        errorLine={tab === 'console' ? errorLine : null}
 
 
-// TODO: Complete implementation in subsequent commits (Stage 3/5)
+// TODO: Complete implementation in subsequent commits (Stage 4/5)
