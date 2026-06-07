@@ -124,6 +124,69 @@ export default function CodeLab() {
     }, [language, code, functionName, parseInputs]);
 
     const handleReset = useCallback(() => {
+        const s = getStarter(language);
+        setCode(s.code);
+        setFunctionName(s.functionName);
+        setInputsText(JSON.stringify(s.inputs, null, 2));
+        setResult(null);
+        setTrace(null);
+        setStatus({ state: 'idle', label: 'Ready' });
+    }, [language, setCode]);
+
+    // Keyboard: Cmd/Ctrl+Enter = run.
+    useEffect(() => {
+        const onKey = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                handleRun();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [handleRun]);
+
+    const errorLine = result && !result.ok ? result.errorLine : null;
+
+    return (
+        <div className="h-full flex flex-col">
+            <SEOHead title="Code Lab — AXIOM" description="Write, run, and visualize algorithms in Python, JavaScript, and TypeScript — right in your browser." />
+
+            {/* Toolbar */}
+            <div
+                className="shrink-0 flex flex-wrap items-center gap-2 px-4 sm:px-6 py-2.5 border-b bg-card/60 backdrop-blur"
+                style={{ borderColor: 'hsl(var(--hair))' }}
+            >
+                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-secondary/70">
+                    {LANGUAGES.map((l) => (
+                        <button
+                            key={l.id}
+                            type="button"
+                            onClick={() => setLanguage(l.id)}
+                            className={`px-3 h-7 rounded-md text-[12.5px] font-medium transition-colors ${
+                                language === l.id ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            {l.label}
+                        </button>
+                    ))}
+                </div>
+
+                <label className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                    <span className="hidden sm:inline">fn</span>
+                    <input
+                        value={functionName}
+                        onChange={(e) => setFunctionName(e.target.value)}
+                        spellCheck={false}
+                        className="w-28 h-7 px-2 rounded-md bg-card border text-[12.5px] font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-[#0E334F]/15"
+                        style={{ borderColor: 'hsl(var(--hair))' }}
+                    />
+                </label>
+
+                <button
+                    type="button"
+                    onClick={() => setShowInputs((v) => !v)}
+                    className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md text-[12px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                >
 
 
-// TODO: Complete implementation in subsequent commits (Stage 2/5)
+// TODO: Complete implementation in subsequent commits (Stage 3/5)
