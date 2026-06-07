@@ -1,1 +1,4 @@
 .env.keys
+
+# Commit the env template even though the root .gitignore excludes .env.*
+!.env.example

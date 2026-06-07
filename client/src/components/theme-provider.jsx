@@ -19,8 +19,8 @@ export function ThemeProvider({
         root.classList.remove("dark")
         root.classList.add("light")
         // Clear any stale theme from previous installs
-        try { localStorage.removeItem("vite-ui-theme"); } catch (e) {}
-        try { localStorage.removeItem("axiom-theme-v2"); } catch (e) {}
+        try { localStorage.removeItem("vite-ui-theme"); } catch { /* ignore */ }
+        try { localStorage.removeItem("axiom-theme-v2"); } catch { /* ignore */ }
     }, [])
 
     const value = { theme, setTheme }

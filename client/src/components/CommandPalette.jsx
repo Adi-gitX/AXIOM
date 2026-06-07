@@ -182,7 +182,7 @@ const CommandPalette = () => {
                 <div className="max-h-[50vh] overflow-y-auto custom-scrollbar py-2">
                     {flat.length === 0 ? (
                         <div className="px-5 py-8 text-center text-[13.5px] text-muted-foreground">
-                            No results for "{q}"
+                            No results for &quot;{q}&quot;
                         </div>
                     ) : (
                         grouped.map(([kind, items]) => (

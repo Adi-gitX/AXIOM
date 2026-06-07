@@ -222,7 +222,7 @@ const ExperienceCard = ({ e, onUpvote }) => {
             </div>
 
             <p className="text-[13.5px] text-foreground/85 leading-relaxed line-clamp-4">
-                "{e.quote}"
+                &quot;{e.quote}&quot;
             </p>
 
             <div className="flex items-center justify-between mt-4 pt-3 border-t" style={{ borderColor: 'hsl(var(--hair))' }}>

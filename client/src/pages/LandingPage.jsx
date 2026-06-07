@@ -152,7 +152,7 @@ const Hero = ({ navigate }) => {
                         className="mt-8 text-[16px] md:text-[18px] text-[#0F1419]/65 max-w-[600px] mx-auto leading-relaxed"
                     >
                         Track DSA streaks, find your first OSS contribution, prep GSOC, and ship a public
-                        portfolio — all in one app. Replaces 6+ tools you've been duct-taping together.
+                        portfolio — all in one app. Replaces 6+ tools you&apos;ve been duct-taping together.
                     </motion.p>
 
                     <motion.div
@@ -283,9 +283,9 @@ const FounderNote = () => (
             </FadeIn>
             <FadeIn delay={0.05}>
                 <p className="mt-6 font-serif text-[24px] md:text-[32px] leading-[1.32] tracking-[-0.012em] text-[#0F1419]">
-                    "I built AXIOM because I was juggling LeetCode, GitHub, a Notion tracker, three
+                    &quot;I built AXIOM because I was juggling LeetCode, GitHub, a Notion tracker, three
                     Discord servers, and a half-broken Chrome extension just to stay consistent.
-                    <span className="italic"> One app. One workflow. Free forever.</span>"
+                    <span className="italic"> One app. One workflow. Free forever.</span>&quot;
                 </p>
             </FadeIn>
             <FadeIn delay={0.1}>
@@ -645,7 +645,7 @@ const StoriesBand = ({ navigate }) => {
                                         <p className="text-[11.5px] text-[#0F1419]/55 truncate">{s.role}</p>
                                     </div>
                                 </div>
-                                <p className="text-[13px] text-[#0F1419]/75 leading-relaxed line-clamp-4 flex-1">"{s.quote}"</p>
+                                <p className="text-[13px] text-[#0F1419]/75 leading-relaxed line-clamp-4 flex-1">&quot;{s.quote}&quot;</p>
                                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/[0.06]">
                                     <span className={`text-[10.5px] font-semibold uppercase tracking-[0.1em] ${s.result === 'Selected' ? 'text-[#0E334F]' : s.result === 'Rejected' ? 'text-[#9C2A1F]' : 'text-[#0F1419]/60'}`}>
                                         {s.result} · {s.rounds}r · {s.problems}p

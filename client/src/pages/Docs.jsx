@@ -264,7 +264,7 @@ const Docs = () => {
                                 a real student needed it. There is no fluff.
                             </p>
                             <p>
-                                If this resonates, we'd love your help — as a user, contributor, or future colleague.
+                                If this resonates, we&apos;d love your help — as a user, contributor, or future colleague.
                             </p>
                             <p className="font-serif italic text-[#0F1419]/75">— Aditya & the AXIOM team</p>
                         </div>
@@ -349,7 +349,7 @@ const Docs = () => {
                                     style={{ borderColor: 'rgba(15,20,25,0.08)' }}
                                 >
                                     <p className="font-serif text-[18px] leading-[1.45] text-[#0F1419]/90 flex-1">
-                                        "{t.quote}"
+                                        &quot;{t.quote}&quot;
                                     </p>
                                     <div className="mt-6 flex items-center gap-3">
                                         <div
@@ -377,7 +377,7 @@ const Docs = () => {
                                 Open positions
                             </p>
                             <h2 className="font-display font-semibold text-[34px] md:text-[42px] leading-[1.05] tracking-[-0.025em] text-[#0F1419]">
-                                Come build with us — <span className="font-serif italic font-light">we'd love your help.</span>
+                                Come build with us — <span className="font-serif italic font-light">we&apos;d love your help.</span>
                             </h2>
                         </div>
 

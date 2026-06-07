@@ -19,7 +19,7 @@ const NotFound = () => {
                     Off the map.
                 </h1>
                 <p className="mt-6 text-[15px] text-[#0F1419]/65 max-w-[460px] text-center leading-relaxed">
-                    This page doesn't exist
+                    This page doesn&apos;t exist
                     <span style={{ fontFamily: 'Newsreader, "Source Serif Pro", Georgia, serif', fontStyle: 'italic', fontWeight: 300 }}> — yet.</span>
                     Try the dashboard or the docs.
                 </p>

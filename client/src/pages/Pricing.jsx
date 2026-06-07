@@ -72,7 +72,7 @@ const Pricing = () => {
                     <h1 className="font-display font-semibold text-[42px] md:text-[58px] leading-[1.05] tracking-[-0.025em] text-foreground">
                         Free forever — Pro
                         <br />
-                        <span className="font-serif italic font-light text-foreground/65">when you're ready.</span>
+                        <span className="font-serif italic font-light text-foreground/65">when you&apos;re ready.</span>
                     </h1>
                     <p className="mt-6 text-[15.5px] text-muted-foreground max-w-[560px] mx-auto leading-relaxed">
                         Keep the full learning stack free for life. Upgrade only for AI-heavy workflows and deeper analytics.

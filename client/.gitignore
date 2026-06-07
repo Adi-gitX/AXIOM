@@ -4,3 +4,6 @@
 # Re-include the directory, then its contents.
 !vendor/tracecode-harness/dist/
 !vendor/tracecode-harness/dist/**
+
+# Commit the env template even though the root .gitignore excludes .env.*
+!.env.example
