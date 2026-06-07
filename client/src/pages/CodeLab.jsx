@@ -250,6 +250,66 @@ export default function CodeLab() {
                         onChange={setCode}
                         language={language}
                         errorLine={tab === 'console' ? errorLine : null}
+                        activeLine={tab === 'visualize' ? vizLine : null}
+                    />
+                </div>
 
+                <div className="flex-1 min-h-0 flex flex-col">
+                    {/* Panel tabs */}
+                    <div className="shrink-0 flex items-center gap-1 px-3 h-9 border-b bg-card/40" style={{ borderColor: 'hsl(var(--hair))' }}>
+                        <PanelTab active={tab === 'console'} onClick={() => setTab('console')} icon={Terminal} label="Console" />
+                        <PanelTab active={tab === 'visualize'} onClick={() => setTab('visualize')} icon={Eye} label="Visualize" />
+                    </div>
 
-// TODO: Complete implementation in subsequent commits (Stage 4/5)
+                    <div className="flex-1 min-h-0 overflow-hidden">
+                        {tab === 'console' ? (
+                            <ConsolePanel result={result} language={language} />
+                        ) : (
+                            <Visualizer
+                                trace={trace}
+                                language={language}
+                                functionName={functionName}
+                                onActiveLineChange={setVizLine}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function StatusPill({ status }) {
+    const map = {
+        idle: { dot: 'bg-muted-foreground/40', text: 'text-muted-foreground' },
+        loading: { dot: 'bg-amber-500 animate-pulse', text: 'text-muted-foreground' },
+        running: { dot: 'bg-[#2E7D7A] animate-pulse', text: 'text-foreground' },
+        success: { dot: 'bg-emerald-600', text: 'text-foreground' },
+        error: { dot: 'bg-[#9C2A1F]', text: 'text-[#9C2A1F]' },
+    };
+    const s = map[status.state] || map.idle;
+    return (
+        <span className={`inline-flex items-center gap-1.5 text-[12px] tabular ${s.text} mr-1`}>
+            {status.state === 'error' ? (
+                <AlertTriangle className="w-3.5 h-3.5" />
+            ) : (
+                <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+            )}
+            {status.label}
+        </span>
+    );
+}
+
+function PanelTab({ active, onClick, icon: Icon, label }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`inline-flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[12px] font-medium transition-colors ${
+                active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+        >
+            <Icon className="w-3.5 h-3.5" /> {label}
+        </button>
+    );
+}
