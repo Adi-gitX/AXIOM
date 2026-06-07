@@ -51,3 +51,4 @@ Judge0 is **GPLv3**, run here as a **separate service over HTTP** — that does 
 GPL on the AXIOM application (separate process, not linked). Safe for a closed-source
 product. (Contrast with `@tracecode/harness`, which is AGPL and bundled — see
 `client/vendor/tracecode-harness/README.md`.)
+
