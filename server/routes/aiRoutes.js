@@ -136,6 +136,73 @@ const TUTOR_MODES = {
     explain: {
         max: 320,
         system: [
+            'You are a patient programming tutor.',
+            'Explain in plain English what the provided code does, step by step, briefly.',
+            'Point out the core idea and the time/space complexity in one line at the end.',
+            'Use short markdown bullets. Under 140 words. Do not rewrite the code.',
+        ],
+    },
+    complexity: {
+        max: 200,
+        system: [
+            'You are an algorithms expert.',
+            'State the time and space complexity of the provided code in Big-O, each with a one-line justification.',
+            'Format: "**Time:** O(...) — reason" and "**Space:** O(...) — reason". Under 80 words.',
+        ],
+    },
+    debug: {
+        max: 320,
+        system: [
+            'You are a debugging assistant for a coding student.',
+            'Given the code (and any error or failing case), identify the most likely bug and how to fix the idea.',
+            'Point to the specific line/logic. Suggest the fix in words, not a full rewrite. Under 130 words. Use markdown.',
+        ],
+    },
+};
 
+router.post('/tutor', async (req, res, next) => {
+    try {
+        const { mode = 'hint', code = '', language = '', problemTitle, statement, error, failingCase } = req.body || {};
+        const cfg = TUTOR_MODES[mode];
+        if (!cfg) return res.status(400).json({ error: `Unknown tutor mode "${mode}".` });
+        if ((mode === 'explain' || mode === 'complexity' || mode === 'debug') && code.trim().length < 5) {
+            return res.status(400).json({ error: 'Write some code first.' });
+        }
 
-// TODO: Complete implementation in subsequent commits (Stage 2/3)
+        const parts = [];
+        if (problemTitle) parts.push(`Problem: ${truncate(problemTitle)}`);
+        if (statement) parts.push(`Statement:\n${truncate(statement)}`);
+        if (language) parts.push(`Language: ${language}`);
+        if (code) parts.push(`Code:\n"""\n${truncate(code)}\n"""`);
+        if (error) parts.push(`Error / output: ${truncate(error)}`);
+        if (failingCase) parts.push(`Failing case: ${truncate(failingCase)}`);
+        if (mode === 'hint' && !code.trim()) parts.push('The user has not written code yet — hint at how to start.');
+
+        const text = await callLLM({ system: cfg.system.join('\n'), user: parts.join('\n\n'), max_tokens: cfg.max });
+        res.json({ text });
+    } catch (err) { next(err); }
+});
+
+/**
+ * POST /api/ai/bio-rewrite
+ * Rewrite a developer bio to be sharper and outcomes-driven (Profile page hook).
+ */
+router.post('/bio-rewrite', async (req, res, next) => {
+    try {
+        const { bio, role } = req.body || {};
+        if (!bio || bio.trim().length < 10) {
+            return res.status(400).json({ error: 'Bio must be at least 10 characters.' });
+        }
+        const system = [
+            'You are a developer-portfolio editor.',
+            'Rewrite the bio to be 2-3 punchy sentences with specific signals (technologies, outcomes, scale).',
+            'Keep first-person voice. No emojis. No buzzwords like "passionate" or "rockstar".',
+            'Output ONLY the rewritten bio, no preamble.',
+        ].join('\n');
+        const user = `Role: ${role || 'Software Engineer'}\n\nOriginal bio:\n"""\n${truncate(bio)}\n"""`;
+        const rewritten = await callLLM({ system, user, max_tokens: 250 });
+        res.json({ rewritten });
+    } catch (err) { next(err); }
+});
+
+export default router;
